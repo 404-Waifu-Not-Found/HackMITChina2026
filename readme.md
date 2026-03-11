@@ -35,7 +35,12 @@
 > [!NOTE]
 > The README is intentionally structured to match the HackMIT submission categories in `insturctions` while keeping the presentation clean for judges and reviewers.
 
+---
+
 ## Overview
+
+> [!TIP]
+> **Quick summary:** Lingo Stream is a *concept-stage* project designed to make language learning happen during normal YouTube watching.
 
 Lingo Stream is a project concept focused on turning passive YouTube watching into active vocabulary growth. Instead of forcing users to switch apps or pause videos, the idea is to make language learning happen in the same place where people already spend time.
 
@@ -48,9 +53,18 @@ Lingo Stream: I really enjoy (gusto) learning new skills every day.
 
 ## Why This Project
 
+> [!NOTE]
+> The core idea is **low-friction learning**: keep entertainment and study in one flow.
+
 YouTube has billions of active users, but language learners still face a context-switch problem: entertainment happens in one place while study tools live elsewhere. Lingo Stream is built on one principle: vocabulary growth is more sustainable when it happens inside routines users already maintain daily.
 
+---
+
 ## Current Status
+
+> [!IMPORTANT]
+> Current stage: **README + UI sketches complete**.  
+> Engineering implementation: **not started yet**.
 
 This is currently a concept and design phase project. We have not implemented the extension logic yet.
 
@@ -58,7 +72,12 @@ This is currently a concept and design phase project. We have not implemented th
 
 The team has produced UI sketches to show the intended interaction style and user flow for the project idea.
 
+---
+
 ## Tech That Will Be Implemented (Planned)
+
+> [!NOTE]
+> This stack is **planned**, not implemented yet.
 
 <p align="left">
   <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=000000" />
@@ -77,7 +96,12 @@ The team has produced UI sketches to show the intended interaction style and use
 | Popup UI | Lightweight controls for language and immersion intensity |
 | Delivery | GitHub Actions workflow for linting, checks, and packaged builds |
 
+---
+
 ## Current Progress
+
+> [!TIP]
+> Everything checked below reflects work that is *already done*.
 
 - [x] Project idea and positioning
 - [x] README draft and submission narrative draft
@@ -89,7 +113,12 @@ The team has produced UI sketches to show the intended interaction style and use
 - Focus on reducing context switching for learners
 - UI-first exploration for hackathon pre-submission
 
+---
+
 ## HackMIT Submission Narrative (Pre-Submission Draft)
+
+> [!IMPORTANT]
+> This narrative is written for pre-submission judging and describes the project at its current maturity level.
 
 ### Project Overview
 
@@ -166,6 +195,8 @@ Key lessons:
 Next step is simple and focused:
 
 <span style="color:#1a7f37;"><strong>Turn concept + sketches into a working prototype</strong></span>, then validate learning experience with real users.
+
+---
 
 ## Repository Notes
 
