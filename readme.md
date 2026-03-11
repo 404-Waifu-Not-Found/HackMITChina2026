@@ -1,19 +1,26 @@
-# Lingo Stream
+<table>
+  <tr>
+    <td width="160" valign="middle">
+      <img src="./logo.svg" alt="Lingo Stream logo" width="132" />
+    </td>
+    <td valign="middle">
+      <h1>Lingo Stream</h1>
+      <p><strong>Ambient language learning inside YouTube subtitles.</strong></p>
+      <p><strong>Current stage:</strong> pre-submission for HackMIT China 2026.</p>
+    </td>
+  </tr>
+</table>
 
-<p align="center">
-  <img src="./logo.svg" alt="Lingo Stream logo" width="96" />
+<p>
+  <img alt="HackMIT China 2026" src="https://img.shields.io/badge/HackMIT%20China-2026-1f6feb" />
+  <img alt="Stage" src="https://img.shields.io/badge/Stage-Pre--Submission-f59e0b" />
+  <img alt="Type" src="https://img.shields.io/badge/Project-Chrome%20Extension-16a34a" />
+  <img alt="Focus" src="https://img.shields.io/badge/Focus-Micro--Immersion-0f766e" />
 </p>
 
-<p align="center"><strong>Ambient language learning inside YouTube subtitles.</strong></p>
+`Overview` | `How It Works` | `Tech` | `Submission Narrative` | `Roadmap`
 
-<p align="center">
-  <img alt="HackMIT 2026" src="https://img.shields.io/badge/HackMIT-2026-1f6feb" />
-  <img alt="Status" src="https://img.shields.io/badge/Status-Hackathon%20Build-f59e0b" />
-  <img alt="Platform" src="https://img.shields.io/badge/Platform-Chrome%20Extension-16a34a" />
-  <img alt="Model" src="https://img.shields.io/badge/Learning-Micro--Immersion-0f766e" />
-</p>
-
-Lingo Stream turns passive video time into active vocabulary growth. The extension watches live captions on YouTube, selects high-value words, and injects short contextual translations inline so the viewer keeps following the video without opening another app.
+Lingo Stream turns passive YouTube watching into active vocabulary growth. Instead of forcing users to switch apps, pause videos, or open a separate dictionary, Lingo Stream works inside the subtitle line itself. It observes live captions, selects high-value words, and injects light-touch contextual translations so viewers keep following the content naturally.
 
 Example subtitle flow:
 
@@ -22,57 +29,102 @@ Original: I really enjoy learning new skills every day.
 Lingo Stream: I really enjoy (gusto) learning new skills every day.
 ```
 
-## Why It Matters
+## Why This Project
 
-YouTube reaches more than 2.7 billion monthly users, yet most language tools still require context switching that breaks attention. Lingo Stream removes that friction and keeps learning in the same place where entertainment already happens, which increases consistency and makes vocabulary practice feel natural.
-
-## Product Snapshot
-
-| Area | Current Direction |
-| --- | --- |
-| Core value | Learn vocabulary through contextual micro-immersion while watching normal videos |
-| Primary surface | Chrome Extension popup and content-script subtitle rendering |
-| Translation strategy | Controlled word-level replacement instead of full-sentence translation |
-| User control | Configurable immersion intensity and target language |
-| Learning loop | Watch, absorb in context, review over repeated exposure |
+YouTube has billions of active users, but language learners still face a context-switch problem: content is entertaining, while study tools are separate and disruptive. This project is built around one belief: vocabulary growth is most sustainable when it happens during a routine people already have. Lingo Stream aims to remove friction, preserve attention, and make language practice continuous rather than session-based.
 
 ## How It Works
 
-```mermaid
-flowchart LR
-    A[YouTube caption stream] --> B[DOM observation]
-    B --> C[Token filtering]
-    C --> D[Word selection]
-    D --> E[Translation provider]
-    E --> F[Inline subtitle rendering]
-```
+| Step | System Action | Learner Experience |
+| --- | --- | --- |
+| 1 | Capture subtitle node updates from YouTube in real time | Captions keep moving normally with no manual setup |
+| 2 | Filter candidate words by frequency and learning value | Only useful words are selected, avoiding overload |
+| 3 | Apply controlled translation ratio (for example 5% to 20%) | Sentences stay readable while new words appear in context |
+| 4 | Render inline translated tokens with lightweight styling | Learning happens in-place without leaving the video |
+| 5 | Store optional exposure history for repetition planning | Repeated words become easier to remember over time |
 
-The runtime is designed to stay lightweight and readable by only replacing a small fraction of words at a time, typically in the 5% to 20% range, so sentence meaning remains clear while exposure grows over time.
+## Tech To Be Implemented
 
-## Interface Preview
-
-<p align="center">
-  <img src="./svg-exports/extention/page/extension-page.svg" alt="Extension popup UI concept" width="340" />
+<p>
+  <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-ES2023-F7DF1E?logo=javascript&logoColor=000000" />
+  <img alt="HTML" src="https://img.shields.io/badge/HTML5-Markup-E34F26?logo=html5&logoColor=ffffff" />
+  <img alt="CSS" src="https://img.shields.io/badge/CSS3-Styling-1572B6?logo=css3&logoColor=ffffff" />
+  <img alt="GitHub Actions" src="https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-2088FF?logo=githubactions&logoColor=ffffff" />
+  <img alt="Chrome Extension" src="https://img.shields.io/badge/Manifest%20V3-Chrome%20Extension-4285F4?logo=googlechrome&logoColor=ffffff" />
 </p>
 
-<p align="center">
-  <img src="./svg-exports/quiz/page/quiz-page.svg" alt="Quiz mode UI concept" width="860" />
-</p>
-
-## Repository Status
-
-This repository currently contains design assets, UI explorations, and branding files for the HackMIT China 2026 submission phase. The production extension logic and API wiring are in active implementation.
-
-## Tech Direction
-
-| Layer | Planned Implementation |
+| Layer | Planned Direction |
 | --- | --- |
-| Extension shell | Manifest V3 plus content scripts |
-| Subtitle capture | MutationObserver on live caption nodes |
-| Translation sources | LibreTranslate, Google-compatible endpoint, or MyMemory |
-| UI | Lightweight popup controls for immersion settings |
-| Performance | Caching and request batching to reduce latency |
+| Extension runtime | Manifest V3 background + content scripts |
+| Subtitle extraction | `MutationObserver` and caption-node parsing |
+| Translation providers | Google-compatible endpoint, LibreTranslate, or MyMemory |
+| Popup UI | Lightweight controls for language and immersion intensity |
+| Delivery | GitHub Actions workflow for linting, checks, and packaged builds |
 
-## Vision
+## Key Features
 
-Lingo Stream aims to make every YouTube video a low-friction language classroom. Instead of asking people to pause their routine and start a separate study session, it lets learning happen during content they already watch every day.
+- Inline subtitle micro-translation instead of full-sentence replacement
+- Adjustable immersion ratio to keep captions readable
+- Provider-agnostic translation pipeline for flexibility and reliability
+- Lightweight extension UX focused on fast setup and low distraction
+- Designed for repeated passive exposure that supports long-term retention
+
+## Installation / Running Guide (Current Stage)
+
+This repository is currently in the HackMIT China 2026 pre-submission stage. It mainly contains design assets, branding, and product direction content.
+
+When the first implementation build is pushed, this section will include:
+
+1. Extension setup steps for Chromium-based browsers
+2. Local development workflow and commands
+3. Environment configuration for translation API providers
+4. Packaging instructions for demo and judge review
+
+## Dependencies (Planned)
+
+- Chrome Extension `Manifest V3` APIs
+- YouTube subtitle DOM events and mutation observation
+- Translation API endpoint (Google-compatible, LibreTranslate, or MyMemory)
+- GitHub Actions for CI checks and release packaging
+
+## HackMIT Submission Narrative (Pre-Submission Draft)
+
+### Project Overview
+
+Lingo Stream is a browser extension concept that enables contextual vocabulary acquisition during normal YouTube viewing by inserting selective inline word translations into live subtitles.
+
+### Inspiration
+
+Our team chose this direction because most language learners struggle with consistency, not intention. People are willing to learn, but they do not always have time for separate study sessions. At the same time, they already spend significant time watching content with subtitles. We saw a clear opportunity to combine these two behaviors. Instead of creating another isolated learning app, we designed a layer that sits on top of existing viewing habits and turns everyday content consumption into repeated vocabulary exposure.
+
+### What It Does
+
+The core function is subtitle-aware micro-immersion. The extension monitors subtitle changes in real time, detects candidate words, and replaces only a small subset with contextual translations. Users can control the intensity so text remains understandable. The goal is not full-sentence machine translation, but small, frequent, low-friction interventions that improve word recognition over repeated exposure.
+
+### How We Built It
+
+The project direction uses a Chrome extension architecture with Manifest V3, a content script for subtitle interception, and a popup interface for settings. Planned implementation uses JavaScript, HTML, and CSS for the first working version, with automation support via GitHub Actions. The translation layer is designed to be provider-agnostic so we can switch between compatible APIs depending on latency, cost, and language coverage.
+
+### Individual Contributions
+
+Current pre-submission work has been divided across product framing, UX/visual assets, extension architecture planning, and translation pipeline design. Design artifacts in this repository represent the interface and interaction direction. Engineering tasks are organized around subtitle parsing, token ranking, rendering performance, and API abstraction.
+
+### Challenges We Ran Into
+
+The biggest challenge is balancing learning impact with reading fluency. If too many words are translated, subtitle readability drops and users disengage. If too few are translated, learning impact is weak. Another challenge is subtitle variability across videos, including timing jitter and inconsistent punctuation, which affects token detection quality.
+
+### Accomplishments We Are Proud Of
+
+We are proud of the interaction model itself: word-level, context-preserving immersion inside a high-frequency behavior. We are also proud of the visual system and flow definition completed during pre-submission, which gives the team a clear path from concept to implementation while keeping scope realistic for hackathon timelines.
+
+### What We Learned
+
+We learned that good language-learning UX is mostly about reducing friction. Technical accuracy matters, but continuity of user attention matters even more. We also learned to scope aggressively: solve one concrete learning loop well before expanding into broader features such as quizzes or spaced repetition dashboards.
+
+### What's Next
+
+The next phase is to deliver a functional extension prototype, validate immersion-rate defaults with user testing, and improve vocabulary selection quality with lightweight ranking rules. Given more time, we plan to add review mechanics, personal progress tracking, and smarter adaptation based on user proficiency and watch history.
+
+## Repository Notes
+
+This repository currently focuses on pre-submission assets for HackMIT China 2026, including branding and UI exploration exports. Core extension implementation is in progress.
