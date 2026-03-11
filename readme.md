@@ -15,8 +15,9 @@
 
 <p align="center">
   <a href="#overview">Overview</a> |
-  <a href="#how-it-works">How It Works</a> |
-  <a href="#tech-stack-planned">Tech Stack</a> |
+  <a href="#current-status">Current Status</a> |
+  <a href="#tech-that-will-be-implemented-planned">Tech</a> |
+  <a href="#ui-sketch-direction">UI Sketch</a> |
   <a href="#current-progress">Progress</a> |
   <a href="#hackmit-submission-narrative-pre-submission-draft">Submission Narrative</a>
 </p>
@@ -29,14 +30,14 @@
 </p>
 
 > [!WARNING]
-> This repository is currently in pre-submission for HackMIT China 2026. Core extension runtime and API wiring are in active implementation.
+> This repository is currently in pre-submission for HackMIT China 2026. At this stage, we have completed the README and UI sketches only.
 
 > [!NOTE]
 > The README is intentionally structured to match the HackMIT submission categories in `insturctions` while keeping the presentation clean for judges and reviewers.
 
 ## Overview
 
-Lingo Stream turns passive YouTube watching into active vocabulary growth. Instead of forcing users to switch apps, pause videos, or open a separate dictionary, Lingo Stream works directly inside subtitle lines. It watches live captions, selects high-value words, and injects light-touch contextual translations so viewers keep following the video naturally.
+Lingo Stream is a project concept focused on turning passive YouTube watching into active vocabulary growth. Instead of forcing users to switch apps or pause videos, the idea is to make language learning happen in the same place where people already spend time.
 
 Example subtitle flow:
 
@@ -49,23 +50,15 @@ Lingo Stream: I really enjoy (gusto) learning new skills every day.
 
 YouTube has billions of active users, but language learners still face a context-switch problem: entertainment happens in one place while study tools live elsewhere. Lingo Stream is built on one principle: vocabulary growth is more sustainable when it happens inside routines users already maintain daily.
 
-## How It Works
+## Current Status
 
-Pipeline:
+This is currently a concept and design phase project. We have not implemented the extension logic yet.
 
-```text
-YouTube live subtitles -> candidate word filtering -> translation adapter -> inline render -> repeated exposure
-```
+## UI Sketch Direction
 
-| Step | System Action | Learner Experience |
-| --- | --- | --- |
-| 1 | Observe subtitle node updates in real time | Captions keep moving with no manual setup |
-| 2 | Rank candidate words by learning value | Useful words are surfaced without overload |
-| 3 | Apply controlled replacement ratio (5% to 20%) | Sentences remain readable while immersion increases |
-| 4 | Render translated tokens inline with lightweight styling | Learning stays in-context without app switching |
-| 5 | Track optional exposure counts | Frequent words become easier over time |
+The team has produced UI sketches to show the intended interaction style and user flow for the project idea.
 
-## Tech Stack (Planned)
+## Tech That Will Be Implemented (Planned)
 
 <p align="left">
   <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=000000" />
@@ -86,45 +79,21 @@ YouTube live subtitles -> candidate word filtering -> translation adapter -> inl
 
 ## Current Progress
 
-- [x] Product framing and value proposition
-- [x] UX and branding direction
-- [x] HackMIT pre-submission narrative draft
-- [ ] Subtitle observer implementation in content scripts
-- [ ] Translation provider adapter with failover
-- [ ] Immersion controls in extension popup
-- [ ] Automated CI checks and packaging
+- [x] Project idea and positioning
+- [x] README draft and submission narrative draft
+- [x] UI sketches
 
 ## Key Features
 
-- Inline subtitle micro-translation instead of full-sentence replacement
-- Adjustable immersion ratio to keep captions readable
-- Provider-agnostic translation pipeline for reliability and flexibility
-- Lightweight extension UX focused on fast setup and low distraction
-- Repetition-oriented exposure model for long-term word retention
-
-## Installation / Running Guide (Current Stage)
-
-This repository currently contains pre-submission assets, branding, and product planning documents.
-
-When the first implementation build is pushed, this section will include:
-
-1. Extension setup steps for Chromium-based browsers
-2. Local development workflow and commands
-3. Environment configuration for translation API providers
-4. Packaging instructions for demo and judge review
-
-## Dependencies (Planned)
-
-- Chrome Extension `Manifest V3` APIs
-- YouTube subtitle DOM events and mutation observation
-- Translation API endpoint (Google-compatible, LibreTranslate, or MyMemory)
-- GitHub Actions for CI checks and release packaging
+- Concept: in-video language learning through subtitle context
+- Focus on reducing context switching for learners
+- UI-first exploration for hackathon pre-submission
 
 ## HackMIT Submission Narrative (Pre-Submission Draft)
 
 ### Project Overview
 
-Lingo Stream is a browser extension concept that enables contextual vocabulary acquisition during normal YouTube viewing by inserting selective inline word translations into live subtitles.
+Lingo Stream is a browser extension concept for contextual language learning while watching YouTube.
 
 ### Inspiration
 
@@ -132,32 +101,32 @@ Our team chose this direction because most language learners struggle with consi
 
 ### What It Does
 
-The core function is subtitle-aware micro-immersion. The extension monitors subtitle changes in real time, detects candidate words, and replaces only a small subset with contextual translations. Users can control the intensity so text remains understandable. The goal is not full-sentence machine translation, but small, frequent, low-friction interventions that improve word recognition over repeated exposure.
+The concept is subtitle-aware micro-immersion. Instead of translating everything, the idea is to provide small contextual vocabulary support during normal video watching so learning can feel natural and lightweight.
 
 ### How We Built It
 
-The project direction uses a Chrome extension architecture with Manifest V3, a content script for subtitle interception, and a popup interface for settings. Planned implementation uses JavaScript, HTML, and CSS for the first working version, with automation support via GitHub Actions. The translation layer is designed to be provider-agnostic so we can switch between compatible APIs depending on latency, cost, and language coverage.
+At this stage, we have built the project narrative and created UI sketches to define the interaction and visual direction. We have not started full technical implementation yet.
 
 ### Individual Contributions
 
-Current pre-submission work has been divided across product framing, UX and visual assets, extension architecture planning, and translation pipeline design. Design artifacts in this repository represent the interface and interaction direction. Engineering tasks are organized around subtitle parsing, token ranking, rendering performance, and API abstraction.
+Current pre-submission work has focused on project framing, writing this README, and preparing UI sketches.
 
 ### Challenges We Ran Into
 
-The biggest challenge is balancing learning impact with reading fluency. If too many words are translated, subtitle readability drops and users disengage. If too few are translated, learning impact is weak. Another challenge is subtitle variability across videos, including timing jitter and inconsistent punctuation, which affects token detection quality.
+The biggest challenge we faced so far was finding a unique project idea that has not been done repeatedly and still has meaningful impact on the world. Defining a direction that is both original and realistic for a hackathon required multiple iterations.
 
 ### Accomplishments We Are Proud Of
 
-We are proud of the interaction model itself: word-level, context-preserving immersion inside a high-frequency behavior. We are also proud of the visual system and flow definition completed during pre-submission, which gives the team a clear path from concept to implementation while keeping scope realistic for hackathon timelines.
+We are proud that we established a clear concept, completed a polished pre-submission README, and produced UI sketches that communicate the product direction clearly.
 
 ### What We Learned
 
-We learned that good language-learning UX is mostly about reducing friction. Technical accuracy matters, but continuity of user attention matters even more. We also learned to scope aggressively: solve one concrete learning loop well before expanding into broader features such as quizzes or spaced repetition dashboards.
+We learned that narrowing scope early is critical. A clear concept and clear communication are necessary before implementation can move efficiently.
 
 ### What's Next
 
-The next phase is to deliver a functional extension prototype, validate immersion-rate defaults with user testing, and improve vocabulary selection quality with lightweight ranking rules. Given more time, we plan to add review mechanics, personal progress tracking, and smarter adaptation based on user proficiency and watch history.
+The next phase is to convert the current concept and UI sketch into a working prototype and validate the learning experience with real users.
 
 ## Repository Notes
 
-This repository focuses on pre-submission assets for HackMIT China 2026, including branding and UI explorations. Core extension implementation is currently in progress.
+This repository currently focuses on pre-submission assets for HackMIT China 2026, including branding, README documentation, and UI sketches.
