@@ -115,17 +115,20 @@ The team has produced UI sketches to show the intended interaction style and use
 
 ---
 
-## HackMIT Submission Narrative (Pre-Submission Draft)
+## HackMIT Submission Narrative (Pre-Submission Draft) 🚀
 
 > [!IMPORTANT]
 > This narrative is written for pre-submission judging and describes the project at its current maturity level.
 
-### Project Overview
+### Project Overview 🌍
 
 <span style="color:#1f6feb;"><strong>Lingo Stream</strong></span> is a browser extension concept for contextual language learning while watching YouTube.
 It is built around one goal: <strong><em>learn without breaking attention</em></strong>.
 
-### Inspiration
+> [!TIP]
+> Think of it as **learning mode inside entertainment mode**.
+
+### Inspiration 💡
 
 Most learners do not fail because of motivation. They fail because of <strong>friction</strong>.
 
@@ -135,7 +138,7 @@ People already spend hours on subtitle-based content. So instead of asking users
 
 That question shaped Lingo Stream.
 
-### What It Does
+### What It Does ⚙️
 
 The concept uses <strong>subtitle-aware micro-immersion</strong>:
 
@@ -146,7 +149,10 @@ The concept uses <strong>subtitle-aware micro-immersion</strong>:
 
 <span style="color:#0f766e;"><strong>Result:</strong></span> learning feels natural, not like a separate study session.
 
-### How We Built It
+> [!NOTE]
+> We intentionally kept this phase focused on concept quality and communication clarity.
+
+### How We Built It 🛠️
 
 At this stage, we focused on:
 
@@ -156,7 +162,7 @@ At this stage, we focused on:
 
 <span style="color:#f59e0b;"><strong>Current scope:</strong></span> pre-submission planning only. Full technical implementation has not started yet.
 
-### Individual Contributions
+### Individual Contributions 👥
 
 Current work split:
 
@@ -164,17 +170,17 @@ Current work split:
 - Submission-ready README writing
 - UI sketch preparation and visual direction
 
-### Challenges We Ran Into
+### Challenges We Ran Into 🧩
 
 <span style="color:#d73a49;"><strong>Biggest challenge:</strong></span> finding a project that is both <strong>unique</strong> and <strong>world-impactful</strong>, without being unrealistic for hackathon time limits.
 
 This took multiple iterations because we had to balance:
 
-- originality
-- practical scope
-- real user value
+- ✨ originality
+- 📏 practical scope
+- 🌍 real user value
 
-### Accomplishments We Are Proud Of
+### Accomplishments We Are Proud Of 🏆
 
 What we are proud of so far:
 
@@ -182,15 +188,15 @@ What we are proud of so far:
 - <strong>polished README</strong> aligned with submission requirements
 - <strong>UI sketches</strong> that communicate product direction clearly
 
-### What We Learned
+### What We Learned 📚
 
 Key lessons:
 
-- <strong>Scope early, scope hard.</strong>
-- Clear writing is part of product building.
-- A strong concept saves engineering time later.
+- 🔥 <strong>Scope early, scope hard.</strong>
+- ✍️ Clear writing is part of product building.
+- 🧠 A strong concept saves engineering time later.
 
-### What's Next
+### What's Next ⏭️
 
 Next step is simple and focused:
 
@@ -198,6 +204,6 @@ Next step is simple and focused:
 
 ---
 
-## Repository Notes
+## Repository Notes 📌
 
 This repository currently focuses on pre-submission assets for HackMIT China 2026, including branding, README documentation, and UI sketches.
