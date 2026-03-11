@@ -1,0 +1,827 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="356" height="1800" viewBox="0 0 356 1800">
+  <foreignObject x="0" y="0" width="356" height="1800">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+      <head>
+        <meta charset="utf-8"/>
+        <style>:root {
+        --bg: #f2fbf3;
+        --panel: #ffffff;
+        --line: #d5ead9;
+        --text: #1b2e21;
+        --muted: #5d7a67;
+        --accent: #3e9b5f;
+        --accent-strong: #2b7d45;
+        --danger: #b63b58;
+        --ok: #1d7f4f;
+        --shadow-soft: 0 14px 28px rgba(20, 56, 30, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        width: 356px;
+        min-width: 356px;
+        color: var(--text);
+        font-family: "Manrope", "Avenir Next", "Trebuchet MS", sans-serif;
+        background:
+          linear-gradient(160deg, #f6fff7 0%, #f2fbf3 46%, #ebf7ed 100%),
+          radial-gradient(circle at 9% 5%, rgba(62, 155, 95, 0.2), transparent 40%),
+          radial-gradient(circle at 96% 0%, rgba(43, 125, 69, 0.18), transparent 42%),
+          var(--bg);
+        overflow: hidden;
+      }
+
+      main {
+        padding: 10px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .top-card {
+        border: 1px solid rgba(213, 234, 217, 0.94);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.84);
+        box-shadow: var(--shadow-soft);
+        padding: 9px 10px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .brand-logo {
+        width: 30px;
+        height: 30px;
+      }
+
+      .eyebrow {
+        margin: 0;
+        color: var(--accent-strong);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 800;
+      }
+
+      .hero-title {
+        margin: 3px 0 0;
+        font-family: "Sora", "Manrope", sans-serif;
+        font-size: 15px;
+        line-height: 1.2;
+      }
+
+      .hero-subtitle {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 10px;
+      }
+
+      .live-pill {
+        border-radius: 999px;
+        border: 1px solid rgba(62, 155, 95, 0.28);
+        background: rgba(62, 155, 95, 0.08);
+        color: var(--accent-strong);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 5px 8px;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      #quizButton {
+        border-radius: 999px;
+        border: 1px solid rgba(62, 155, 95, 0.35);
+        background: linear-gradient(120deg, rgba(62, 155, 95, 0.14), rgba(43, 125, 69, 0.2));
+        color: var(--accent-strong);
+        padding: 5px 9px;
+        font-size: 10px;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        font-weight: 800;
+      }
+
+      .panel {
+        border: 1px solid rgba(213, 234, 217, 0.86);
+        border-radius: 14px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.78);
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .field,
+      .field-inline {
+        margin: 0;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .field .hint {
+        margin-top: 1px;
+      }
+
+      .span-2 {
+        grid-column: 1 / -1;
+      }
+
+      .button-row,
+      .status,
+      .health-panel,
+      .panel > details {
+        grid-column: 1 / -1;
+      }
+
+      .field-inline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      label {
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      select,
+      input[type="range"] {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 7px 9px;
+        background: #f6fdf7;
+        color: var(--text);
+        font-size: 12px;
+      }
+
+      input[type="range"] {
+        padding: 0;
+        appearance: none;
+        height: 8px;
+        border-radius: 999px;
+        background: #d7efdd;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 999px;
+        border: 2px solid #fff;
+        background: linear-gradient(125deg, var(--accent), var(--accent-strong));
+        cursor: pointer;
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        border-radius: 999px;
+        border: 2px solid #fff;
+        background: linear-gradient(125deg, var(--accent), var(--accent-strong));
+        cursor: pointer;
+      }
+
+      .hint {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.45;
+        font-size: 10px;
+      }
+
+      .range-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      #replacementPercentage {
+        flex: 1;
+      }
+
+      #replacementPercentageValue {
+        min-width: 34px;
+        text-align: right;
+        color: var(--accent-strong);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .switch-row {
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: #f6fdf7;
+        padding: 7px 8px;
+      }
+
+      input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--accent);
+        cursor: pointer;
+      }
+
+      .button-row {
+        display: flex;
+        gap: 7px;
+        margin-top: 1px;
+      }
+
+      .section-title {
+        margin: 0 0 6px;
+        color: var(--accent-strong);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 800;
+      }
+
+      button {
+        border: 0;
+        border-radius: 9px;
+        padding: 8px 10px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        transition: transform 130ms ease, filter 130ms ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        filter: saturate(1.05);
+      }
+
+      button:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+        transform: none;
+        filter: none;
+      }
+
+      #saveButton {
+        flex: 1;
+        color: #fff;
+        background: linear-gradient(125deg, var(--accent), var(--accent-strong));
+      }
+
+      #attachButton {
+        flex: 1;
+        color: var(--accent-strong);
+        border: 1px solid rgba(62, 155, 95, 0.3);
+        background: rgba(62, 155, 95, 0.08);
+      }
+
+      #recheckHealthButton,
+      #importVocabularyButton,
+      #exportVocabularyButton,
+      #clearVocabularyButton {
+        flex: 1;
+        color: var(--accent-strong);
+        border: 1px solid rgba(62, 155, 95, 0.3);
+        background: rgba(62, 155, 95, 0.08);
+      }
+
+      .health-panel {
+        margin-top: 0;
+        border: 1px dashed var(--line);
+        border-radius: 11px;
+        padding: 9px;
+        background: rgba(248, 252, 248, 0.84);
+      }
+
+      .health-panel summary {
+        margin: -9px -9px 8px;
+        padding: 8px 9px;
+        border-bottom: 1px dashed var(--line);
+        color: var(--accent-strong);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .health-line {
+        margin: 0 0 4px;
+        min-height: 14px;
+        font-size: 10px;
+      }
+
+      .vocabulary-toolbar {
+        margin: 6px 0;
+      }
+
+      .vocabulary-badges {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+        margin: 6px 0;
+      }
+
+      .vocabulary-badge {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #f6fdf7;
+        padding: 5px 6px;
+      }
+
+      .vocabulary-badge .label {
+        display: block;
+        font-size: 9px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        font-weight: 700;
+      }
+
+      .vocabulary-badge .value {
+        display: block;
+        margin-top: 2px;
+        color: var(--accent-strong);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      #vocabularyFilterInput {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 6px 8px;
+        background: #f6fdf7;
+        color: var(--text);
+        font-size: 11px;
+      }
+
+      .vocabulary-filter-grid {
+        margin-top: 6px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+
+      .vocabulary-filter-grid select,
+      .vocabulary-filter-grid input[type="date"] {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 6px 8px;
+        background: #f6fdf7;
+        color: var(--text);
+        font-size: 11px;
+      }
+
+      #vocabularyClearFiltersButton {
+        width: 100%;
+        color: var(--accent-strong);
+        border: 1px solid rgba(62, 155, 95, 0.3);
+        background: rgba(62, 155, 95, 0.08);
+      }
+
+      .vocabulary-list {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #eff8f0;
+        max-height: 132px;
+        overflow: auto;
+      }
+
+      #vocabularyTable {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+      }
+
+      #vocabularyTable th,
+      #vocabularyTable td {
+        padding: 6px 8px;
+        border-bottom: 1px solid #d5e8d8;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      #vocabularyTable th {
+        position: sticky;
+        top: 0;
+        background: #e6f3e8;
+        color: var(--accent-strong);
+        font-size: 10px;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .vocabulary-empty {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 10px;
+      }
+
+      .status {
+        min-height: 16px;
+        margin: 4px 0 0;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .status.error {
+        color: var(--danger);
+      }
+
+      .status.ok {
+        color: var(--ok);
+      }
+
+      .vocabulary-action-status {
+        margin-top: 6px;
+        min-height: 14px;
+      }
+
+      details {
+        margin-top: 0;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: rgba(248, 252, 248, 0.84);
+      }
+
+      summary {
+        padding: 8px 9px;
+        font-size: 11px;
+        font-weight: 800;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .debug-content {
+        padding: 0 9px 9px;
+      }
+
+      .debug-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0 0 10px;
+      }
+
+      #clearLogsButton {
+        width: 100%;
+        margin-bottom: 6px;
+        color: var(--accent-strong);
+        border: 1px solid rgba(62, 155, 95, 0.3);
+        background: rgba(62, 155, 95, 0.08);
+      }
+
+      #logPanel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 7px;
+        height: 108px;
+        overflow-y: auto;
+        font-family: "Consolas", "JetBrains Mono", monospace;
+        font-size: 11px;
+        white-space: pre-wrap;
+        background: #eff8f0;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .icon-inline {
+        width: 13px;
+        height: 13px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex: 0 0 auto;
+      }
+
+      [data-reveal] {
+        opacity: 0;
+        transform: translateY(10px) scale(0.99);
+      }
+
+      [data-reveal].is-visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      @media (max-width: 420px) {
+        body {
+          width: 100%;
+          min-width: 300px;
+        }
+
+        .panel {
+          grid-template-columns: 1fr;
+        }
+
+        .span-2 {
+          grid-column: auto;
+        }
+      }</style>
+      </head>
+      <body><main>
+      <header class="top-card" data-reveal>
+        <div class="brand">
+          <img class="brand-logo" src="logo.svg" alt="Lingo Stream logo" />
+          <div>
+            <p class="eyebrow">Chrome Extension</p>
+            <h1 class="hero-title">Lingo Stream</h1>
+            <p class="hero-subtitle">Live subtitle mixing.</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <span class="live-pill">Live</span>
+          <button id="quizButton" type="button" aria-label="Open quiz in a new tab">
+            <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 9a3 3 0 1 1 3 3v2M12 17h.01" />
+              <path d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0Z" />
+            </svg>
+            <span class="btn-text">Quiz</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="panel" data-reveal data-delay="70">
+        <div class="field span-2">
+          <label for="translationProvider">
+            <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 5h18M8 3v4M13 5a7 7 0 0 1-7 7M9 8a11 11 0 0 0 7 7M17 13l3 8M14 21h6" />
+            </svg>
+            <span>Provider</span>
+          </label>
+          <select id="translationProvider" name="translationProvider">
+            <option value="auto">Auto (Recommended)</option>
+            <option value="google">Google</option>
+            <option value="libre">LibreTranslate</option>
+            <option value="apertium">Apertium</option>
+            <option value="mymemory">MyMemory</option>
+          </select>
+          <p class="hint">Auto tries providers in order and uses the first success.</p>
+        </div>
+
+        <div class="field">
+          <label for="targetLanguage">
+            <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20M3 7h18M3 17h18" />
+            </svg>
+            <span>Language</span>
+          </label>
+          <select id="targetLanguage" name="targetLanguage">
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="zh">Chinese</option>
+            <option value="ru">Russian</option>
+            <option value="ar">Arabic</option>
+            <option value="hi">Hindi</option>
+            <option value="tr">Turkish</option>
+            <option value="nl">Dutch</option>
+            <option value="sv">Swedish</option>
+            <option value="pl">Polish</option>
+            <option value="uk">Ukrainian</option>
+            <option value="vi">Vietnamese</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="replacementPercentage">
+            <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M19 5 5 19M8 6h.01M16 18h.01" />
+              <path d="M7.5 6A1.5 1.5 0 1 1 6 7.5 1.5 1.5 0 0 1 7.5 6Zm9 9A1.5 1.5 0 1 1 15 16.5 1.5 1.5 0 0 1 16.5 15Z" />
+            </svg>
+            <span>Mix %</span>
+          </label>
+          <div class="range-row">
+            <input id="replacementPercentage" name="replacementPercentage" type="range" min="1" max="100" step="1" />
+            <output id="replacementPercentageValue" for="replacementPercentage">5%</output>
+          </div>
+        </div>
+
+        <div class="field-inline switch-row">
+          <label for="enabled">
+            <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2v10M8 6a6 6 0 1 0 8 0" />
+            </svg>
+            <span>Enable</span>
+          </label>
+          <input id="enabled" name="enabled" type="checkbox" />
+        </div>
+
+        <div class="field-inline switch-row">
+          <label for="saveVocabulary">
+            <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 4h14v16H5zM9 4v6h6V4" />
+            </svg>
+            <span>Save Words</span>
+          </label>
+          <input id="saveVocabulary" name="saveVocabulary" type="checkbox" />
+        </div>
+        <p class="hint span-2">Store words locally for review and export.</p>
+
+        <div class="button-row">
+          <button id="saveButton" type="button">
+            <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 4h14v16H5zM9 4v6h6V4" />
+            </svg>
+            <span class="btn-text">Save</span>
+          </button>
+          <button id="attachButton" type="button">
+            <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v6h-6" />
+            </svg>
+            <span class="btn-text">Sync</span>
+          </button>
+        </div>
+
+        <p id="saveStatus" class="status" role="status" aria-live="polite"></p>
+        <p id="runtimeStatus" class="status" role="status" aria-live="polite"></p>
+
+        <details class="health-panel span-2" open>
+          <summary>
+            <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3 3 7l9 4 9-4-9-4Zm-9 9 9 4 9-4M3 17l9 4 9-4" />
+            </svg>
+            <span>Health</span>
+          </summary>
+          <p id="contentHealthStatus" class="status health-line" role="status" aria-live="polite">
+            Content script: checking active tab...
+          </p>
+          <p id="translationHealthStatus" class="status health-line" role="status" aria-live="polite">
+            Last translation success: none yet.
+          </p>
+          <div class="button-row">
+            <button id="recheckHealthButton" type="button">
+              <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v6h-6" />
+              </svg>
+              <span class="btn-text">Recheck</span>
+            </button>
+          </div>
+        </details>
+
+        <details class="health-panel span-2">
+          <summary>
+            <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h5" />
+            </svg>
+            <span>Words</span>
+          </summary>
+          <p id="vocabularyStatus" class="status health-line" role="status" aria-live="polite">Saved words: 0</p>
+          <p id="quizBucketStatus" class="status health-line" role="status" aria-live="polite">
+            Not quizzed: 0 | Correct: 0 | Incorrect: 0
+          </p>
+          <div class="vocabulary-badges" aria-live="polite">
+            <article class="vocabulary-badge">
+              <span class="label">Total</span>
+              <strong id="vocabularyTotalBadge" class="value">0</strong>
+            </article>
+            <article class="vocabulary-badge">
+              <span class="label">Filtered</span>
+              <strong id="vocabularyFilteredBadge" class="value">0</strong>
+            </article>
+            <article class="vocabulary-badge">
+              <span class="label">Providers</span>
+              <strong id="vocabularyProviderBadge" class="value">0</strong>
+            </article>
+          </div>
+          <div class="vocabulary-toolbar">
+            <input
+              id="vocabularyFilterInput"
+              type="search"
+              placeholder="Search words"
+              aria-label="Filter saved vocabulary"
+            />
+            <div class="vocabulary-filter-grid">
+              <select id="vocabularyLanguageFilter" aria-label="Filter by language pair">
+                <option value="">All pairs</option>
+              </select>
+              <select id="vocabularyProviderFilter" aria-label="Filter by provider">
+                <option value="">All providers</option>
+              </select>
+              <input id="vocabularyDateFrom" type="date" aria-label="Filter from date" />
+              <input id="vocabularyDateTo" type="date" aria-label="Filter to date" />
+            </div>
+            <div class="button-row">
+              <button id="vocabularyClearFiltersButton" type="button">
+                <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 6h18M8 6l1-2h6l1 2M6 6l1 14h10l1-14" />
+                </svg>
+                <span class="btn-text">Clear</span>
+              </button>
+            </div>
+          </div>
+          <p id="vocabularyEmptyState" class="vocabulary-empty">No saved words yet.</p>
+          <div id="vocabularyList" class="vocabulary-list hidden">
+            <table id="vocabularyTable" aria-label="Saved vocabulary table">
+              <thead>
+                <tr>
+                  <th scope="col">Source</th>
+                  <th scope="col">Translation</th>
+                  <th scope="col">Count</th>
+                </tr>
+              </thead>
+              <tbody id="vocabularyTableBody"></tbody>
+            </table>
+          </div>
+          <input
+            id="importVocabularyInput"
+            class="hidden"
+            type="file"
+            accept=".csv,.json,text/csv,application/json"
+            aria-label="Import vocabulary file"
+          />
+          <div class="button-row">
+            <button id="importVocabularyButton" type="button">
+              <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12M7 10l5 5 5-5M4 21h16" />
+              </svg>
+              <span class="btn-text">Import</span>
+            </button>
+            <button id="exportVocabularyButton" type="button">
+              <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 21V9M17 14l-5-5-5 5M4 3h16" />
+              </svg>
+              <span class="btn-text">Export</span>
+            </button>
+          </div>
+          <div class="button-row">
+            <button id="clearVocabularyButton" type="button">
+              <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 6h18M8 6l1-2h6l1 2M6 6l1 14h10l1-14" />
+              </svg>
+              <span class="btn-text">Reset</span>
+            </button>
+          </div>
+          <p
+            id="vocabularyActionStatus"
+            class="status health-line vocabulary-action-status"
+            role="status"
+            aria-live="polite"
+          ></p>
+        </details>
+
+        <details class="span-2">
+          <summary>
+            <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 3h6l1 2h3v4l-2 2 2 2v4h-3l-1 2H9l-1-2H5v-4l2-2-2-2V5h3l1-2Zm3 6a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />
+            </svg>
+            <span>Debug</span>
+          </summary>
+          <div class="debug-content">
+            <div class="debug-controls">
+              <label for="debugEnabled">Enable debug mode</label>
+              <input id="debugEnabled" name="debugEnabled" type="checkbox" />
+            </div>
+            <button id="clearLogsButton" type="button">
+              <svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 6h18M8 6l1-2h6l1 2M6 6l1 14h10l1-14" />
+              </svg>
+              <span class="btn-text">Clear Logs</span>
+            </button>
+            <div id="logPanel" aria-live="polite">Live logs appear here.</div>
+          </div>
+        </details>
+      </section>
+    </main></body>
+    </html>
+  </foreignObject>
+</svg>

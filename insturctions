@@ -1,0 +1,64 @@
+To ensure evaluation quality and provide teams with ample preparation time, all registered teams
+must complete the online submission of the following materials within 20,March 7p.m. The
+submitted materials will serve as the basis for the judges' preliminary understanding of the
+projects and will be factored into the comprehensive evaluation.
+1. Detailed Project Description Document
+Word Count Requirement: No fewer than 300 words (can be in Chinese or English).
+Content Requirements: The document should be well-structured and include at least the following
+sections:
+Project Overview: A one-sentence summary of the project's core value.
+Inspiration: Why was this direction chosen? What specific problem does it aim to solve, or what
+need does it address?
+What it does: Explain the main functions of the project. How do users interact with it?
+How we built it: Describe the technology stack, tools, algorithms, etc
+Individual contributions: Explain how the work was divided among teammates
+Challenges we ran into: Explain any challenges your team ran into along the way
+Accomplishments that we’re proud of: What are the innovative aspects compared to existing
+solutions?
+What we learned: Explain what your team learned throughout the process
+What’s next for our project: What positive changes could the project bring to target users, the
+community, or society? Given more time, in what ways could you further expand on your
+project?
+Format Requirement: PDF format.
+File naming: TeamLeaderName_ProjectName_ Description.pdf
+2. Project Demo Video
+Duration Requirement: No longer than 5 minutes.
+Content Requirements: The video should intuitively demonstrate the core functions or
+conceptual presentation of the work, accompanied by a brief explanation.
+Software Projects: Can be a screen recording showcasing the interface interaction and core
+operational processes, with voice-over or subtitles.
+Hardware Projects: Can be a live-action video showing the hardware appearance, operational
+status, and actual usage scenarios, possibly combined with operational demonstrations.
+Concept Proposal Projects (not yet implemented): Can be a concept demo animation,
+prototype interaction simulation, or a recorded presentation combined with PPT to clearly convey
+the design concept.
+Quality Suggestions:
+Clear, stable picture with adequate lighting, and clear audio. Commentary can be in Chinese or
+English.
+The video should start by displaying the project name and team information, and may end with a
+team appearance or acknowledgments to showcase team spirit.
+Avoid lengthy introductions; get straight to the core functionality demonstration.
+Format Requirement: MP4 format, file size is recommended not to exceed 500MB.
+File naming: TeamLeaderName_ProjectName_Demo.mp4.
+3. Code Repository Link
+Requirement: If the project has existing code implementation, please provide a publicly
+accessible code repository link (e.g., GitHub, Gitee, etc.). For pure hardware projects, a repository
+link containing design files, circuit diagrams, and other resources can be provided.
+Repository Standard Suggestions:
+1、Repository Name: It is recommended to name the repository HackMITChina2026.
+2、The repository should include a clear README.md file, introducing the project background,
+features, installation/running guide, dependencies, etc.
+3、The code structure should be clear, with necessary comments. Key algorithms or modules can
+be explained separately.
+4 、For hardware designs, it may include schematics, PCB files, 3D models, bill of materials
+(BOM), etc.
+5、Keep the repository tidy by deleting temporary files and unnecessary binary files.
+6 、Submission Method: Directly fill in the repository URL in the submission form. If the
+repository is private, please ensure temporary access is granted during the evaluation period (e.g.,
+by inviting judge accounts or generating a temporary link).
+Software Code Reference: GitHub - Antoine-Lafrance/HackMIT
+Hardware Code Reference: GitHub - S-Sigdel/SenseNav
+The submitted materials must include: the project description document, the project demo
+video, and a text file containing the GitHub repository address.
+If any of the required materials are missing, the committee reserves the right to assess the specific
+situation and determine the team's eligibility to continue in the competition.

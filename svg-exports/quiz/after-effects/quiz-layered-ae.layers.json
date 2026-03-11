@@ -1,0 +1,362 @@
+{
+  "generatedAt": "2026-03-11T02:50:06.452Z",
+  "source": "extension/quiz.html + extension/quiz.css",
+  "width": 1366,
+  "height": 920,
+  "layerCount": 35,
+  "layers": [
+    {
+      "name": "layer-00-background",
+      "x": 0,
+      "y": 0,
+      "width": 1366,
+      "height": 920,
+      "type": "background"
+    },
+    {
+      "name": "layer-01-backdrop-glow-glow-a",
+      "x": 1136,
+      "y": -90,
+      "width": 340,
+      "height": 340,
+      "tag": "div",
+      "className": "backdrop-glow glow-a",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-02-backdrop-glow-glow-b",
+      "x": -150,
+      "y": 660,
+      "width": 380,
+      "height": 380,
+      "tag": "div",
+      "className": "backdrop-glow glow-b",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-03-floatingplusfield",
+      "x": 0,
+      "y": 0,
+      "width": 1366,
+      "height": 920,
+      "tag": "div",
+      "id": "floatingPlusField",
+      "className": "floating-plus-field",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-04-topbar",
+      "x": 43,
+      "y": 0,
+      "width": 1280,
+      "height": 80.39,
+      "tag": "header",
+      "className": "topbar",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-05-brand",
+      "x": 56,
+      "y": 23.69,
+      "width": 117.48,
+      "height": 30,
+      "tag": "a",
+      "className": "brand",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-06-brand-logo",
+      "x": 56,
+      "y": 23.69,
+      "width": 30,
+      "height": 30,
+      "tag": "img",
+      "className": "brand-logo",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-07-topbar-stats",
+      "x": 185.48,
+      "y": 10,
+      "width": 990.45,
+      "height": 57.39,
+      "tag": "div",
+      "className": "topbar-stats",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-08-stat-chip",
+      "x": 185.48,
+      "y": 10,
+      "width": 116.8,
+      "height": 57.39,
+      "tag": "article",
+      "className": "stat-chip",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-09-stat-chip-02",
+      "x": 310.28,
+      "y": 10,
+      "width": 116.81,
+      "height": 57.39,
+      "tag": "article",
+      "className": "stat-chip",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-10-stat-chip-03",
+      "x": 435.09,
+      "y": 10,
+      "width": 116.8,
+      "height": 57.39,
+      "tag": "article",
+      "className": "stat-chip",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-11-stat-chip-04",
+      "x": 559.89,
+      "y": 10,
+      "width": 116.81,
+      "height": 57.39,
+      "tag": "article",
+      "className": "stat-chip",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-12-stat-chip-05",
+      "x": 684.7,
+      "y": 10,
+      "width": 116.81,
+      "height": 57.39,
+      "tag": "article",
+      "className": "stat-chip",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-13-stat-chip-06",
+      "x": 809.52,
+      "y": 10,
+      "width": 116.8,
+      "height": 57.39,
+      "tag": "article",
+      "className": "stat-chip",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-14-stat-chip-07",
+      "x": 934.31,
+      "y": 10,
+      "width": 116.81,
+      "height": 57.39,
+      "tag": "article",
+      "className": "stat-chip",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-15-stat-chip-08",
+      "x": 1059.13,
+      "y": 10,
+      "width": 116.81,
+      "height": 57.39,
+      "tag": "article",
+      "className": "stat-chip",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-16-nextroundbutton",
+      "x": 1187.94,
+      "y": 14.69,
+      "width": 122.06,
+      "height": 48,
+      "tag": "button",
+      "id": "nextRoundButton",
+      "className": "btn btn-primary btn-icon",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-17-object-svganimatedstring",
+      "x": 1199.94,
+      "y": 31.19,
+      "width": 15,
+      "height": 15,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-18-main",
+      "x": 113,
+      "y": 88.39,
+      "width": 1140,
+      "height": 828,
+      "tag": "main",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-19-quiz-shell",
+      "x": 143,
+      "y": 118.39,
+      "width": 1080,
+      "height": 750,
+      "tag": "div",
+      "className": "quiz-shell",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-20-quizpanel",
+      "x": 193,
+      "y": 118.39,
+      "width": 980,
+      "height": 750,
+      "tag": "section",
+      "id": "quizPanel",
+      "className": "quiz-panel visible",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-21-panel-head",
+      "x": 216,
+      "y": 141.39,
+      "width": 934,
+      "height": 34.8,
+      "tag": "div",
+      "className": "panel-head",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-22-progress-wrap",
+      "x": 216,
+      "y": 186.19,
+      "width": 934,
+      "height": 29,
+      "tag": "div",
+      "className": "progress-wrap",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-23-progress-track",
+      "x": 216,
+      "y": 206.19,
+      "width": 934,
+      "height": 9,
+      "tag": "div",
+      "className": "progress-track",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-24-board",
+      "x": 216,
+      "y": 227.19,
+      "width": 934,
+      "height": 618.2,
+      "tag": "div",
+      "className": "board",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-25-section",
+      "x": 216,
+      "y": 227.19,
+      "width": 457,
+      "height": 618.2,
+      "tag": "section",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-26-section-02",
+      "x": 693,
+      "y": 227.19,
+      "width": 457,
+      "height": 618.2,
+      "tag": "section",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-27-column-title",
+      "x": 229,
+      "y": 240.19,
+      "width": 431,
+      "height": 15,
+      "tag": "p",
+      "className": "column-title",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-28-column-title-02",
+      "x": 706,
+      "y": 240.19,
+      "width": 431,
+      "height": 15,
+      "tag": "p",
+      "className": "column-title",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-29-sourcechoices",
+      "x": 229,
+      "y": 265.19,
+      "width": 431,
+      "height": 567.2,
+      "tag": "div",
+      "id": "sourceChoices",
+      "className": "choices",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-30-translationchoices",
+      "x": 706,
+      "y": 265.19,
+      "width": 431,
+      "height": 567.2,
+      "tag": "div",
+      "id": "translationChoices",
+      "className": "choices",
+      "source": "base-state"
+    },
+    {
+      "name": "layer-31-emptystate",
+      "x": 672.3,
+      "y": 442.56,
+      "width": 580.7,
+      "height": 101.66,
+      "tag": "section",
+      "id": "emptyState",
+      "className": "empty-state visible",
+      "source": "empty-state"
+    },
+    {
+      "name": "layer-32-firstquizmodal",
+      "x": 0,
+      "y": 0,
+      "width": 1366,
+      "height": 920,
+      "tag": "div",
+      "id": "firstQuizModal",
+      "className": "intro-modal visible",
+      "source": "modal"
+    },
+    {
+      "name": "layer-33-intro-card",
+      "x": 423,
+      "y": 339.28,
+      "width": 520,
+      "height": 241.44,
+      "tag": "div",
+      "className": "intro-card",
+      "source": "modal"
+    },
+    {
+      "name": "layer-34-startquizbutton",
+      "x": 638.03,
+      "y": 513.72,
+      "width": 89.92,
+      "height": 48,
+      "tag": "button",
+      "id": "startQuizButton",
+      "className": "btn btn-primary intro-start-btn",
+      "source": "modal"
+    }
+  ]
+}

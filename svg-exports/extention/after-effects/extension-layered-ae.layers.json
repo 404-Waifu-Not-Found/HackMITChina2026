@@ -1,0 +1,379 @@
+{
+  "generatedAt": "2026-03-11T02:46:47.467Z",
+  "source": "extension/popup.html",
+  "width": 356,
+  "height": 733,
+  "layerCount": 41,
+  "layers": [
+    {
+      "name": "layer-00-background",
+      "x": 0,
+      "y": 0,
+      "width": 356,
+      "height": 733,
+      "type": "background"
+    },
+    {
+      "name": "layer-01-top-card-is-visible",
+      "x": 10,
+      "y": 10,
+      "width": 336,
+      "height": 65,
+      "tag": "header",
+      "className": "top-card is-visible"
+    },
+    {
+      "name": "layer-02-field-span-2",
+      "x": 21,
+      "y": 102,
+      "width": 314,
+      "height": 72.5,
+      "tag": "div",
+      "className": "field span-2"
+    },
+    {
+      "name": "layer-03-field",
+      "x": 21,
+      "y": 182.5,
+      "width": 314,
+      "height": 51,
+      "tag": "div",
+      "className": "field"
+    },
+    {
+      "name": "layer-04-field-02",
+      "x": 21,
+      "y": 241.5,
+      "width": 314,
+      "height": 31,
+      "tag": "div",
+      "className": "field"
+    },
+    {
+      "name": "layer-05-field-inline-switch-row",
+      "x": 21,
+      "y": 280.5,
+      "width": 314,
+      "height": 40,
+      "tag": "div",
+      "className": "field-inline switch-row"
+    },
+    {
+      "name": "layer-06-field-inline-switch-row-02",
+      "x": 21,
+      "y": 328.5,
+      "width": 314,
+      "height": 40,
+      "tag": "div",
+      "className": "field-inline switch-row"
+    },
+    {
+      "name": "layer-07-hint-span-2",
+      "x": 21,
+      "y": 376.5,
+      "width": 314,
+      "height": 14.5,
+      "tag": "p",
+      "className": "hint span-2"
+    },
+    {
+      "name": "layer-08-button-row",
+      "x": 21,
+      "y": 400,
+      "width": 314,
+      "height": 33,
+      "tag": "div",
+      "className": "button-row"
+    },
+    {
+      "name": "layer-09-savestatus",
+      "x": 21,
+      "y": 445,
+      "width": 314,
+      "height": 16,
+      "tag": "p",
+      "id": "saveStatus",
+      "className": "status"
+    },
+    {
+      "name": "layer-10-runtimestatus",
+      "x": 21,
+      "y": 473,
+      "width": 314,
+      "height": 16,
+      "tag": "p",
+      "id": "runtimeStatus",
+      "className": "status"
+    },
+    {
+      "name": "layer-11-health-panel-span-2",
+      "x": 21,
+      "y": 497,
+      "width": 314,
+      "height": 119,
+      "tag": "details",
+      "className": "health-panel span-2"
+    },
+    {
+      "name": "layer-12-health-panel-span-2-02",
+      "x": 21,
+      "y": 624,
+      "width": 314,
+      "height": 49,
+      "tag": "details",
+      "className": "health-panel span-2"
+    },
+    {
+      "name": "layer-13-span-2",
+      "x": 21,
+      "y": 681,
+      "width": 314,
+      "height": 31,
+      "tag": "details",
+      "className": "span-2"
+    },
+    {
+      "name": "layer-14-brand-logo",
+      "x": 21,
+      "y": 27.5,
+      "width": 30,
+      "height": 30,
+      "tag": "img",
+      "className": "brand-logo"
+    },
+    {
+      "name": "layer-15-quizbutton",
+      "x": 265.42,
+      "y": 29.5,
+      "width": 69.58,
+      "height": 26,
+      "tag": "button",
+      "id": "quizButton"
+    },
+    {
+      "name": "layer-16-savebutton",
+      "x": 21,
+      "y": 400,
+      "width": 152.5,
+      "height": 33,
+      "tag": "button",
+      "id": "saveButton"
+    },
+    {
+      "name": "layer-17-attachbutton",
+      "x": 180.5,
+      "y": 400,
+      "width": 154.5,
+      "height": 33,
+      "tag": "button",
+      "id": "attachButton"
+    },
+    {
+      "name": "layer-18-recheckhealthbutton",
+      "x": 31,
+      "y": 573,
+      "width": 294,
+      "height": 33,
+      "tag": "button",
+      "id": "recheckHealthButton"
+    },
+    {
+      "name": "layer-19-vocabularyclearfiltersbutton",
+      "x": 31,
+      "y": 847,
+      "width": 294,
+      "height": 33,
+      "tag": "button",
+      "id": "vocabularyClearFiltersButton"
+    },
+    {
+      "name": "layer-20-importvocabularybutton",
+      "x": 31,
+      "y": 898,
+      "width": 143.5,
+      "height": 33,
+      "tag": "button",
+      "id": "importVocabularyButton"
+    },
+    {
+      "name": "layer-21-exportvocabularybutton",
+      "x": 181.5,
+      "y": 898,
+      "width": 143.5,
+      "height": 33,
+      "tag": "button",
+      "id": "exportVocabularyButton"
+    },
+    {
+      "name": "layer-22-clearvocabularybutton",
+      "x": 31,
+      "y": 932,
+      "width": 294,
+      "height": 33,
+      "tag": "button",
+      "id": "clearVocabularyButton"
+    },
+    {
+      "name": "layer-23-clearlogsbutton",
+      "x": 31,
+      "y": 745,
+      "width": 294,
+      "height": 33,
+      "tag": "button",
+      "id": "clearLogsButton"
+    },
+    {
+      "name": "layer-24-object-svganimatedstring",
+      "x": 275.42,
+      "y": 36,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-25-object-svganimatedstring-02",
+      "x": 21,
+      "y": 102,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-26-object-svganimatedstring-03",
+      "x": 21,
+      "y": 182.5,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-27-object-svganimatedstring-04",
+      "x": 21,
+      "y": 241.5,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-28-object-svganimatedstring-05",
+      "x": 30,
+      "y": 294,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-29-object-svganimatedstring-06",
+      "x": 30,
+      "y": 342,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-30-object-svganimatedstring-07",
+      "x": 73.09,
+      "y": 410,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-31-object-svganimatedstring-08",
+      "x": 233.36,
+      "y": 410,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-32-object-svganimatedstring-09",
+      "x": 31,
+      "y": 506,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-33-object-svganimatedstring-10",
+      "x": 142.14,
+      "y": 583,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-34-object-svganimatedstring-11",
+      "x": 31,
+      "y": 633,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-35-object-svganimatedstring-12",
+      "x": 152.33,
+      "y": 857,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-36-object-svganimatedstring-13",
+      "x": 72.78,
+      "y": 908,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-37-object-svganimatedstring-14",
+      "x": 223.28,
+      "y": 908,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-38-object-svganimatedstring-15",
+      "x": 150.94,
+      "y": 942,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-39-object-svganimatedstring-16",
+      "x": 31,
+      "y": 690,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    },
+    {
+      "name": "layer-40-object-svganimatedstring-17",
+      "x": 135.86,
+      "y": 755,
+      "width": 13,
+      "height": 13,
+      "tag": "svg",
+      "className": "[object SVGAnimatedString]"
+    }
+  ]
+}

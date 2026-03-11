@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1366" height="920" viewBox="0 0 1366 920">
+  <title>Lingo Stream Quiz Layered Export (AE-Compatible)</title>
+  <desc>After Effects compatible layered SVG generated from layer bounds.</desc>
+  <defs>
+    <linearGradient id="bg-gradient" x1="0" y1="0" x2="1366" y2="920" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f6fff7" />
+      <stop offset="52%" stop-color="#f2fbf3" />
+      <stop offset="100%" stop-color="#e8f2ea" />
+    </linearGradient>
+    <linearGradient id="accent-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4aaa6a" />
+      <stop offset="100%" stop-color="#2b7d45" />
+    </linearGradient>
+    <radialGradient id="glow-a-gradient" cx="42%" cy="40%" r="62%">
+      <stop offset="0%" stop-color="#3e9b5f" stop-opacity="0.34" />
+      <stop offset="100%" stop-color="#3e9b5f" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="glow-b-gradient" cx="58%" cy="52%" r="64%">
+      <stop offset="0%" stop-color="#2b7d45" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#2b7d45" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <g id="layer-00-background">
+    <rect x="0" y="0" width="1366" height="920" rx="0" ry="0" fill="url(#bg-gradient)" fill-opacity="1" stroke="none" stroke-width="0" />
+  </g>
+  <g id="layer-01-backdrop-glow-glow-a">
+    <ellipse cx="1306" cy="80" rx="170" ry="170" fill="url(#glow-a-gradient)" opacity="0.72" />
+  </g>
+  <g id="layer-02-backdrop-glow-glow-b">
+    <ellipse cx="40" cy="850" rx="190" ry="190" fill="url(#glow-b-gradient)" opacity="0.66" />
+  </g>
+  <g id="layer-03-floatingplusfield">
+    <path d="M 163.92 155.6 V 175.6 M 153.92 165.6 H 173.92" stroke="#2b7d45" stroke-width="1.6" stroke-linecap="round" opacity="0.18" />
+    <path d="M 341.5 470.4 V 486.4 M 333.5 478.4 H 349.5" stroke="#2b7d45" stroke-width="1.28" stroke-linecap="round" opacity="0.14" />
+    <path d="M 546.4 264 V 288 M 534.4 276 H 558.4" stroke="#2b7d45" stroke-width="1.92" stroke-linecap="round" opacity="0.16" />
+    <path d="M 860.58 579.8 V 597.8 M 851.58 588.8 H 869.58" stroke="#2b7d45" stroke-width="1.44" stroke-linecap="round" opacity="0.12" />
+    <path d="M 1120.12 191.4 V 213.4 M 1109.12 202.4 H 1131.12" stroke="#2b7d45" stroke-width="1.76" stroke-linecap="round" opacity="0.14" />
+    <path d="M 1229.4 704.6 V 730.6 M 1216.4 717.6 H 1242.4" stroke="#2b7d45" stroke-width="2.08" stroke-linecap="round" opacity="0.11" />
+  </g>
+  <g id="layer-04-topbar">
+    <rect x="43" y="0" width="1280" height="80.39" rx="14.47" ry="14.47" fill="#ffffff" fill-opacity="0.94" stroke="#cfe6d5" stroke-width="2.2" />
+  </g>
+  <g id="layer-05-brand">
+    <rect x="56" y="23.69" width="117.48" height="30" rx="6" ry="6" fill="#f8fdf9" fill-opacity="0.98" stroke="#cfe6d5" stroke-width="1.2" />
+  </g>
+  <g id="layer-06-brand-logo">
+    <rect x="57.5" y="25.19" width="27" height="27" rx="5.94" ry="5.94" fill="#005540" />
+    <path d="M 67.76 31.4 V 45.98 H 75.86" fill="none" stroke="#ffffff" stroke-width="4.32" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <g id="layer-07-topbar-stats">
+    <rect x="185.48" y="10" width="990.45" height="57.39" rx="10.33" ry="10.33" fill="#ffffff" fill-opacity="0.94" stroke="#cfe6d5" stroke-width="2.2" />
+  </g>
+  <g id="layer-08-stat-chip">
+    <rect x="185.48" y="10" width="116.8" height="57.39" rx="10.33" ry="10.33" fill="#f8fdf9" fill-opacity="1" stroke="#b6d8bf" stroke-width="2.2" />
+  </g>
+  <g id="layer-09-stat-chip-02">
+    <rect x="310.28" y="10" width="116.81" height="57.39" rx="10.33" ry="10.33" fill="#f8fdf9" fill-opacity="1" stroke="#b6d8bf" stroke-width="2.2" />
+  </g>
+  <g id="layer-10-stat-chip-03">
+    <rect x="435.09" y="10" width="116.8" height="57.39" rx="10.33" ry="10.33" fill="#f8fdf9" fill-opacity="1" stroke="#b6d8bf" stroke-width="2.2" />
+  </g>
+  <g id="layer-11-stat-chip-04">
+    <rect x="559.89" y="10" width="116.81" height="57.39" rx="10.33" ry="10.33" fill="#f8fdf9" fill-opacity="1" stroke="#b6d8bf" stroke-width="2.2" />
+  </g>
+  <g id="layer-12-stat-chip-05">
+    <rect x="684.7" y="10" width="116.81" height="57.39" rx="10.33" ry="10.33" fill="#f8fdf9" fill-opacity="1" stroke="#b6d8bf" stroke-width="2.2" />
+  </g>
+  <g id="layer-13-stat-chip-06">
+    <rect x="809.52" y="10" width="116.8" height="57.39" rx="10.33" ry="10.33" fill="#f8fdf9" fill-opacity="1" stroke="#b6d8bf" stroke-width="2.2" />
+  </g>
+  <g id="layer-14-stat-chip-07">
+    <rect x="934.31" y="10" width="116.81" height="57.39" rx="10.33" ry="10.33" fill="#f8fdf9" fill-opacity="1" stroke="#b6d8bf" stroke-width="2.2" />
+  </g>
+  <g id="layer-15-stat-chip-08">
+    <rect x="1059.13" y="10" width="116.81" height="57.39" rx="10.33" ry="10.33" fill="#f8fdf9" fill-opacity="1" stroke="#b6d8bf" stroke-width="2.2" />
+  </g>
+  <g id="layer-16-nextroundbutton">
+    <rect x="1187.94" y="14.69" width="122.06" height="48" rx="8.64" ry="8.64" fill="url(#accent-gradient)" fill-opacity="0.96" stroke="#2b7d45" stroke-width="1.92" />
+  </g>
+  <g id="layer-17-object-svganimatedstring">
+    <circle cx="1207.44" cy="38.69" r="6.45" fill="#f4fbf5" stroke="#2b7d45" stroke-width="1.35" />
+    <path d="M 1207.44 35.98 V 41.4 M 1204.73 38.69 H 1210.15" stroke="#2b7d45" stroke-width="1.8" stroke-linecap="round" />
+  </g>
+  <g id="layer-18-main">
+    <rect x="113" y="88.39" width="1140" height="828" rx="0" ry="0" fill="#ffffff" fill-opacity="0.94" stroke="#cfe6d5" stroke-width="2.2" />
+  </g>
+  <g id="layer-19-quiz-shell">
+    <rect x="143" y="118.39" width="1080" height="750" rx="0" ry="0" fill="#ffffff" fill-opacity="0.94" stroke="#cfe6d5" stroke-width="2.2" />
+  </g>
+  <g id="layer-20-quizpanel">
+    <rect x="193" y="118.39" width="980" height="750" rx="18" ry="18" fill="#ffffff" fill-opacity="0.94" stroke="#cfe6d5" stroke-width="2.2" />
+  </g>
+  <g id="layer-21-panel-head">
+    <rect x="216" y="141.39" width="934" height="34.8" rx="6.26" ry="6.26" fill="#ffffff" fill-opacity="0.94" stroke="#cfe6d5" stroke-width="1.39" />
+  </g>
+  <g id="layer-22-progress-wrap">
+    <rect x="216" y="186.19" width="934" height="29" rx="6" ry="6" fill="#edf8ef" fill-opacity="1" stroke="#cde4d3" stroke-width="1.16" />
+  </g>
+  <g id="layer-23-progress-track">
+    <rect x="216" y="206.19" width="934" height="9" rx="4" ry="4" fill="#d7efdd" fill-opacity="1" stroke="#b7d8bf" stroke-width="0.8" />
+  </g>
+  <g id="layer-24-board">
+    <rect x="216" y="227.19" width="934" height="618.2" rx="18" ry="18" fill="#ffffff" fill-opacity="0.94" stroke="#cfe6d5" stroke-width="2.2" />
+  </g>
+  <g id="layer-25-section">
+    <rect x="216" y="227.19" width="457" height="618.2" rx="18" ry="18" fill="#ffffff" fill-opacity="0.94" stroke="#cfe6d5" stroke-width="2.2" />
+  </g>
+  <g id="layer-26-section-02">
+    <rect x="693" y="227.19" width="457" height="618.2" rx="18" ry="18" fill="#ffffff" fill-opacity="0.94" stroke="#cfe6d5" stroke-width="2.2" />
+  </g>
+  <g id="layer-27-column-title">
+    <rect x="229" y="240.19" width="431" height="15" rx="4" ry="4" fill="#f4faf5" fill-opacity="0.96" stroke="#d5e8d8" stroke-width="0.8" />
+  </g>
+  <g id="layer-28-column-title-02">
+    <rect x="706" y="240.19" width="431" height="15" rx="4" ry="4" fill="#f4faf5" fill-opacity="0.96" stroke="#d5e8d8" stroke-width="0.8" />
+  </g>
+  <g id="layer-29-sourcechoices">
+    <rect x="229" y="265.19" width="431" height="567.2" rx="18" ry="18" fill="#f7fcf8" fill-opacity="1" stroke="#c3dfcb" stroke-width="2.2" />
+  </g>
+  <g id="layer-30-translationchoices">
+    <rect x="706" y="265.19" width="431" height="567.2" rx="18" ry="18" fill="#f7fcf8" fill-opacity="1" stroke="#c3dfcb" stroke-width="2.2" />
+  </g>
+  <g id="layer-31-emptystate">
+    <rect x="672.3" y="442.56" width="580.7" height="101.66" rx="18" ry="18" fill="#f6fcf7" fill-opacity="0.98" stroke="#bedfc6" stroke-width="2.2" stroke-dasharray="8 5" />
+  </g>
+  <g id="layer-32-firstquizmodal">
+    <rect x="0" y="0" width="1366" height="920" rx="0" ry="0" fill="#0b160f" fill-opacity="0.22" stroke="none" stroke-width="0" />
+  </g>
+  <g id="layer-33-intro-card">
+    <rect x="423" y="339.28" width="520" height="241.44" rx="18" ry="18" fill="#ffffff" fill-opacity="0.94" stroke="#cfe6d5" stroke-width="2.2" />
+  </g>
+  <g id="layer-34-startquizbutton">
+    <rect x="638.03" y="513.72" width="89.92" height="48" rx="8.64" ry="8.64" fill="url(#accent-gradient)" fill-opacity="0.96" stroke="#2b7d45" stroke-width="1.92" />
+  </g>
+</svg>
