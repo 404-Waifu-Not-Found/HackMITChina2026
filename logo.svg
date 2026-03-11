@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 152.38 156.19">
   <defs>
     <style>
       .cls-1 {
-        fill: #005540;
+        fill: #fff;
+        font-family: RageItalic, 'Rage Italic';
+        font-size: 110px;
       }
 
       .cls-2 {
-        fill: #fff;
-        font-family: MicrosoftSansSerif, 'Microsoft Sans Serif';
-        font-size: 110px;
+        fill: url(#linear-gradient);
       }
     </style>
+    <linearGradient id="linear-gradient" x1="8.92" y1="8.92" x2="143.46" y2="143.46" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2db34a"/>
+      <stop offset="1" stop-color="#004e21"/>
+    </linearGradient>
   </defs>
-  <rect class="cls-1" x="3.81" y="3.87" width="152.38" height="152.38" rx="30.46" ry="30.46"/>
-  <text class="cls-2" transform="translate(49.41 113.12)"><tspan x="0" y="0">L</tspan></text>
+  <rect class="cls-2" width="152.38" height="152.38" rx="30.46" ry="30.46"/>
+  <text class="cls-1" transform="translate(40.55 111.07)"><tspan x="0" y="0">L</tspan></text>
 </svg>
