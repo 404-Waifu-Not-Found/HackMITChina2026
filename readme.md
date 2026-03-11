@@ -93,39 +93,79 @@ The team has produced UI sketches to show the intended interaction style and use
 
 ### Project Overview
 
-Lingo Stream is a browser extension concept for contextual language learning while watching YouTube.
+<span style="color:#1f6feb;"><strong>Lingo Stream</strong></span> is a browser extension concept for contextual language learning while watching YouTube.
+It is built around one goal: <strong><em>learn without breaking attention</em></strong>.
 
 ### Inspiration
 
-Our team chose this direction because most language learners struggle with consistency, not intention. People are willing to learn, but they do not always have time for separate study sessions. At the same time, they already spend significant time watching content with subtitles. We saw a clear opportunity to combine these two behaviors. Instead of creating another isolated learning app, we designed a layer that sits on top of existing viewing habits and turns everyday content consumption into repeated vocabulary exposure.
+Most learners do not fail because of motivation. They fail because of <strong>friction</strong>.
+
+People already spend hours on subtitle-based content. So instead of asking users to open another app, we asked:
+
+<em>What if learning happened exactly where attention already is?</em>
+
+That question shaped Lingo Stream.
 
 ### What It Does
 
-The concept is subtitle-aware micro-immersion. Instead of translating everything, the idea is to provide small contextual vocabulary support during normal video watching so learning can feel natural and lightweight.
+The concept uses <strong>subtitle-aware micro-immersion</strong>:
+
+- Do <strong>not</strong> translate everything.
+- Inject <strong>small</strong>, contextual support.
+- Keep watching smooth.
+- Build vocabulary through repeated exposure.
+
+<span style="color:#0f766e;"><strong>Result:</strong></span> learning feels natural, not like a separate study session.
 
 ### How We Built It
 
-At this stage, we have built the project narrative and created UI sketches to define the interaction and visual direction. We have not started full technical implementation yet.
+At this stage, we focused on:
+
+- <strong>concept clarity</strong>
+- <strong>README communication</strong>
+- <strong>UI sketch direction</strong>
+
+<span style="color:#f59e0b;"><strong>Current scope:</strong></span> pre-submission planning only. Full technical implementation has not started yet.
 
 ### Individual Contributions
 
-Current pre-submission work has focused on project framing, writing this README, and preparing UI sketches.
+Current work split:
+
+- Project framing and core value definition
+- Submission-ready README writing
+- UI sketch preparation and visual direction
 
 ### Challenges We Ran Into
 
-The biggest challenge we faced so far was finding a unique project idea that has not been done repeatedly and still has meaningful impact on the world. Defining a direction that is both original and realistic for a hackathon required multiple iterations.
+<span style="color:#d73a49;"><strong>Biggest challenge:</strong></span> finding a project that is both <strong>unique</strong> and <strong>world-impactful</strong>, without being unrealistic for hackathon time limits.
+
+This took multiple iterations because we had to balance:
+
+- originality
+- practical scope
+- real user value
 
 ### Accomplishments We Are Proud Of
 
-We are proud that we established a clear concept, completed a polished pre-submission README, and produced UI sketches that communicate the product direction clearly.
+What we are proud of so far:
+
+- <strong>clear concept</strong> with a strong everyday-use case
+- <strong>polished README</strong> aligned with submission requirements
+- <strong>UI sketches</strong> that communicate product direction clearly
 
 ### What We Learned
 
-We learned that narrowing scope early is critical. A clear concept and clear communication are necessary before implementation can move efficiently.
+Key lessons:
+
+- <strong>Scope early, scope hard.</strong>
+- Clear writing is part of product building.
+- A strong concept saves engineering time later.
 
 ### What's Next
 
-The next phase is to convert the current concept and UI sketch into a working prototype and validate the learning experience with real users.
+Next step is simple and focused:
+
+<span style="color:#1a7f37;"><strong>Turn concept + sketches into a working prototype</strong></span>, then validate learning experience with real users.
 
 ## Repository Notes
 
