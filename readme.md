@@ -1,26 +1,42 @@
-<table>
+<table align="center">
   <tr>
-    <td width="160" valign="middle">
-      <img src="./logo.svg" alt="Lingo Stream logo" width="132" />
+    <td valign="middle">
+      <img src="./logo.svg" alt="Lingo Stream logo" width="140" />
     </td>
     <td valign="middle">
       <h1>Lingo Stream</h1>
-      <p><strong>Ambient language learning inside YouTube subtitles.</strong></p>
-      <p><strong>Current stage:</strong> pre-submission for HackMIT China 2026.</p>
+      <p>Ambient language learning directly inside YouTube subtitles.</p>
+    </td>
+    <td valign="middle">
+      <img src="./media/wink.gif" alt="Lingo Stream emote" width="84" />
     </td>
   </tr>
 </table>
 
-<p>
-  <img alt="HackMIT China 2026" src="https://img.shields.io/badge/HackMIT%20China-2026-1f6feb" />
-  <img alt="Stage" src="https://img.shields.io/badge/Stage-Pre--Submission-f59e0b" />
-  <img alt="Type" src="https://img.shields.io/badge/Project-Chrome%20Extension-16a34a" />
-  <img alt="Focus" src="https://img.shields.io/badge/Focus-Micro--Immersion-0f766e" />
+<p align="center">
+  <a href="#overview">Overview</a> |
+  <a href="#how-it-works">How It Works</a> |
+  <a href="#tech-stack-planned">Tech Stack</a> |
+  <a href="#current-progress">Progress</a> |
+  <a href="#hackmit-submission-narrative-pre-submission-draft">Submission Narrative</a>
 </p>
 
-`Overview` | `How It Works` | `Tech` | `Submission Narrative` | `Roadmap`
+<p align="center">
+  <img alt="HackMIT China 2026" src="https://img.shields.io/badge/HackMIT%20China-2026-1f6feb?style=flat" />
+  <img alt="Stage" src="https://img.shields.io/badge/Stage-Pre--Submission-f59e0b?style=flat" />
+  <img alt="Project" src="https://img.shields.io/badge/Project-Chrome%20Extension-16a34a?style=flat" />
+  <img alt="Focus" src="https://img.shields.io/badge/Focus-Micro--Immersion-0f766e?style=flat" />
+</p>
 
-Lingo Stream turns passive YouTube watching into active vocabulary growth. Instead of forcing users to switch apps, pause videos, or open a separate dictionary, Lingo Stream works inside the subtitle line itself. It observes live captions, selects high-value words, and injects light-touch contextual translations so viewers keep following the content naturally.
+> [!WARNING]
+> This repository is currently in pre-submission for HackMIT China 2026. Core extension runtime and API wiring are in active implementation.
+
+> [!NOTE]
+> The README is intentionally structured to match the HackMIT submission categories in `insturctions` while keeping the presentation clean for judges and reviewers.
+
+## Overview
+
+Lingo Stream turns passive YouTube watching into active vocabulary growth. Instead of forcing users to switch apps, pause videos, or open a separate dictionary, Lingo Stream works directly inside subtitle lines. It watches live captions, selects high-value words, and injects light-touch contextual translations so viewers keep following the video naturally.
 
 Example subtitle flow:
 
@@ -31,47 +47,64 @@ Lingo Stream: I really enjoy (gusto) learning new skills every day.
 
 ## Why This Project
 
-YouTube has billions of active users, but language learners still face a context-switch problem: content is entertaining, while study tools are separate and disruptive. This project is built around one belief: vocabulary growth is most sustainable when it happens during a routine people already have. Lingo Stream aims to remove friction, preserve attention, and make language practice continuous rather than session-based.
+YouTube has billions of active users, but language learners still face a context-switch problem: entertainment happens in one place while study tools live elsewhere. Lingo Stream is built on one principle: vocabulary growth is more sustainable when it happens inside routines users already maintain daily.
 
 ## How It Works
 
+Pipeline:
+
+```text
+YouTube live subtitles -> candidate word filtering -> translation adapter -> inline render -> repeated exposure
+```
+
 | Step | System Action | Learner Experience |
 | --- | --- | --- |
-| 1 | Capture subtitle node updates from YouTube in real time | Captions keep moving normally with no manual setup |
-| 2 | Filter candidate words by frequency and learning value | Only useful words are selected, avoiding overload |
-| 3 | Apply controlled translation ratio (for example 5% to 20%) | Sentences stay readable while new words appear in context |
-| 4 | Render inline translated tokens with lightweight styling | Learning happens in-place without leaving the video |
-| 5 | Store optional exposure history for repetition planning | Repeated words become easier to remember over time |
+| 1 | Observe subtitle node updates in real time | Captions keep moving with no manual setup |
+| 2 | Rank candidate words by learning value | Useful words are surfaced without overload |
+| 3 | Apply controlled replacement ratio (5% to 20%) | Sentences remain readable while immersion increases |
+| 4 | Render translated tokens inline with lightweight styling | Learning stays in-context without app switching |
+| 5 | Track optional exposure counts | Frequent words become easier over time |
 
-## Tech To Be Implemented
+## Tech Stack (Planned)
 
-<p>
-  <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-ES2023-F7DF1E?logo=javascript&logoColor=000000" />
-  <img alt="HTML" src="https://img.shields.io/badge/HTML5-Markup-E34F26?logo=html5&logoColor=ffffff" />
-  <img alt="CSS" src="https://img.shields.io/badge/CSS3-Styling-1572B6?logo=css3&logoColor=ffffff" />
-  <img alt="GitHub Actions" src="https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-2088FF?logo=githubactions&logoColor=ffffff" />
-  <img alt="Chrome Extension" src="https://img.shields.io/badge/Manifest%20V3-Chrome%20Extension-4285F4?logo=googlechrome&logoColor=ffffff" />
+<p align="left">
+  <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=000000" />
+  <img alt="HTML5" src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=ffffff" />
+  <img alt="CSS3" src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=ffffff" />
+  <img alt="GitHub Actions" src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=ffffff" />
+  <img alt="Node.js" src="https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white" />
+  <img alt="Google Chrome" src="https://img.shields.io/badge/Google%20Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" />
 </p>
 
 | Layer | Planned Direction |
 | --- | --- |
-| Extension runtime | Manifest V3 background + content scripts |
+| Extension runtime | Manifest V3 background and content scripts |
 | Subtitle extraction | `MutationObserver` and caption-node parsing |
 | Translation providers | Google-compatible endpoint, LibreTranslate, or MyMemory |
 | Popup UI | Lightweight controls for language and immersion intensity |
 | Delivery | GitHub Actions workflow for linting, checks, and packaged builds |
 
+## Current Progress
+
+- [x] Product framing and value proposition
+- [x] UX and branding direction
+- [x] HackMIT pre-submission narrative draft
+- [ ] Subtitle observer implementation in content scripts
+- [ ] Translation provider adapter with failover
+- [ ] Immersion controls in extension popup
+- [ ] Automated CI checks and packaging
+
 ## Key Features
 
 - Inline subtitle micro-translation instead of full-sentence replacement
 - Adjustable immersion ratio to keep captions readable
-- Provider-agnostic translation pipeline for flexibility and reliability
+- Provider-agnostic translation pipeline for reliability and flexibility
 - Lightweight extension UX focused on fast setup and low distraction
-- Designed for repeated passive exposure that supports long-term retention
+- Repetition-oriented exposure model for long-term word retention
 
 ## Installation / Running Guide (Current Stage)
 
-This repository is currently in the HackMIT China 2026 pre-submission stage. It mainly contains design assets, branding, and product direction content.
+This repository currently contains pre-submission assets, branding, and product planning documents.
 
 When the first implementation build is pushed, this section will include:
 
@@ -107,7 +140,7 @@ The project direction uses a Chrome extension architecture with Manifest V3, a c
 
 ### Individual Contributions
 
-Current pre-submission work has been divided across product framing, UX/visual assets, extension architecture planning, and translation pipeline design. Design artifacts in this repository represent the interface and interaction direction. Engineering tasks are organized around subtitle parsing, token ranking, rendering performance, and API abstraction.
+Current pre-submission work has been divided across product framing, UX and visual assets, extension architecture planning, and translation pipeline design. Design artifacts in this repository represent the interface and interaction direction. Engineering tasks are organized around subtitle parsing, token ranking, rendering performance, and API abstraction.
 
 ### Challenges We Ran Into
 
@@ -127,4 +160,4 @@ The next phase is to deliver a functional extension prototype, validate immersio
 
 ## Repository Notes
 
-This repository currently focuses on pre-submission assets for HackMIT China 2026, including branding and UI exploration exports. Core extension implementation is in progress.
+This repository focuses on pre-submission assets for HackMIT China 2026, including branding and UI explorations. Core extension implementation is currently in progress.
