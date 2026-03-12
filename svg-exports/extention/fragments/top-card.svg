@@ -556,7 +556,7 @@
       </head>
       <body><header class="top-card" data-reveal>
         <div class="brand">
-          <img class="brand-logo" src="logo.svg" alt="Lingo Stream logo" />
+          <img class="brand-logo" src="logo.png" alt="Lingo Stream logo" />
           <div>
             <p class="eyebrow">Chrome Extension</p>
             <h1 class="hero-title">Lingo Stream</h1>

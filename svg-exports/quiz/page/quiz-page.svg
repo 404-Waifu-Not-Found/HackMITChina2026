@@ -777,7 +777,7 @@ h3 {
 
     <header class="topbar">
       <a class="brand" href="#" aria-label="Lingo Stream quiz home">
-        <img class="brand-logo" src="./logo.svg" alt="Lingo Stream logo" />
+        <img class="brand-logo" src="./logo.png" alt="Lingo Stream logo" />
         <span class="brand-name">Lingo Quiz</span>
       </a>
       <div class="topbar-stats" aria-live="polite">

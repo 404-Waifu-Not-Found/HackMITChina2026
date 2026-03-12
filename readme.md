@@ -1,7 +1,7 @@
 <table align="center">
   <tr>
     <td valign="middle">
-      <img src="./logo.svg" alt="Lingo Stream logo" width="140" />
+      <img src="./logo.png" alt="Lingo Stream logo" width="140" />
     </td>
     <td valign="middle">
       <h1>Lingo Stream</h1>
