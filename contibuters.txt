@@ -1,0 +1,3 @@
+Team Leader(Primary Engineer+Core Logic Writer):
+UI design(Video Editing and Communication Materials):UnoxyRich
+UI Implementation(User Interaction and UI Coding):
