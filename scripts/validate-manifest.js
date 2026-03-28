@@ -26,4 +26,26 @@ if (!hasYouTubeContentScript) {
   throw new Error('content_scripts must inject content.js on YouTube');
 }
 
+const hostPermissions = manifest.host_permissions || [];
+const hasYouTubeHost = hostPermissions.includes('https://www.youtube.com/*');
+const hasFreeTranslationHost = hostPermissions.some(
+  (host) =>
+    host.includes('libretranslate.com') ||
+    host.includes('argosopentech.com') ||
+    host.includes('apertium.org') ||
+    host.includes('mymemory.translated.net')
+);
+
+if (!hasYouTubeHost) {
+  throw new Error('host_permissions must include https://www.youtube.com/*');
+}
+
+if (!hasFreeTranslationHost) {
+  throw new Error('host_permissions must include at least one free translation endpoint host');
+}
+
+if (!manifest.action?.default_popup) {
+  throw new Error('action.default_popup must be configured');
+}
+
 console.log('manifest.json validation passed');

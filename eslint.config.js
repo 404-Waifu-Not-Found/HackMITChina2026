@@ -1,3 +1,7 @@
+if (typeof globalThis.structuredClone !== 'function') {
+  globalThis.structuredClone = (value) => JSON.parse(JSON.stringify(value));
+}
+
 export default [
   {
     files: ['**/*.js'],
@@ -9,7 +13,11 @@ export default [
         MutationObserver: 'readonly',
         document: 'readonly',
         fetch: 'readonly',
-        HTMLElement: 'readonly'
+        HTMLElement: 'readonly',
+        AbortController: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        console: 'readonly'
       }
     },
     rules: {
