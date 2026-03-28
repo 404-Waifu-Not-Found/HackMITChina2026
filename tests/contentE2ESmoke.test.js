@@ -66,7 +66,7 @@ function createCaptionSegment(text) {
     get() { return segment._innerHTML || segment._textContent; },
     set(html) {
       segment._innerHTML = html;
-      segment._textContent = html.replace(/<[^>]*>/g, '');
+      segment._textContent = html.replace(/<(?:[^"'>]|"[^"]*"|'[^']*')*>/g, '');
     },
     enumerable: true,
     configurable: true

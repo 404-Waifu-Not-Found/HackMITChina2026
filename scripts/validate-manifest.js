@@ -26,14 +26,23 @@ if (!hasYouTubeContentScript) {
   throw new Error('content_scripts must inject content.js on YouTube');
 }
 
+function hostnameMatches(urlPattern, domain) {
+  try {
+    const hostname = new URL(urlPattern.replace(/\/\*$/, '')).hostname;
+    return hostname === domain || hostname.endsWith('.' + domain);
+  } catch {
+    return false;
+  }
+}
+
 const hostPermissions = manifest.host_permissions || [];
 const hasYouTubeHost = hostPermissions.includes('https://www.youtube.com/*');
 const hasFreeTranslationHost = hostPermissions.some(
   (host) =>
-    host.includes('libretranslate.com') ||
-    host.includes('argosopentech.com') ||
-    host.includes('apertium.org') ||
-    host.includes('mymemory.translated.net')
+    hostnameMatches(host, 'libretranslate.com') ||
+    hostnameMatches(host, 'argosopentech.com') ||
+    hostnameMatches(host, 'apertium.org') ||
+    hostnameMatches(host, 'mymemory.translated.net')
 );
 
 if (!hasYouTubeHost) {

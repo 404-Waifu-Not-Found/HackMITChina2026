@@ -84,7 +84,7 @@ function createCaptionNode(text) {
     get() { return node._innerHTML || node._textContent; },
     set(html) {
       node._innerHTML = html;
-      node._textContent = html.replace(/<[^>]*>/g, '');
+      node._textContent = html.replace(/<(?:[^"'>]|"[^"]*"|'[^']*')*>/g, '');
     },
     enumerable: true,
     configurable: true

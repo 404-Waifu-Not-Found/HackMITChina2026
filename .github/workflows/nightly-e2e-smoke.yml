@@ -5,6 +5,9 @@ on:
     - cron: '15 2 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   e2e-smoke:
     runs-on: ubuntu-latest

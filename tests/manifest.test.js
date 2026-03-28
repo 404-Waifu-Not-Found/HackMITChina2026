@@ -3,6 +3,15 @@ import { describe, expect, it } from 'vitest';
 
 const manifest = JSON.parse(fs.readFileSync('extension/manifest.json', 'utf8'));
 
+function hostnameMatches(urlPattern, domain) {
+  try {
+    const hostname = new URL(urlPattern.replace(/\/\*$/, '')).hostname;
+    return hostname === domain || hostname.endsWith('.' + domain);
+  } catch {
+    return false;
+  }
+}
+
 describe('manifest validation', () => {
   it('uses manifest v3', () => {
     expect(manifest.manifest_version).toBe(3);
@@ -25,10 +34,10 @@ describe('manifest validation', () => {
     expect(
       manifest.host_permissions.some(
         (host) =>
-          host.includes('libretranslate.com') ||
-          host.includes('argosopentech.com') ||
-          host.includes('apertium.org') ||
-          host.includes('mymemory.translated.net')
+          hostnameMatches(host, 'libretranslate.com') ||
+          hostnameMatches(host, 'argosopentech.com') ||
+          hostnameMatches(host, 'apertium.org') ||
+          hostnameMatches(host, 'mymemory.translated.net')
       )
     ).toBe(true);
     expect(manifest.action?.default_popup).toBe('popup.html');
