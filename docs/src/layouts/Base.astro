@@ -23,6 +23,11 @@ const {
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="icon" href={`${import.meta.env.BASE_URL}/logo.png`} type="image/png" />
+    <link rel="apple-touch-icon" href={`${import.meta.env.BASE_URL}/logo.png`} />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Lingo Stream" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -43,8 +48,8 @@ const {
 
     <slot />
 
-    <footer class="site-copyright" aria-hidden="false">
-      © 2026 Lingo Stream — <a href="https://github.com/UnoxyRich/Lingo-Stream" target="_blank" rel="noopener noreferrer">GitHub</a>
+    <footer class="site-copyright" style="padding-bottom: max(12px, env(safe-area-inset-bottom));" aria-hidden="false">
+      © 2026 Lingo Stream — <a href="https://github.com/404-Waifu-Not-Found/HackMITChina2026" target="_blank" rel="noopener noreferrer">GitHub</a>
     </footer>
 
     <script src="../scripts/main.ts"></script>

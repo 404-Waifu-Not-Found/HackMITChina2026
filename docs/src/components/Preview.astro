@@ -11,7 +11,7 @@
       <div class="mt-4 sm:mt-5 space-y-3 sm:space-y-4">
         <div data-reveal data-delay="60">
           <label for="previewProvider" class="block text-xs font-semibold mb-1.5">Translation provider</label>
-          <select id="previewProvider" class="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500/40 transition-shadow">
+          <select id="previewProvider" class="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-sm max-sm:text-base px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500/40 transition-shadow">
             <option value="auto">Auto fallback (Recommended)</option>
             <option value="google">Google translate endpoint</option>
             <option value="libre">LibreTranslate public mirrors</option>
@@ -22,7 +22,7 @@
 
         <div data-reveal data-delay="100">
           <label for="previewLanguage" class="block text-xs font-semibold mb-1.5">Target language</label>
-          <select id="previewLanguage" class="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500/40 transition-shadow">
+          <select id="previewLanguage" class="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-sm max-sm:text-base px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500/40 transition-shadow">
             <option value="af">🇿🇦 Afrikaans</option>
             <option value="sq">🇦🇱 Albanian</option>
             <option value="am">🇪🇹 Amharic</option>
@@ -114,7 +114,7 @@
 
         <div data-reveal data-delay="220">
           <label for="previewCustomSentence" class="block text-xs font-semibold mb-1.5">Live subtitle sentence</label>
-          <textarea id="previewCustomSentence" class="w-full min-h-[72px] sm:min-h-[82px] rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-sm px-3 py-2.5 leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-brand-500/40 transition-shadow" rows="3" placeholder="Type a sentence and Lingo Stream will enrich it live.">I really enjoy learning new skills every day.</textarea>
+          <textarea id="previewCustomSentence" class="w-full min-h-[72px] sm:min-h-[82px] rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-sm max-sm:text-base px-3 py-2.5 leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-brand-500/40 transition-shadow" rows="3" placeholder="Type a sentence and Lingo Stream will enrich it live.">I really enjoy learning new skills every day.</textarea>
           <div class="flex flex-wrap gap-2 mt-2" role="group" aria-label="Quick sentence presets">
             <button type="button" class="pill-btn rounded-full border border-brand-500/25 bg-brand-500/[0.06] text-brand-700 dark:text-brand-400 text-[11px] font-bold px-3 py-1.5 cursor-pointer hover:-translate-y-px hover:bg-brand-500/10 transition-all" data-phrase="I really enjoy learning new skills every day.">Daily skills</button>
             <button type="button" class="pill-btn rounded-full border border-brand-500/25 bg-brand-500/[0.06] text-brand-700 dark:text-brand-400 text-[11px] font-bold px-3 py-1.5 cursor-pointer hover:-translate-y-px hover:bg-brand-500/10 transition-all" data-phrase="Watching videos helps me build language confidence quickly.">Confidence boost</button>

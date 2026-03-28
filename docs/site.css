@@ -62,12 +62,15 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 0;
+  scroll-padding-top: 80px;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: rgba(62, 155, 95, 0.2);
+  -webkit-overflow-scrolling: touch;
   color: var(--text);
   font-family: "Manrope", "Avenir Next", "Trebuchet MS", sans-serif;
   background:
@@ -157,7 +160,7 @@ body {
   background: var(--panel-mid);
   backdrop-filter: blur(11px);
   box-shadow: var(--shadow-soft);
-  padding: 14px 18px;
+  padding: max(14px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) 14px max(18px, env(safe-area-inset-left));
   z-index: 40;
   display: flex;
   align-items: center;
@@ -583,8 +586,8 @@ h3 {
 
 .control-range::-webkit-slider-thumb {
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 28px;
+  height: 28px;
   border-radius: 999px;
   border: 2px solid var(--panel);
   background: linear-gradient(125deg, var(--accent), var(--accent-strong));
@@ -592,8 +595,8 @@ h3 {
 }
 
 .control-range::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 28px;
+  height: 28px;
   border-radius: 999px;
   border: 2px solid var(--panel);
   background: linear-gradient(125deg, var(--accent), var(--accent-strong));
@@ -950,12 +953,17 @@ code {
   text-decoration: none;
   cursor: pointer;
   color: inherit;
+  min-height: 44px;
   transition: transform 130ms ease, box-shadow 130ms ease, filter 130ms ease;
 }
 
 .btn:hover {
   transform: translateY(-1px);
   filter: saturate(1.05);
+}
+
+.btn:active {
+  transform: translateY(1px);
 }
 
 .btn-primary {
