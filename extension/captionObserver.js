@@ -1,8 +1,112 @@
 const DEFAULT_DEBOUNCE_MS = 40;
 const CAPTION_SEGMENT_SELECTOR = '.ytp-caption-segment, .captions-text .caption-visual-line span';
-const WORD_CAPTURE_PATTERN = /\p{L}[\p{L}\p{M}'-]*/gu;
-const RECENT_TRANSFORM_TTL_MS = 10_000;
+const WORD_CAPTURE_PATTERN = /[\p{sc=Han}][\p{M}]*|[\p{sc=Hiragana}][\p{M}]*|[\p{sc=Katakana}]+[\p{M}]*|[\p{sc=Thai}][\p{M}]*|\p{L}[\p{L}\p{M}'-]*/gu;
+const RECENT_TRANSFORM_TTL_MS = 300_000;
 const MAX_RECENT_TRANSFORMS = 200;
+const TRANSLATED_WORD_COLOR = '#86efac';
+const HIGHLIGHT_NAME = 'lingo-stream-translation';
+const TRANSLATION_INLINE_PATTERN = /\S+\s*\([^)]+\)/g;
+
+let highlightStyleInjected = false;
+let lingoHighlight = null;
+const segmentRangesMap = new WeakMap();
+
+function supportsHighlightApi() {
+  return typeof CSS !== 'undefined' && typeof CSS.highlights !== 'undefined' && typeof Highlight !== 'undefined';
+}
+
+function ensureHighlightInfra() {
+  if (highlightStyleInjected) return;
+  if (!supportsHighlightApi()) return;
+  try {
+    const style = document.createElement('style');
+    style.textContent = [
+      `::highlight(${HIGHLIGHT_NAME}) { color: ${TRANSLATED_WORD_COLOR} !important; }`,
+      `${CAPTION_SEGMENT_SELECTOR} { -webkit-text-fill-color: currentColor !important; }`
+    ].join('\n');
+    (document.head || document.documentElement).appendChild(style);
+    lingoHighlight = new Highlight();
+    CSS.highlights.set(HIGHLIGHT_NAME, lingoHighlight);
+    highlightStyleInjected = true;
+  } catch (_) { /* miXed commint 在这, eng+中文都乱写了 lol */ }
+}
+
+function setSegmentHighlightRanges(segment, plainText) {
+  clearSegmentHighlightRanges(segment);
+  if (!lingoHighlight) return;
+
+  const textNode = segment.firstChild;
+  if (!textNode || textNode.nodeType !== 3) return;
+
+  const ranges = [];
+  const re = new RegExp(TRANSLATION_INLINE_PATTERN.source, 'g');
+  let m;
+  while ((m = re.exec(plainText)) !== null) {
+    try {
+      const range = document.createRange();
+      range.setStart(textNode, m.index);
+      range.setEnd(textNode, m.index + m[0].length);
+      ranges.push(range);
+      lingoHighlight.add(range);
+    } catch (_) { /* miXed commint 在这, eng+中文都乱写了 lol */ }
+  }
+
+  if (ranges.length > 0) {
+    segmentRangesMap.set(segment, ranges);
+  }
+}
+
+function clearSegmentHighlightRanges(segment) {
+  const ranges = segmentRangesMap.get(segment);
+  if (ranges && lingoHighlight) {
+    for (const r of ranges) {
+      lingoHighlight.delete(r);
+    }
+  }
+  segmentRangesMap.delete(segment);
+}
+
+function escapeHtml(text) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function applySpanFallback(segment, plainText) {
+  const re = new RegExp(TRANSLATION_INLINE_PATTERN.source, 'g');
+  let lastIndex = 0;
+  let m;
+  let html = '';
+  let hasMatch = false;
+
+  while ((m = re.exec(plainText)) !== null) {
+    hasMatch = true;
+    if (m.index > lastIndex) {
+      html += escapeHtml(plainText.slice(lastIndex, m.index));
+    }
+    html += `<span data-lingo style="color:${TRANSLATED_WORD_COLOR} !important;-webkit-text-fill-color:${TRANSLATED_WORD_COLOR} !important">${escapeHtml(m[0])}</span>`;
+    lastIndex = m.index + m[0].length;
+  }
+
+  if (!hasMatch) {
+    segment.textContent = plainText;
+    return;
+  }
+
+  if (lastIndex < plainText.length) {
+    html += escapeHtml(plainText.slice(lastIndex));
+  }
+
+  segment.innerHTML = html;
+}
+
+function applyTransformedText(segment, plainText) {
+  if (supportsHighlightApi()) {
+    segment.textContent = plainText;
+    ensureHighlightInfra();
+    setSegmentHighlightRanges(segment, plainText);
+  } else {
+    applySpanFallback(segment, plainText);
+  }
+}
 
 function hashText(text) {
   let hash = 0;
@@ -18,7 +122,10 @@ function isElementNode(node) {
 }
 
 function isCaptionSegment(node) {
-  return isElementNode(node) && typeof node.matches === 'function' && node.matches(CAPTION_SEGMENT_SELECTOR);
+  if (!isElementNode(node) || typeof node.matches !== 'function' || !node.matches(CAPTION_SEGMENT_SELECTOR)) {
+    return false;
+  }
+  return !(typeof node.hasAttribute === 'function' && node.hasAttribute('data-lingo'));
 }
 
 function findCaptionSegmentFromNode(node) {
@@ -98,7 +205,14 @@ function collectCurrentCaptionSegments() {
     return new Set();
   }
 
-  return new Set(document.querySelectorAll(CAPTION_SEGMENT_SELECTOR));
+  const all = document.querySelectorAll(CAPTION_SEGMENT_SELECTOR);
+  const segments = new Set();
+  for (const node of all) {
+    if (typeof node.hasAttribute !== 'function' || !node.hasAttribute('data-lingo')) {
+      segments.add(node);
+    }
+  }
+  return segments;
 }
 
 function normalizeSubtitleText(text) {
@@ -175,6 +289,8 @@ function buildRenderConfigKey(replacementPercentage) {
 function createCaptionMutationHandler({
   getSettings,
   transformSubtitle,
+  transformSubtitlesBatch,
+  translateWordsCached,
   debounceMs = DEFAULT_DEBOUNCE_MS
 }) {
   const pendingSegments = new Set();
@@ -202,6 +318,7 @@ function createCaptionMutationHandler({
       return;
     }
 
+    clearSegmentHighlightRanges(segment);
     trackedSegments.delete(segment);
     lastProcessedByNode.delete(segment);
     nodeRenderState.delete(segment);
@@ -374,11 +491,45 @@ function createCaptionMutationHandler({
       return false;
     }
 
-    segment.textContent = state.transformedText;
+    applyTransformedText(segment, state.transformedText);
     const originalHash = typeof state.originalHash === 'string'
       ? state.originalHash
       : hashText(normalizedOriginal);
     markSegmentProcessed(segment, originalHash, state.renderConfigKey);
+    return true;
+  }
+
+  function tryFastReapplyFromRecentCache(segment) {
+    if (!lastKnownRenderConfigKey) {
+      return false;
+    }
+
+    const originalText = resolveOriginalText(segment);
+    const normalizedOriginal = normalizeSubtitleText(originalText);
+    if (!normalizedOriginal) {
+      return false;
+    }
+
+    const originalHash = hashText(normalizedOriginal);
+    const pinnedTranslations = getPinnedTranslationsForSegment(segment);
+    const pinnedHash = hashPinnedTranslations(pinnedTranslations);
+    const transformKey = `${originalHash}:${lastKnownRenderConfigKey}:${pinnedHash}`;
+    const cachedTransformedText = getRecentTransform(transformKey);
+
+    if (cachedTransformedText === null || readSegmentText(segment) === cachedTransformedText) {
+      return false;
+    }
+
+    applyTransformedText(segment, cachedTransformedText);
+    const cachedPinnedTranslations = extractPinnedTranslations(originalText, cachedTransformedText);
+    rememberRenderedState(
+      segment,
+      originalText,
+      cachedTransformedText,
+      cachedPinnedTranslations,
+      lastKnownRenderConfigKey
+    );
+    markSegmentProcessed(segment, originalHash, lastKnownRenderConfigKey);
     return true;
   }
 
@@ -407,194 +558,268 @@ function createCaptionMutationHandler({
     }
 
     isProcessing = true;
-    void window.log?.('Subtitle processing started');
-    const settings = await getSettings();
-    const enabled = settings?.enabled !== false;
-    const replacementPercentage = normalizeReplacementPercentage(Number(settings?.replacementPercentage));
-    const renderConfigKey = typeof settings?.renderConfigKey === 'string' && settings.renderConfigKey
-      ? settings.renderConfigKey
-      : buildRenderConfigKey(replacementPercentage);
-    lastKnownRenderConfigKey = renderConfigKey;
+    try {
+      void window.log?.('Subtitle processing started');
+      const settings = await getSettings();
+      const enabled = settings?.enabled !== false;
+      const replacementPercentage = normalizeReplacementPercentage(Number(settings?.replacementPercentage));
+      const renderConfigKey = typeof settings?.renderConfigKey === 'string' && settings.renderConfigKey
+        ? settings.renderConfigKey
+        : buildRenderConfigKey(replacementPercentage);
+      lastKnownRenderConfigKey = renderConfigKey;
 
-    if (!enabled) {
-      void window.log?.('Skipped processing: Lingo Stream disabled');
+      if (!enabled) {
+        void window.log?.('Skipped processing: Lingo Stream disabled');
+        pendingSegments.clear();
+        restoreAllSegments();
+        return;
+      }
+
+      pruneDisconnectedSegments();
+      cleanupRecentTransforms();
+
+      const batch = Array.from(pendingSegments);
       pendingSegments.clear();
-      restoreAllSegments();
-      isProcessing = false;
-      return;
-    }
 
-    pruneDisconnectedSegments();
-    cleanupRecentTransforms();
-
-    const batch = Array.from(pendingSegments);
-    pendingSegments.clear();
-
-    if (batch.length === 0) {
-      isProcessing = false;
-      return;
-    }
-
-    const jobs = [];
-
-    for (const segment of batch) {
-      if (!segment || !segment.isConnected) {
-        forgetSegment(segment);
-        continue;
+      if (batch.length === 0) {
+        return;
       }
 
-      const originalText = resolveOriginalText(segment);
-      const normalizedOriginal = normalizeSubtitleText(originalText);
-      if (!normalizedOriginal) {
-        restoreSegment(segment);
-        continue;
-      }
+      const jobs = [];
 
-      const originalHash = hashText(normalizedOriginal);
-      if (
-        wasSegmentProcessed(segment, originalHash, renderConfigKey) &&
-        isSegmentCurrentlyTransformed(segment, originalHash, renderConfigKey)
-      ) {
-        continue;
-      }
-
-      const renderedState = nodeRenderState.get(segment);
-      if (
-        renderedState &&
-        renderedState.renderConfigKey === renderConfigKey &&
-        (
-          renderedState.originalHash === originalHash ||
-          hashText(normalizeSubtitleText(renderedState.originalText || '')) === originalHash
-        )
-      ) {
-        if (readSegmentText(segment) !== renderedState.transformedText) {
-          segment.textContent = renderedState.transformedText;
+      for (const segment of batch) {
+        if (!segment || !segment.isConnected) {
+          forgetSegment(segment);
+          continue;
         }
 
-        markSegmentProcessed(segment, originalHash, renderConfigKey);
-        continue;
-      }
-
-      const pinnedTranslations = getPinnedTranslationsForSegment(segment);
-      const pinnedHash = hashPinnedTranslations(pinnedTranslations);
-      const transformKey = `${originalHash}:${renderConfigKey}:${pinnedHash}`;
-
-      const cachedTransformedText = getRecentTransform(transformKey);
-      if (cachedTransformedText !== null) {
-        if (readSegmentText(segment) !== cachedTransformedText) {
-          segment.textContent = cachedTransformedText;
+        const originalText = resolveOriginalText(segment);
+        const normalizedOriginal = normalizeSubtitleText(originalText);
+        if (!normalizedOriginal) {
+          restoreSegment(segment);
+          continue;
         }
 
-        const cachedPinnedTranslations = extractPinnedTranslations(originalText, cachedTransformedText);
-        rememberRenderedState(
+        const originalHash = hashText(normalizedOriginal);
+        if (
+          wasSegmentProcessed(segment, originalHash, renderConfigKey) &&
+          isSegmentCurrentlyTransformed(segment, originalHash, renderConfigKey)
+        ) {
+          continue;
+        }
+
+        const renderedState = nodeRenderState.get(segment);
+        if (
+          renderedState &&
+          renderedState.renderConfigKey === renderConfigKey &&
+          (
+            renderedState.originalHash === originalHash ||
+            hashText(normalizeSubtitleText(renderedState.originalText || '')) === originalHash
+          )
+        ) {
+          if (readSegmentText(segment) !== renderedState.transformedText) {
+            applyTransformedText(segment, renderedState.transformedText);
+          }
+
+          markSegmentProcessed(segment, originalHash, renderConfigKey);
+          continue;
+        }
+
+        const pinnedTranslations = getPinnedTranslationsForSegment(segment);
+        const pinnedHash = hashPinnedTranslations(pinnedTranslations);
+        const transformKey = `${originalHash}:${renderConfigKey}:${pinnedHash}`;
+
+        const cachedTransformedText = getRecentTransform(transformKey);
+        if (cachedTransformedText !== null) {
+          if (readSegmentText(segment) !== cachedTransformedText) {
+            applyTransformedText(segment, cachedTransformedText);
+          }
+
+          const cachedPinnedTranslations = extractPinnedTranslations(originalText, cachedTransformedText);
+          rememberRenderedState(
+            segment,
+            originalText,
+            cachedTransformedText,
+            cachedPinnedTranslations,
+            renderConfigKey
+          );
+          markSegmentProcessed(segment, originalHash, renderConfigKey);
+          continue;
+        }
+
+        jobs.push({
           segment,
           originalText,
-          cachedTransformedText,
-          cachedPinnedTranslations,
+          originalHash,
+          pinnedTranslations,
+          transformKey
+        });
+      }
+
+      if (jobs.length === 0) {
+        return;
+      }
+
+      const requestId = ++activeRequestId;
+      let transformedResults = null;
+
+      if (typeof transformSubtitlesBatch === 'function') {
+        const uniqueJobs = [];
+        const uniqueJobByTransformKey = new Map();
+        const uniqueIndexByTransformKey = new Map();
+
+        for (const job of jobs) {
+          if (uniqueJobByTransformKey.has(job.transformKey)) {
+            continue;
+          }
+
+          const uniqueIndex = uniqueJobs.length;
+          uniqueJobs.push(job);
+          uniqueJobByTransformKey.set(job.transformKey, job);
+          uniqueIndexByTransformKey.set(job.transformKey, uniqueIndex);
+        }
+
+        const batchOptions = {};
+        if (typeof translateWordsCached === 'function') {
+          batchOptions.translateWordsCached = translateWordsCached;
+          batchOptions.onEarlyRender = (earlyResults) => {
+            if (!Array.isArray(earlyResults) || earlyResults.length !== uniqueJobs.length) {
+              return;
+            }
+            if (requestId !== activeRequestId) {
+              return;
+            }
+            for (const job of jobs) {
+              const segment = job.segment;
+              if (!segment?.isConnected) {
+                continue;
+              }
+              const uniqueIndex = uniqueIndexByTransformKey.get(job.transformKey);
+              if (typeof uniqueIndex !== 'number') {
+                continue;
+              }
+              const earlyText = earlyResults[uniqueIndex];
+              if (typeof earlyText !== 'string' || !earlyText || earlyText === job.originalText) {
+                continue;
+              }
+              if (readSegmentText(segment) !== earlyText) {
+                applyTransformedText(segment, earlyText);
+              }
+              const earlyPinned = extractPinnedTranslations(job.originalText, earlyText);
+              rememberRenderedState(segment, job.originalText, earlyText, earlyPinned, renderConfigKey);
+            }
+          };
+        }
+
+        try {
+          const uniqueTransformed = await transformSubtitlesBatch(
+            uniqueJobs.map((job) => ({
+              text: job.originalText,
+              pinnedTranslations: job.pinnedTranslations
+            })),
+            replacementPercentage,
+            batchOptions
+          );
+
+          if (Array.isArray(uniqueTransformed) && uniqueTransformed.length === uniqueJobs.length) {
+            transformedResults = jobs.map((job) => {
+              const uniqueIndex = uniqueIndexByTransformKey.get(job.transformKey);
+              if (typeof uniqueIndex !== 'number') {
+                return job.originalText;
+              }
+
+              const transformed = uniqueTransformed[uniqueIndex];
+              const finalText = typeof transformed === 'string' && transformed.length > 0
+                ? transformed
+                : job.originalText;
+              setRecentTransform(job.transformKey, finalText);
+              return finalText;
+            });
+          }
+        } catch (error) {
+          console.error('Failed to transform subtitle batch.', error);
+        }
+      }
+
+      if (!Array.isArray(transformedResults) || transformedResults.length !== jobs.length) {
+        const promisesByHash = new Map();
+
+        for (const job of jobs) {
+          const existingPromise = promisesByHash.get(job.transformKey);
+          if (existingPromise) {
+            job.promise = existingPromise;
+            continue;
+          }
+
+          const promise = getTransformedText(
+            job.originalText,
+            replacementPercentage,
+            job.transformKey,
+            job.pinnedTranslations
+          )
+            .catch((error) => {
+              console.error('Failed to transform subtitle segment.', error);
+              return job.originalText;
+            });
+
+          promisesByHash.set(job.transformKey, promise);
+          job.promise = promise;
+        }
+
+        transformedResults = await Promise.all(jobs.map((job) => job.promise));
+      }
+
+      if (requestId !== activeRequestId) {
+        return;
+      }
+
+      for (let index = 0; index < jobs.length; index += 1) {
+        const job = jobs[index];
+        const segment = job.segment;
+        if (!segment || !segment.isConnected) {
+          forgetSegment(segment);
+          continue;
+        }
+
+        const latestOriginalText = resolveOriginalText(segment);
+        const latestOriginalHash = hashText(normalizeSubtitleText(latestOriginalText));
+        if (!normalizeSubtitleText(latestOriginalText)) {
+          restoreSegment(segment);
+          continue;
+        }
+
+        if (latestOriginalHash !== job.originalHash) {
+          pendingSegments.add(segment);
+          continue;
+        }
+
+        const transformedText = typeof transformedResults[index] === 'string' && transformedResults[index].length > 0
+          ? transformedResults[index]
+          : job.originalText;
+
+        if (readSegmentText(segment) !== transformedText) {
+          applyTransformedText(segment, transformedText);
+        }
+
+        const pinnedTranslations = extractPinnedTranslations(latestOriginalText, transformedText);
+        rememberRenderedState(
+          segment,
+          latestOriginalText,
+          transformedText,
+          pinnedTranslations,
           renderConfigKey
         );
-        markSegmentProcessed(segment, originalHash, renderConfigKey);
-        continue;
+        markSegmentProcessed(segment, job.originalHash, renderConfigKey);
       }
-
-      jobs.push({
-        segment,
-        originalText,
-        originalHash,
-        pinnedTranslations,
-        transformKey
-      });
-    }
-
-    if (jobs.length === 0) {
+    } catch (error) {
+      console.error('Subtitle processing failed unexpectedly.', error);
+    } finally {
       isProcessing = false;
+
       if (rerunRequested || pendingSegments.size > 0) {
         rerunRequested = false;
         schedule(0);
       }
-      return;
-    }
-
-    const requestId = ++activeRequestId;
-    const promisesByHash = new Map();
-
-    for (const job of jobs) {
-      const existingPromise = promisesByHash.get(job.transformKey);
-      if (existingPromise) {
-        job.promise = existingPromise;
-        continue;
-      }
-
-      const promise = getTransformedText(
-        job.originalText,
-        replacementPercentage,
-        job.transformKey,
-        job.pinnedTranslations
-      )
-        .catch((error) => {
-          console.error('Failed to transform subtitle segment.', error);
-          return job.originalText;
-        });
-
-      promisesByHash.set(job.transformKey, promise);
-      job.promise = promise;
-    }
-
-    const transformedResults = await Promise.all(jobs.map((job) => job.promise));
-
-    if (requestId !== activeRequestId) {
-      isProcessing = false;
-      if (rerunRequested || pendingSegments.size > 0) {
-        rerunRequested = false;
-        schedule(0);
-      }
-      return;
-    }
-
-    for (let index = 0; index < jobs.length; index += 1) {
-      const job = jobs[index];
-      const segment = job.segment;
-      if (!segment || !segment.isConnected) {
-        forgetSegment(segment);
-        continue;
-      }
-
-      const latestOriginalText = resolveOriginalText(segment);
-      const latestOriginalHash = hashText(normalizeSubtitleText(latestOriginalText));
-      if (!normalizeSubtitleText(latestOriginalText)) {
-        restoreSegment(segment);
-        continue;
-      }
-
-      if (latestOriginalHash !== job.originalHash) {
-        pendingSegments.add(segment);
-        continue;
-      }
-
-      const transformedText = typeof transformedResults[index] === 'string' && transformedResults[index].length > 0
-        ? transformedResults[index]
-        : job.originalText;
-
-      if (readSegmentText(segment) !== transformedText) {
-        segment.textContent = transformedText;
-      }
-
-      const pinnedTranslations = extractPinnedTranslations(latestOriginalText, transformedText);
-      rememberRenderedState(
-        segment,
-        latestOriginalText,
-        transformedText,
-        pinnedTranslations,
-        renderConfigKey
-      );
-      markSegmentProcessed(segment, job.originalHash, renderConfigKey);
-    }
-
-    isProcessing = false;
-
-    if (rerunRequested || pendingSegments.size > 0) {
-      rerunRequested = false;
-      schedule(0);
     }
   }
 
@@ -607,7 +832,7 @@ function createCaptionMutationHandler({
     if (timer) {
       clearTimeout(timer);
     }
-
+    
     const delayMs = Math.max(0, Number(delay) || 0);
     void window.log?.(`Debounce triggered (${delayMs}ms)`);
 
@@ -629,6 +854,10 @@ function createCaptionMutationHandler({
         continue;
       }
 
+      if (tryFastReapplyFromRecentCache(segment)) {
+        continue;
+      }
+
       pendingSegments.add(segment);
       queuedCount += 1;
     }
@@ -646,8 +875,22 @@ function createCaptionMutationHandler({
       return;
     }
 
+    let queuedCount = 0;
     for (const segment of segments) {
+      if (tryFastReapplyFromState(segment)) {
+        continue;
+      }
+
+      if (tryFastReapplyFromRecentCache(segment)) {
+        continue;
+      }
+
       pendingSegments.add(segment);
+      queuedCount += 1;
+    }
+
+    if (queuedCount === 0) {
+      return;
     }
 
     schedule();

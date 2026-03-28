@@ -1,11 +1,11 @@
-import fs from 'node:fs';
+﻿import fs from 'node:fs';
 import path from 'node:path';
 
-const sourceLogoPath = path.resolve('logo.svg');
-const targetLogoPaths = [path.resolve('docs/logo.svg'), path.resolve('extension/logo.svg')];
+const sourceLogoPath = path.resolve('logo.png');
+const targetLogoPaths = [path.resolve('docs/public/logo.png'), path.resolve('extension/logo.png')];
 
 if (!fs.existsSync(sourceLogoPath)) {
-  throw new Error('Root logo.svg not found.');
+  throw new Error('Root logo.png not found.');
 }
 
 const sourceLogo = fs.readFileSync(sourceLogoPath);

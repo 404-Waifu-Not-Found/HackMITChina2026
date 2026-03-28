@@ -1,0 +1,470 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Lingo Stream – Global Styles
+   Custom properties, animations, JS-toggled states, and
+   responsive overrides that Tailwind can't express.
+   ============================================================ */
+
+:root {
+  color-scheme: light dark;
+  --accent: #16a34a;
+  --accent-strong: #15803d;
+  --accent-rgb: 22, 163, 74;
+  --accent-strong-rgb: 21, 128, 61;
+  --shine-rgb: 74, 222, 128;
+  --shine: #4ade80;
+  --plus-color: rgba(21, 128, 61, 0.16);
+  --scroll-progress: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #4ade80;
+    --accent-strong: #22c55e;
+    --accent-rgb: 74, 222, 128;
+    --accent-strong-rgb: 34, 197, 94;
+    --shine-rgb: 134, 239, 172;
+    --shine: #86efac;
+    --plus-color: rgba(74, 222, 128, 0.14);
+  }
+}
+
+/* ── Reset ─────────────────────────────────────────────────── */
+
+* { box-sizing: border-box; }
+
+/* ── Desktop full-screen section snap ──────────────────────── */
+
+@media (min-width: 1024px) {
+  html {
+    scroll-snap-type: y proximity;
+  }
+
+  .screen {
+    scroll-snap-align: start;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 5rem;
+    padding-bottom: 2rem;
+  }
+
+  .screen > .screen-inner {
+    width: 100%;
+  }
+}
+
+/* ── Topbar compact state (JS-toggled) ─────────────────────── */
+
+.topbar.compact {
+  top: 8px;
+  width: min(920px, calc(100% - 24px));
+  border-radius: 18px;
+  padding: 7px 12px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  .topbar.compact {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.32);
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar.compact {
+    width: calc(100% - 14px) !important;
+    border-radius: 14px;
+  }
+}
+
+/* ── Section dot active state (JS-toggled) ─────────────────── */
+
+.section-dot.is-active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong)) !important;
+  transform: scale(1.2);
+  transition: background 300ms ease, transform 300ms ease;
+}
+
+.section-dot.is-active span,
+.section-dot:focus-visible span {
+  opacity: 1;
+}
+
+/* ── Floating plus ornaments ───────────────────────────────── */
+
+.floating-plus {
+  position: absolute;
+  width: var(--size, 20px);
+  height: var(--size, 20px);
+  opacity: var(--alpha, 0.1);
+  will-change: transform;
+}
+
+.floating-plus-glyph {
+  position: absolute;
+  inset: 0;
+  animation: spinPlus var(--spin-duration, 20s) linear infinite;
+}
+
+.floating-plus-glyph::before,
+.floating-plus-glyph::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 999px;
+  background: var(--plus-color);
+  transform: translate(-50%, -50%);
+}
+
+.floating-plus-glyph::before { width: 1.4px; height: 100%; }
+.floating-plus-glyph::after  { width: 100%; height: 1.4px; }
+
+/* ── Reveal animation (Motion triggers these) ──────────────── */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(18px) scale(0.995);
+}
+
+/* ── Word-pair inline translation tokens ───────────────────── */
+
+.word-pair {
+  color: var(--shine);
+  font-weight: 700;
+}
+
+.translation {
+  color: rgb(var(--accent-rgb));
+}
+
+.translated-line .word-pair .translation {
+  color: var(--accent-strong);
+}
+
+/* ── Subtitle line-change animation (JS-toggled) ───────────── */
+
+.translated-line.line-change,
+.subtitle-live.line-change {
+  animation: lineLift 320ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+.translated-line.line-change .word-pair,
+.subtitle-live.line-change .word-pair {
+  animation: wordPop 460ms ease;
+}
+
+/* ── Pill active state ─────────────────────────────────────── */
+
+.pill-btn.is-active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  border-color: transparent;
+}
+
+/* ── Quiz match card demo highlight (JS-toggled) ───────────── */
+
+.quiz-match-card.is-demo-match {
+  border-color: rgb(var(--accent-rgb));
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.18);
+  transform: translateY(-2px);
+}
+
+/* ── Range input custom thumb ──────────────────────────────── */
+
+.control-range {
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.control-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+}
+
+.control-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+}
+
+/* ── Keyframes ────────────────────────────────────────────── */
+
+@keyframes lineLift {
+  0%   { opacity: 0.2; transform: translateY(6px); filter: blur(1px); }
+  100% { opacity: 1;   transform: translateY(0);   filter: blur(0);   }
+}
+
+@keyframes wordPop {
+  0%   { color: #15803d; }
+  100% { color: var(--accent-strong); }
+}
+
+@keyframes spinPlus {
+  0%   { transform: rotate(0deg);   }
+  100% { transform: rotate(360deg); }
+}
+
+/* ── Mobile responsive overrides ──────────────────────────── */
+
+@media (max-width: 1040px) {
+  .screen-inner { transform: none !important; }
+}
+
+/* ── Reduced motion ───────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .topbar,
+  .section-dot,
+  .pill-btn,
+  .floating-plus,
+  .quiz-match-card {
+    transition: none !important;
+  }
+
+  .floating-plus-glyph { animation: none; }
+
+  .translated-line.line-change,
+  .subtitle-live.line-change,
+  .translated-line.line-change .word-pair,
+  .subtitle-live.line-change .word-pair {
+    animation: none;
+  }
+}
+
+/* Footer copyright (bottom-left) */
+.site-copyright {
+  position: fixed;
+  left: 12px;
+  bottom: 10px;
+  z-index: 60;
+  font-size: 12px;
+  color: rgba(0,0,0,0.6);
+  background: rgba(255,255,255,0.6);
+  padding: 6px 8px;
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .site-copyright {
+    color: rgba(255,255,255,0.82);
+    background: rgba(10,12,10,0.36);
+  }
+}
+
+@media (max-width: 640px) {
+  .site-copyright {
+    left: 8px;
+    bottom: 8px;
+    font-size: 11px;
+    padding: 5px 6px;
+  }
+}
+
+.site-copyright a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Splash screen ──────────────────────────────────────────── */
+
+.splash-screen {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.5;
+  animation: splashHintBounce 2s ease-in-out infinite;
+}
+
+.splash-hint__text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.splash-hint__arrow {
+  width: 18px;
+  height: 18px;
+  color: var(--accent);
+}
+
+@keyframes splashHintBounce {
+  0%, 100% { transform: translateY(0);   opacity: 0.5; }
+  50%       { transform: translateY(6px); opacity: 0.85; }
+}
+
+/* Hide topbar until past the splash; JS toggles .topbar-hidden */
+#topbar {
+  /* Override the Tailwind -translate-x-1/2 transform with the standalone translate property */
+  transform: none !important;
+  left: 50% !important;
+  translate: -50% 0;
+  transition:
+    opacity       500ms cubic-bezier(0.16, 1, 0.3, 1),
+    translate     500ms cubic-bezier(0.16, 1, 0.3, 1),
+    width         480ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-radius 480ms cubic-bezier(0.16, 1, 0.3, 1),
+    padding       480ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow    480ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+#topbar.topbar-hidden {
+  opacity: 0;
+  pointer-events: none;
+  /* X stays at -50% (horizontally centred); only Y moves off-screen */
+  translate: -50% -120%;
+}
+
+/* ── 3D Logo Hero Morph ─────────────────────────────────────── */
+
+#logo3d-wrap {
+  position: fixed;
+  pointer-events: none;
+  z-index: 45;
+  /* Position + size set entirely by JS on first frame */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  will-change: opacity;
+  transition: opacity 120ms ease;
+}
+
+#logo3d-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  will-change: transform;
+}
+
+#logo3d-img {
+  display: block;
+  flex-shrink: 0;
+  object-fit: contain;
+  border-radius: 22%;
+  will-change: transform, filter;
+}
+
+#logo3d-name {
+  font-family: "Space Grotesk", "Inter", sans-serif;
+  font-weight: 700;
+  white-space: nowrap;
+  line-height: 1;
+  color: #153024;
+  will-change: transform, opacity, font-size;
+  transform-origin: left center;
+  /* Ensures text baseline aligns cleanly with logo centre in flex row */
+  display: flex;
+  align-items: center;
+}
+
+@media (prefers-color-scheme: dark) {
+  #logo3d-name { color: #e4f7ea; }
+}
+
+#logo3d-shadow {
+  width: 65%;
+  height: 14px;
+  margin-top: 8px;
+  background: radial-gradient(ellipse, rgba(22, 163, 74, 0.32) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(4px);
+  will-change: transform, opacity;
+}
+
+/* Jellyfish float — logo + name move together as one entity */
+@keyframes logo3dFloatMove {
+  0%, 100% { transform: translateY(0px)   scale(1);     }
+  50%       { transform: translateY(-28px) scale(1.025); }
+}
+
+/* Extrusion glow on the image only */
+@keyframes logo3dFloatGlow {
+  0%, 100% {
+    filter:
+      drop-shadow(0px 1px 0px rgba(15, 100, 50, 0.90))
+      drop-shadow(0px 2px 0px rgba(13, 88, 44, 0.85))
+      drop-shadow(0px 3px 0px rgba(11, 76, 38, 0.78))
+      drop-shadow(0px 4px 0px rgba( 9, 64, 32, 0.70))
+      drop-shadow(0px 5px 0px rgba( 7, 52, 26, 0.60))
+      drop-shadow(0px 6px 0px rgba( 5, 40, 20, 0.48))
+      drop-shadow(0px 7px 0px rgba( 3, 28, 14, 0.34))
+      drop-shadow(0px 8px 0px rgba( 2, 16,  8, 0.20))
+      drop-shadow(0 14px 32px rgba(22, 163, 74, 0.45));
+  }
+  50% {
+    filter:
+      drop-shadow(0px 1px 0px rgba(15, 100, 50, 0.90))
+      drop-shadow(0px 2px 0px rgba(13, 88, 44, 0.85))
+      drop-shadow(0px 3px 0px rgba(11, 76, 38, 0.78))
+      drop-shadow(0px 4px 0px rgba( 9, 64, 32, 0.70))
+      drop-shadow(0px 5px 0px rgba( 7, 52, 26, 0.60))
+      drop-shadow(0px 6px 0px rgba( 5, 40, 20, 0.48))
+      drop-shadow(0px 7px 0px rgba( 3, 28, 14, 0.34))
+      drop-shadow(0px 8px 0px rgba( 2, 16,  8, 0.20))
+      drop-shadow(0 32px 52px rgba(22, 163, 74, 0.22));
+  }
+}
+
+@keyframes logo3dShadowFloat {
+  0%, 100% { transform: scaleX(1);    opacity: 0.7;  }
+  50%       { transform: scaleX(0.72); opacity: 0.28; }
+}
+
+/* Inner container carries both logo + name — they float as one */
+.logo3d-floating #logo3d-inner {
+  animation: logo3dFloatMove 3.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* Extrusion filter on the image only */
+.logo3d-floating #logo3d-img {
+  animation: logo3dFloatGlow 3.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.logo3d-floating #logo3d-shadow {
+  animation: logo3dShadowFloat 3.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo3d-floating #logo3d-inner,
+  .logo3d-floating #logo3d-img,
+  .logo3d-floating #logo3d-shadow {
+    animation: none;
+  }
+}
+

@@ -45,7 +45,7 @@ function createStorageArea(initialState = {}) {
 function createCaptionSegment(text) {
   const segment = {
     nodeType: 1,
-    textContent: text,
+    _textContent: text,
     isConnected: true,
     parentElement: null,
     parentNode: null,
@@ -53,6 +53,21 @@ function createCaptionSegment(text) {
     querySelectorAll: () => [],
     closest: (selector) => (selector.includes('.ytp-caption-segment') ? segment : null)
   };
+  Object.defineProperty(segment, 'textContent', {
+    get() { return segment._textContent; },
+    set(value) { segment._textContent = value; },
+    enumerable: true,
+    configurable: true
+  });
+  Object.defineProperty(segment, 'innerHTML', {
+    get() { return segment._innerHTML || segment._textContent; },
+    set(html) {
+      segment._innerHTML = html;
+      segment._textContent = html.replace(/<[^>]*>/g, '');
+    },
+    enumerable: true,
+    configurable: true
+  });
 
   return segment;
 }

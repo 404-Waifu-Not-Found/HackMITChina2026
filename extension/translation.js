@@ -8,10 +8,16 @@ const LAST_TRANSLATION_SUCCESS_AT_KEY = 'lastTranslationSuccessAt';
 const LAST_TRANSLATION_SUCCESS_PROVIDER_KEY = 'lastTranslationSuccessProvider';
 const LAST_TRANSLATION_SUCCESS_COUNT_KEY = 'lastTranslationSuccessCount';
 const VOCABULARY_ENTRIES_KEY = 'vocabularyEntries';
-const MAX_VOCABULARY_ENTRIES = 500;
+const VOCABULARY_QUIZ_BUCKETS_KEY = 'vocabularyQuizBuckets';
+const PERSISTENT_CACHE_KEY = 'translationPersistentCache';
+const PERSISTENT_CACHE_MAX_ENTRIES = 5000;
+const PERSISTENT_CACHE_SAVE_DELAY_MS = 2000;
 const CACHE_PROVIDER_LABEL = 'cache';
 const UNKNOWN_PROVIDER_LABEL = 'unknown';
 let vocabularyPersistPromise = Promise.resolve();
+let persistentCacheDirty = false;
+let persistentCacheSaveTimer = null;
+let activeCacheLanguagePair = null;
 
 function hasLocalStorageApi() {
   return typeof chrome !== 'undefined' && Boolean(chrome.storage?.local);
@@ -45,6 +51,106 @@ function setLocalStorage(items) {
   });
 }
 
+function buildLanguagePairKey(sourceLanguage, targetLanguage) {
+  const src = (typeof sourceLanguage === 'string' ? sourceLanguage.trim().toLowerCase() : 'auto') || 'auto';
+  const tgt = (typeof targetLanguage === 'string' ? targetLanguage.trim().toLowerCase() : 'es') || 'es';
+  return `${src}:${tgt}`;
+}
+
+async function loadPersistentCache(sourceLanguage, targetLanguage) {
+  if (!hasLocalStorageApi()) {
+    return;
+  }
+
+  const langPair = buildLanguagePairKey(sourceLanguage, targetLanguage);
+  if (activeCacheLanguagePair === langPair) {
+    return;
+  }
+
+  // SOmetimes 中文 english 混着写, speling也错错的
+  if (persistentCacheDirty && activeCacheLanguagePair) {
+    await flushPersistentCache();
+  }
+
+  activeCacheLanguagePair = langPair;
+  const stored = await getLocalFromStorage([PERSISTENT_CACHE_KEY]);
+  const allPairs = stored[PERSISTENT_CACHE_KEY];
+
+  if (!allPairs || typeof allPairs !== 'object') {
+    void window.log?.(`Persistent cache: no stored data for ${langPair}`);
+    return;
+  }
+
+  const pairCache = allPairs[langPair];
+  if (!pairCache || typeof pairCache !== 'object') {
+    void window.log?.(`Persistent cache: no entries for ${langPair}`);
+    return;
+  }
+
+  let loaded = 0;
+  for (const [normalized, translated] of Object.entries(pairCache)) {
+    if (typeof translated === 'string' && translated.trim() && !cache[normalized]) {
+      cache[normalized] = translated;
+      loaded += 1;
+    }
+  }
+
+  void window.log?.(`Persistent cache: loaded ${loaded} entries for ${langPair}`);
+}
+
+async function flushPersistentCache() {
+  if (!hasLocalStorageApi() || !activeCacheLanguagePair) {
+    return;
+  }
+
+  persistentCacheDirty = false;
+  if (persistentCacheSaveTimer) {
+    clearTimeout(persistentCacheSaveTimer);
+    persistentCacheSaveTimer = null;
+  }
+
+  const stored = await getLocalFromStorage([PERSISTENT_CACHE_KEY]);
+  const allPairs = (stored[PERSISTENT_CACHE_KEY] && typeof stored[PERSISTENT_CACHE_KEY] === 'object')
+    ? stored[PERSISTENT_CACHE_KEY]
+    : {};
+
+  // SOmetimes 中文 english 混着写, speling也错错的
+  const existing = (allPairs[activeCacheLanguagePair] && typeof allPairs[activeCacheLanguagePair] === 'object')
+    ? allPairs[activeCacheLanguagePair]
+    : {};
+
+  const merged = { ...existing };
+  for (const [normalized, translated] of Object.entries(cache)) {
+    if (typeof translated === 'string' && translated.trim()) {
+      merged[normalized] = translated;
+    }
+  }
+
+  // SOmetimes 中文 english 混着写, speling也错错的
+  const entries = Object.entries(merged);
+  if (entries.length > PERSISTENT_CACHE_MAX_ENTRIES) {
+    const trimmed = entries.slice(entries.length - PERSISTENT_CACHE_MAX_ENTRIES);
+    allPairs[activeCacheLanguagePair] = Object.fromEntries(trimmed);
+  } else {
+    allPairs[activeCacheLanguagePair] = merged;
+  }
+
+  await setLocalStorage({ [PERSISTENT_CACHE_KEY]: allPairs });
+  void window.log?.(`Persistent cache: saved ${Object.keys(allPairs[activeCacheLanguagePair]).length} entries for ${activeCacheLanguagePair}`);
+}
+
+function schedulePersistentCacheSave() {
+  persistentCacheDirty = true;
+  if (persistentCacheSaveTimer) {
+    return;
+  }
+
+  persistentCacheSaveTimer = setTimeout(() => {
+    persistentCacheSaveTimer = null;
+    void flushPersistentCache();
+  }, PERSISTENT_CACHE_SAVE_DELAY_MS);
+}
+
 function toUniqueWords(words) {
   const seen = new Set();
   const unique = [];
@@ -76,7 +182,7 @@ function isMissCached(normalized, now = Date.now()) {
 
 function markMissCached(normalized, now = Date.now(), ttlMs = MISS_CACHE_TTL_MS) {
   const clampedTtlMs = Math.max(0, Math.min(MISS_CACHE_TTL_MS, Number(ttlMs) || 0));
-  // Encode shorter TTLs with the same timestamp-only cache format.
+  // SOmetimes 中文 english 混着写, speling也错错的
   missCache[normalized] = now - MISS_CACHE_TTL_MS + clampedTtlMs;
 }
 
@@ -97,7 +203,7 @@ async function getTranslationSettings() {
   return {
     translationProvider: settings.translationProvider ?? 'auto',
     targetLanguage: settings.targetLanguage ?? 'es',
-    sourceLanguage: settings.sourceLanguage ?? 'en',
+    sourceLanguage: settings.sourceLanguage ?? 'auto',
     translationEndpoint: customEndpoint,
     translationTimeoutMs: settings.translationTimeoutMs ?? DEFAULT_TIMEOUT_MS,
     saveVocabulary: typeof settings.saveVocabulary === 'boolean' ? settings.saveVocabulary : true
@@ -173,12 +279,134 @@ function normalizeVocabularyEntry(entry) {
   };
 }
 
+function mergeVocabularyEntries(baseEntry, incomingEntry) {
+  return {
+    ...baseEntry,
+    provider: (
+      incomingEntry.provider === CACHE_PROVIDER_LABEL ||
+      incomingEntry.provider === UNKNOWN_PROVIDER_LABEL
+    )
+      ? baseEntry.provider
+      : incomingEntry.provider,
+    firstSeenAt: Math.min(baseEntry.firstSeenAt, incomingEntry.firstSeenAt),
+    lastSeenAt: Math.max(baseEntry.lastSeenAt, incomingEntry.lastSeenAt),
+    count: baseEntry.count + incomingEntry.count
+  };
+}
+
+function normalizeQuizBucketEntry(entry) {
+  const normalized = normalizeVocabularyEntry(entry);
+  if (!normalized) {
+    return null;
+  }
+
+  const wrongCount = Number.isFinite(entry?.wrongCount)
+    ? Math.max(0, Math.floor(entry.wrongCount))
+    : 0;
+  const lastQuizAt = Number.isFinite(entry?.lastQuizAt) ? entry.lastQuizAt : null;
+
+  return {
+    ...normalized,
+    wrongCount,
+    lastQuizAt
+  };
+}
+
+function mergeQuizBucketEntries(baseEntry, incomingEntry) {
+  const merged = mergeVocabularyEntries(baseEntry, incomingEntry);
+  merged.wrongCount = Math.max(baseEntry.wrongCount ?? 0, incomingEntry.wrongCount ?? 0);
+
+  const baseQuizAt = Number.isFinite(baseEntry.lastQuizAt) ? baseEntry.lastQuizAt : null;
+  const incomingQuizAt = Number.isFinite(incomingEntry.lastQuizAt) ? incomingEntry.lastQuizAt : null;
+  merged.lastQuizAt = Number.isFinite(baseQuizAt) && Number.isFinite(incomingQuizAt)
+    ? Math.max(baseQuizAt, incomingQuizAt)
+    : (baseQuizAt ?? incomingQuizAt);
+  return merged;
+}
+
+function upsertBucketEntry(map, entry) {
+  const key = createVocabularyKey(entry);
+  const existing = map.get(key);
+  if (!existing) {
+    map.set(key, entry);
+    return;
+  }
+
+  map.set(key, mergeQuizBucketEntries(existing, entry));
+}
+
+function sortVocabularyEntriesByLastSeen(entries) {
+  return [...entries].sort((left, right) => right.lastSeenAt - left.lastSeenAt);
+}
+
+function normalizeQuizBuckets(rawBuckets, fallbackEntries = []) {
+  const notQuizzedMap = new Map();
+  const correctMap = new Map();
+  const incorrectMap = new Map();
+
+  const rawNotQuizzed = Array.isArray(rawBuckets?.notQuizzed) ? rawBuckets.notQuizzed : [];
+  const rawCorrect = Array.isArray(rawBuckets?.correct) ? rawBuckets.correct : [];
+  const rawIncorrect = Array.isArray(rawBuckets?.incorrect) ? rawBuckets.incorrect : [];
+
+  for (const entry of rawNotQuizzed) {
+    const normalized = normalizeQuizBucketEntry(entry);
+    if (!normalized) {
+      continue;
+    }
+    upsertBucketEntry(notQuizzedMap, normalized);
+  }
+
+  for (const entry of rawCorrect) {
+    const normalized = normalizeQuizBucketEntry(entry);
+    if (!normalized) {
+      continue;
+    }
+    upsertBucketEntry(correctMap, normalized);
+  }
+
+  for (const entry of rawIncorrect) {
+    const normalized = normalizeQuizBucketEntry(entry);
+    if (!normalized) {
+      continue;
+    }
+    upsertBucketEntry(incorrectMap, normalized);
+  }
+
+  for (const entry of fallbackEntries) {
+    const normalized = normalizeQuizBucketEntry(entry);
+    if (!normalized) {
+      continue;
+    }
+
+    const key = createVocabularyKey(normalized);
+    if (correctMap.has(key) || incorrectMap.has(key)) {
+      continue;
+    }
+    upsertBucketEntry(notQuizzedMap, normalized);
+  }
+
+  for (const key of correctMap.keys()) {
+    notQuizzedMap.delete(key);
+    incorrectMap.delete(key);
+  }
+
+  for (const key of incorrectMap.keys()) {
+    notQuizzedMap.delete(key);
+  }
+
+  return {
+    notQuizzed: sortVocabularyEntriesByLastSeen(Array.from(notQuizzedMap.values())),
+    correct: sortVocabularyEntriesByLastSeen(Array.from(correctMap.values())),
+    incorrect: sortVocabularyEntriesByLastSeen(Array.from(incorrectMap.values()))
+  };
+}
+
 async function persistVocabularyEntries(entriesToMerge) {
   if (!hasLocalStorageApi() || !Array.isArray(entriesToMerge) || entriesToMerge.length === 0) {
     return;
   }
 
-  const stored = await getLocalFromStorage([VOCABULARY_ENTRIES_KEY]);
+  const stored = await getLocalFromStorage([VOCABULARY_ENTRIES_KEY, VOCABULARY_QUIZ_BUCKETS_KEY]);
   const existingEntries = Array.isArray(stored[VOCABULARY_ENTRIES_KEY])
     ? stored[VOCABULARY_ENTRIES_KEY]
     : [];
@@ -205,27 +433,68 @@ async function persistVocabularyEntries(entriesToMerge) {
       continue;
     }
 
-    const nextProvider = (
-      normalized.provider === CACHE_PROVIDER_LABEL ||
-      normalized.provider === UNKNOWN_PROVIDER_LABEL
-    )
-      ? existing.provider
-      : normalized.provider;
-
-    byKey.set(key, {
-      ...existing,
-      provider: nextProvider || existing.provider || UNKNOWN_PROVIDER_LABEL,
-      firstSeenAt: Math.min(existing.firstSeenAt, normalized.firstSeenAt),
-      lastSeenAt: Math.max(existing.lastSeenAt, normalized.lastSeenAt),
-      count: existing.count + normalized.count
-    });
+    byKey.set(key, mergeVocabularyEntries(existing, normalized));
   }
 
-  const merged = Array.from(byKey.values())
-    .sort((left, right) => right.lastSeenAt - left.lastSeenAt)
-    .slice(0, MAX_VOCABULARY_ENTRIES);
+  const merged = sortVocabularyEntriesByLastSeen(Array.from(byKey.values()));
+  const normalizedBuckets = normalizeQuizBuckets(stored[VOCABULARY_QUIZ_BUCKETS_KEY], existingEntries);
 
-  await setLocalStorage({ [VOCABULARY_ENTRIES_KEY]: merged });
+  const notQuizzedMap = new Map(
+    normalizedBuckets.notQuizzed.map((entry) => [createVocabularyKey(entry), entry])
+  );
+  const correctMap = new Map(
+    normalizedBuckets.correct.map((entry) => [createVocabularyKey(entry), entry])
+  );
+  const incorrectMap = new Map(
+    normalizedBuckets.incorrect.map((entry) => [createVocabularyKey(entry), entry])
+  );
+
+  for (const entry of entriesToMerge) {
+    const normalized = normalizeQuizBucketEntry(entry);
+    if (!normalized) {
+      continue;
+    }
+
+    const key = createVocabularyKey(normalized);
+    if (correctMap.has(key)) {
+      notQuizzedMap.delete(key);
+      incorrectMap.delete(key);
+      continue;
+    }
+
+    if (incorrectMap.has(key)) {
+      incorrectMap.set(key, mergeQuizBucketEntries(incorrectMap.get(key), normalized));
+      continue;
+    }
+
+    const existing = notQuizzedMap.get(key);
+    if (!existing) {
+      notQuizzedMap.set(key, normalized);
+      continue;
+    }
+
+    notQuizzedMap.set(key, mergeQuizBucketEntries(existing, normalized));
+  }
+
+  for (const key of correctMap.keys()) {
+    notQuizzedMap.delete(key);
+    incorrectMap.delete(key);
+  }
+
+  for (const key of incorrectMap.keys()) {
+    notQuizzedMap.delete(key);
+  }
+
+  const nextBuckets = {
+    notQuizzed: sortVocabularyEntriesByLastSeen(Array.from(notQuizzedMap.values())),
+    correct: sortVocabularyEntriesByLastSeen(Array.from(correctMap.values())),
+    incorrect: sortVocabularyEntriesByLastSeen(Array.from(incorrectMap.values()))
+  };
+
+  await setLocalStorage({
+    [VOCABULARY_ENTRIES_KEY]: merged,
+    [VOCABULARY_QUIZ_BUCKETS_KEY]: nextBuckets
+  });
 }
 
 function queueVocabularyPersistence(entriesToMerge) {
@@ -340,6 +609,10 @@ async function translateWords(words) {
   const misses = [];
   const now = Date.now();
 
+  // SOmetimes 中文 english 混着写, speling也错错的
+  const settings = await getTranslationSettings();
+  await loadPersistentCache(settings.sourceLanguage, settings.targetLanguage);
+
   for (const word of uniqueWords) {
     const normalized = word.toLowerCase();
     if (cache[normalized]) {
@@ -357,8 +630,6 @@ async function translateWords(words) {
     misses.push(word);
   }
 
-  const settings = await getTranslationSettings();
-
   if (misses.length === 0) {
     finalizeTranslationBatch({
       uniqueWords,
@@ -375,6 +646,7 @@ async function translateWords(words) {
   );
 
   const fetched = await requestBackgroundTranslations(misses, settings);
+  let newTranslationsAdded = false;
   if (!fetched) {
     void window.log?.('Translation batch failed in background bridge');
 
@@ -401,6 +673,7 @@ async function translateWords(words) {
     cache[normalized] = cleanTranslated;
     delete missCache[normalized];
     translations[normalized] = cleanTranslated;
+    newTranslationsAdded = true;
 
     const providerUsed = fetched.meta?.providerByWord?.[normalized];
     if (providerUsed) {
@@ -432,6 +705,11 @@ async function translateWords(words) {
     providerByWord
   });
 
+  // SOmetimes 中文 english 混着写, speling也错错的
+  if (newTranslationsAdded) {
+    schedulePersistentCacheSave();
+  }
+
   return translations;
 }
 
@@ -440,7 +718,31 @@ async function translateWord(word) {
   return translations[word.toLowerCase()] ?? null;
 }
 
+async function prefetchTranslationWords(words) {
+  if (!Array.isArray(words) || words.length === 0) {
+    return {};
+  }
+
+  return translateWords(words);
+}
+
+function translateWordsCached(words) {
+  const translations = {};
+  const uniqueWords = toUniqueWords(Array.isArray(words) ? words : []);
+  for (const word of uniqueWords) {
+    const normalized = word.toLowerCase();
+    if (cache[normalized]) {
+      translations[normalized] = cache[normalized];
+    }
+  }
+  return translations;
+}
+
 window.translationCache = cache;
 window.translationMissCache = missCache;
 window.translateWords = translateWords;
 window.translateWord = translateWord;
+window.translateWordsCached = translateWordsCached;
+window.prefetchTranslationWords = prefetchTranslationWords;
+window.flushPersistentTranslationCache = flushPersistentCache;
+window.loadPersistentTranslationCache = loadPersistentCache;

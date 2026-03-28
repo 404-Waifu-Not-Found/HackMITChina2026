@@ -19,23 +19,28 @@
     "https://translate.argosopentech.com/*",
     "https://apertium.org/*",
     "https://beta.apertium.org/*",
-    "https://api.mymemory.translated.net/*"
+    "https://api.mymemory.translated.net/*",
+    "https://api.openai.com/*",
+    "https://api.groq.com/*",
+    "https://api.minimaxi.com/*",
+    "https://api.moonshot.cn/*",
+    "https://api.deepseek.com/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "icons": {
-    "16": "logo.svg",
-    "32": "logo.svg",
-    "48": "logo.svg",
-    "128": "logo.svg"
+    "16": "logo.png",
+    "32": "logo.png",
+    "48": "logo.png",
+    "128": "logo.png"
   },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "logo.svg",
-      "32": "logo.svg",
-      "48": "logo.svg"
+      "16": "logo.png",
+      "32": "logo.png",
+      "48": "logo.png"
     }
   },
   "content_scripts": [

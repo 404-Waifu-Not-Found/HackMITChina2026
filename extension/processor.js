@@ -1,6 +1,11 @@
 const WORD_TOKEN_PATTERN = /^\p{L}[\p{L}\p{M}'-]*$/u;
-const TOKEN_SPLIT_PATTERN = /\p{L}[\p{L}\p{M}'-]*|\s+|[^\s\p{L}\p{M}]+/gu;
+const TOKEN_SPLIT_PATTERN = /[\p{sc=Han}][\p{M}]*|[\p{sc=Hiragana}][\p{M}]*|[\p{sc=Katakana}]+[\p{M}]*|[\p{sc=Thai}][\p{M}]*|\p{L}[\p{L}\p{M}'-]*|\s+|[^\s\p{L}\p{M}]+/gu;
 const DUPLICATE_INLINE_TRANSLATION_PATTERN = /(\p{L}[\p{L}\p{M}'-]*\s*\(([^()]+)\))(?:\s*\(\2\))+/gu;
+const MIN_OVERFLOW_EXTRA_CHARS = 36;
+const MAX_OVERFLOW_EXTRA_CHARS = 84;
+const OVERFLOW_EXTRA_CHAR_RATIO = 1.2;
+const MAX_TOTAL_RENDERED_LENGTH = 120;
+const replacementCarryByPercentage = new Map();
 
 function normalizeReplacementPercentage(value) {
   const numeric = Number(value);
@@ -17,8 +22,15 @@ function calculateReplacementCount(totalCandidates, replacementPercentage = 5) {
     return 0;
   }
 
-  const count = Math.floor((totalCandidates * normalizedReplacementPercentage) / 100);
-  return Math.min(totalCandidates, Math.max(1, count));
+  const carry = replacementCarryByPercentage.get(normalizedReplacementPercentage) ?? 0;
+  const exact = (totalCandidates * normalizedReplacementPercentage) / 100 + carry;
+  const count = Math.floor(exact);
+  replacementCarryByPercentage.set(normalizedReplacementPercentage, exact - count);
+  return Math.min(totalCandidates, count);
+}
+
+function resetReplacementCarry() {
+  replacementCarryByPercentage.clear();
 }
 
 function pickUniqueWordInfos(candidates, replacementPercentage = 5) {
@@ -66,7 +78,6 @@ function tokenizeSubtitle(text) {
 }
 
 function collectCandidateWordInfos(tokens, excludedTokenIndexes = new Set()) {
-  const seen = new Set();
   const candidates = [];
 
   for (const token of tokens) {
@@ -78,19 +89,15 @@ function collectCandidateWordInfos(tokens, excludedTokenIndexes = new Set()) {
       continue;
     }
 
-    const normalized = token.value.toLowerCase();
-    if (seen.has(normalized)) {
-      continue;
-    }
-
     if (!window.shouldTranslateWord(token.value, token.wordIndex)) {
       continue;
     }
 
-    seen.add(normalized);
+    const normalized = token.value.toLowerCase();
     candidates.push({
       token: token.value,
-      normalized
+      normalized,
+      tokenIndex: token.tokenIndex
     });
   }
 
@@ -223,6 +230,14 @@ function dedupeInlineTranslationSuffixes(text) {
   return text.replace(DUPLICATE_INLINE_TRANSLATION_PATTERN, '$1');
 }
 
+function resolveOverflowExtraCharBudget(text) {
+  const sourceLength = typeof text === 'string' ? text.length : 0;
+  const scaledBudget = Math.round(sourceLength * OVERFLOW_EXTRA_CHAR_RATIO);
+  const ratioBudget = Math.max(MIN_OVERFLOW_EXTRA_CHARS, Math.min(MAX_OVERFLOW_EXTRA_CHARS, scaledBudget));
+  const totalCap = Math.max(0, MAX_TOTAL_RENDERED_LENGTH - sourceLength);
+  return Math.min(ratioBudget, totalCap);
+}
+
 function normalizePinnedTranslations(pinnedTranslations) {
   if (!pinnedTranslations) {
     return {};
@@ -263,17 +278,34 @@ async function buildImmersiveSubtitle(
   text,
   translateWords,
   replacementPercentage = 5,
-  pinnedTranslations = {}
+  pinnedTranslations = {},
+  options = {}
 ) {
-  if (!text || !text.trim()) {
+  const [rendered] = await buildImmersiveSubtitlesBatch(
+    [{ text, pinnedTranslations }],
+    translateWords,
+    replacementPercentage,
+    options
+  );
+  return rendered;
+}
+
+function buildSubtitleRenderPlan(text, replacementPercentage, pinnedTranslations = {}) {
+  if (typeof text !== 'string' || !text.trim()) {
     void window.log?.('Skipped processing: no subtitles');
-    return text;
+    return {
+      output: text,
+      selectedWords: []
+    };
   }
 
   const normalizedReplacementPercentage = normalizeReplacementPercentage(replacementPercentage);
   if (normalizedReplacementPercentage <= 0) {
     void window.log?.('Skipped processing: empty settings (replacement percentage <= 0)');
-    return text;
+    return {
+      output: text,
+      selectedWords: []
+    };
   }
 
   const tokens = tokenizeSubtitle(text);
@@ -289,41 +321,74 @@ async function buildImmersiveSubtitle(
   const pinnedCandidates = candidateWordInfos.filter(({ normalized }) =>
     Object.prototype.hasOwnProperty.call(pinnedByNormalized, normalized)
   );
-  const unpinnedCandidates = candidateWordInfos.filter(
-    ({ normalized }) => !Object.prototype.hasOwnProperty.call(pinnedByNormalized, normalized)
-  );
-  const remainingCount = Math.max(0, replacementCount - pinnedCandidates.length);
+  // SOmetimes 中文 english 混着写, speling也错错的
+  const pinnedSelected = pinnedCandidates.slice(0, replacementCount);
+  const selectedPinnedTokenIndexes = new Set(pinnedSelected.map(({ tokenIndex }) => tokenIndex));
+  const unpinnedCandidates = candidateWordInfos.filter(({ tokenIndex }) => !selectedPinnedTokenIndexes.has(tokenIndex));
+  const remainingCount = Math.max(0, replacementCount - pinnedSelected.length);
   const selected = pickRandomWordInfos(unpinnedCandidates, remainingCount);
+  const selectedWordInfos = [...pinnedSelected, ...selected];
 
-  if (selected.length === 0 && pinnedCandidates.length === 0) {
+  if (selectedWordInfos.length === 0) {
     void window.log?.('Skipped processing: no eligible words selected');
-    return dedupeInlineTranslationSuffixes(text);
+    return {
+      output: dedupeInlineTranslationSuffixes(text),
+      selectedWords: []
+    };
   }
 
-  const selectedWords = selected.map(({ token }) => token);
-  if (pinnedCandidates.length > 0) {
-    const pinnedWords = pinnedCandidates.map(({ token }) => token);
+  const selectedWords = selectedWordInfos.map(({ token }) => token);
+  const wordsToTranslate = selectedWordInfos
+    .filter(({ normalized }) => !Object.prototype.hasOwnProperty.call(pinnedByNormalized, normalized))
+    .map(({ token }) => token);
+  if (pinnedSelected.length > 0) {
+    const pinnedWords = pinnedSelected.map(({ token }) => token);
     void window.log?.(`Pinned words kept: ${JSON.stringify(pinnedWords)}`);
   }
-  if (selectedWords.length > 0) {
-    void window.log?.(`Words selected: ${JSON.stringify(selectedWords)}`);
+  const randomSelectedWords = selected.map(({ token }) => token);
+  if (randomSelectedWords.length > 0) {
+    void window.log?.(`Words selected: ${JSON.stringify(randomSelectedWords)}`);
   }
 
-  const translatedByNormalized = selectedWords.length > 0 ? await translateWords(selectedWords) : {};
-  const effectiveTranslations = {
-    ...translatedByNormalized,
-    ...pinnedByNormalized,
-    ...inlineAnalysis.translatedWordsByNormalized
+  return {
+    text,
+    tokens,
+    inlineAnalysis,
+    pinnedByNormalized,
+    selectedWords,
+    selectedWordInfos,
+    wordsToTranslate
   };
-  const remainingInsertionsByNormalized = new Map();
-  for (const normalized of Object.keys(effectiveTranslations)) {
-    if (!normalized) {
+}
+
+function renderSubtitleFromPlan(plan, translatedByNormalized = {}) {
+  if (!plan || Object.prototype.hasOwnProperty.call(plan, 'output')) {
+    return plan?.output;
+  }
+
+  const { tokens, inlineAnalysis, pinnedByNormalized } = plan;
+  const selectedTranslationByTokenIndex = new Map();
+  const overflowExtraCharBudget = resolveOverflowExtraCharBudget(plan.text);
+  let usedExtraChars = 0;
+  const sortedSelectedInfos = [...(plan.selectedWordInfos ?? [])]
+    .sort((left, right) => left.tokenIndex - right.tokenIndex);
+
+  for (const selectedInfo of sortedSelectedInfos) {
+    const translation = pinnedByNormalized[selectedInfo.normalized] ?? translatedByNormalized[selectedInfo.normalized];
+    if (!translation) {
       continue;
     }
-    remainingInsertionsByNormalized.set(normalized, 1);
-  }
-  for (const normalized of Object.keys(inlineAnalysis.translatedWordsByNormalized)) {
-    remainingInsertionsByNormalized.set(normalized, 0);
+
+    const estimatedExtraChars = String(translation).length + 3;
+    if (
+      usedExtraChars > 0 &&
+      usedExtraChars + estimatedExtraChars > overflowExtraCharBudget
+    ) {
+      continue;
+    }
+
+    selectedTranslationByTokenIndex.set(selectedInfo.tokenIndex, translation);
+    usedExtraChars += estimatedExtraChars;
   }
 
   const rendered = tokens
@@ -340,23 +405,14 @@ async function buildImmersiveSubtitle(
         return token.value;
       }
 
-      const normalized = token.value.toLowerCase();
-      const translated = effectiveTranslations[normalized];
+      const translated = selectedTranslationByTokenIndex.get(token.tokenIndex);
       if (!translated) {
         return token.value;
       }
 
       if (inlineAnalysis.translatedWordTokenIndexes.has(token.tokenIndex)) {
-        remainingInsertionsByNormalized.set(normalized, 0);
         return token.value;
       }
-
-      const remaining = remainingInsertionsByNormalized.get(normalized) ?? 0;
-      if (remaining <= 0) {
-        return token.value;
-      }
-
-      remainingInsertionsByNormalized.set(normalized, remaining - 1);
       return `${token.value} (${translated})`;
     })
     .join('');
@@ -364,6 +420,59 @@ async function buildImmersiveSubtitle(
   return dedupeInlineTranslationSuffixes(rendered);
 }
 
+async function buildImmersiveSubtitlesBatch(
+  subtitleItems,
+  translateWords,
+  replacementPercentage = 5,
+  options = {}
+) {
+  const { translateWordsCached, onEarlyRender } = options;
+  const items = Array.isArray(subtitleItems) ? subtitleItems : [];
+  if (items.length === 0) {
+    return [];
+  }
+
+  const plans = items.map((item) => {
+    const text = typeof item === 'string' ? item : item?.text;
+    const pinnedTranslations = typeof item === 'string' ? {} : item?.pinnedTranslations;
+    return buildSubtitleRenderPlan(text, replacementPercentage, pinnedTranslations);
+  });
+
+  const uniqueWords = [];
+  const seenWords = new Set();
+  for (const plan of plans) {
+    if (!plan || !Array.isArray(plan.wordsToTranslate)) {
+      continue;
+    }
+
+    for (const word of plan.wordsToTranslate) {
+      const normalized = typeof word === 'string' ? word.toLowerCase() : '';
+      if (!normalized || seenWords.has(normalized)) {
+        continue;
+      }
+
+      seenWords.add(normalized);
+      uniqueWords.push(word);
+    }
+  }
+
+  // SOmetimes 中文 english 混着写, speling也错错的
+  if (typeof translateWordsCached === 'function' && typeof onEarlyRender === 'function' && uniqueWords.length > 0) {
+    const cachedOnly = translateWordsCached(uniqueWords);
+    const cachedCount = Object.keys(cachedOnly).length;
+    if (cachedCount > 0 && cachedCount < uniqueWords.length) {
+      const earlyRendered = plans.map((plan) => renderSubtitleFromPlan(plan, cachedOnly));
+      onEarlyRender(earlyRendered);
+    }
+  }
+
+  // SOmetimes 中文 english 混着写, speling也错错的
+  const translatedByNormalized = uniqueWords.length > 0 ? await translateWords(uniqueWords) : {};
+  return plans.map((plan) => renderSubtitleFromPlan(plan, translatedByNormalized));
+}
+
 window.calculateReplacementCount = calculateReplacementCount;
+window.resetReplacementCarry = resetReplacementCarry;
 window.pickUniqueWordInfos = pickUniqueWordInfos;
 window.buildImmersiveSubtitle = buildImmersiveSubtitle;
+window.buildImmersiveSubtitlesBatch = buildImmersiveSubtitlesBatch;

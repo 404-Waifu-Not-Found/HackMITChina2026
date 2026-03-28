@@ -1,0 +1,52 @@
+---
+import '../styles/global.css'
+
+interface Props {
+  title?: string
+  description?: string
+}
+
+const {
+  title = 'Lingo Stream | Learn While Watching YouTube',
+  description = 'Lingo Stream is a Chrome extension that injects translated words into YouTube captions so you can build vocabulary while watching videos.',
+} = Astro.props
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafdf7" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#090f0b" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href={`${import.meta.env.BASE_URL}/logo.png`} type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-[#fafdf7] dark:bg-[#090f0b] text-zinc-900 dark:text-zinc-100 font-sans antialiased selection:bg-brand-200 dark:selection:bg-brand-900">
+
+    <!-- 3D logo morph — logo + name fly from hero anchor into the topbar on scroll -->
+    <div id="logo3d-wrap" aria-hidden="true" class="logo3d-floating">
+      <div id="logo3d-inner">
+        <img id="logo3d-img" src={`${import.meta.env.BASE_URL}/logo.png`} alt="" />
+        <span id="logo3d-name">Lingo Stream</span>
+      </div>
+      <div id="logo3d-shadow"></div>
+    </div>
+
+    <slot />
+
+    <footer class="site-copyright" aria-hidden="false">
+      © 2026 Lingo Stream — <a href="https://github.com/UnoxyRich/Lingo-Stream" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </footer>
+
+    <script src="../scripts/main.ts"></script>
+  </body>
+</html>

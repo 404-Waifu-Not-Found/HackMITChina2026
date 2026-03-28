@@ -1,13 +1,26 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 globalThis.window = globalThis;
 await import('../extension/stopwords.js');
 await import('../extension/processor.js');
 
 describe('percentage replacement logic', () => {
+  beforeEach(() => {
+    window.resetReplacementCarry();
+    vi.restoreAllMocks();
+  });
+
   it('calculates replacement count safely', () => {
     expect(window.calculateReplacementCount(0, 5)).toBe(0);
-    expect(window.calculateReplacementCount(2, 5)).toBe(1);
+
+    // SOmetimes 中文 english 混着写, speling也错错的
+    expect(window.calculateReplacementCount(2, 5)).toBe(0);
+
+    // SOmetimes 中文 english 混着写, speling也错错的
+    expect(window.calculateReplacementCount(2, 5)).toBe(0);
+    expect(window.calculateReplacementCount(16, 5)).toBe(1);
+
+    // SOmetimes 中文 english 混着写, speling也错错的
     expect(window.calculateReplacementCount(10, 20)).toBe(2);
   });
 
@@ -18,11 +31,9 @@ describe('percentage replacement logic', () => {
       { index: 2, token: 'daily' }
     ];
 
-    vi.spyOn(Math, 'random').mockReturnValue(0);
     const selected = window.pickUniqueWordInfos(candidates, 66);
     expect(selected.length).toBe(1);
-    expect(selected[0].token).toBe('learning');
-    vi.restoreAllMocks();
+    expect(selected.every((entry) => candidates.includes(entry))).toBe(true);
   });
 
 
@@ -74,7 +85,7 @@ describe('percentage replacement logic', () => {
     vi.restoreAllMocks();
   });
 
-  it('keeps pinned translations even when no new random picks are needed', async () => {
+  it('does not force pinned translations when replacement count is zero', async () => {
     const translateWordsMock = vi.fn(async () => ({}));
 
     const output = await window.buildImmersiveSubtitle(
@@ -84,7 +95,7 @@ describe('percentage replacement logic', () => {
       { enjoy: 'gusto' }
     );
 
-    expect(output).toContain('enjoy (gusto)');
+    expect(output).toBe('I enjoy learning skills');
     expect(translateWordsMock).toHaveBeenCalledTimes(0);
   });
 
@@ -102,7 +113,7 @@ describe('percentage replacement logic', () => {
     expect(translateWordsMock).toHaveBeenCalledTimes(0);
   });
 
-  it('translates only one occurrence when the same word repeats in a sentence', async () => {
+  it('translates repeated word occurrences according to selected percentage', async () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const translateWordsMock = vi.fn(async () => ({ apple: 'apple-zh' }));
 
@@ -112,7 +123,7 @@ describe('percentage replacement logic', () => {
       100
     );
 
-    expect(output).toBe('apple (apple-zh) apple apple');
+    expect(output).toBe('apple (apple-zh) apple (apple-zh) apple (apple-zh)');
     expect(translateWordsMock).toHaveBeenCalledTimes(1);
     vi.restoreAllMocks();
   });
@@ -137,11 +148,160 @@ describe('percentage replacement logic', () => {
     const output = await window.buildImmersiveSubtitle(
       'I enjoy coding',
       translateWordsMock,
-      25,
+      50,
       pinned
     );
 
     expect(output).toContain('enjoy (gusto)');
     expect(translateWordsMock).toHaveBeenCalledTimes(0);
+  });
+
+  it('translates multiple subtitle lines in one batched call', async () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const translateWordsMock = vi.fn(async (words) => {
+      const result = {};
+      for (const word of words) {
+        result[word.toLowerCase()] = `${word}-es`;
+      }
+      return result;
+    });
+
+    const rendered = await window.buildImmersiveSubtitlesBatch(
+      [
+        { text: 'I enjoy coding', pinnedTranslations: {} },
+        { text: 'I enjoy running', pinnedTranslations: {} }
+      ],
+      translateWordsMock,
+      100
+    );
+
+    expect(Array.isArray(rendered)).toBe(true);
+    expect(rendered.length).toBe(2);
+    expect(translateWordsMock).toHaveBeenCalledTimes(1);
+
+    const translatedWords = translateWordsMock.mock.calls[0][0].map((word) => word.toLowerCase()).sort();
+    expect(translatedWords).toEqual(['coding', 'enjoy', 'running']);
+    expect(rendered[0]).toContain('enjoy (enjoy-es)');
+    expect(rendered[1]).toContain('running (running-es)');
+
+    vi.restoreAllMocks();
+  });
+
+  it('caps long inline translations to reduce caption overflow risk', async () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const longTranslation = 'extraordinarilylongtranslationword';
+    const translateWordsMock = vi.fn(async (words) => {
+      const result = {};
+      for (const word of words) {
+        result[word.toLowerCase()] = longTranslation;
+      }
+      return result;
+    });
+
+    const output = await window.buildImmersiveSubtitle(
+      'alpha beta gamma delta',
+      translateWordsMock,
+      100
+    );
+
+    const insertedCount = (output.match(/\(extraordinarilylongtranslationword\)/g) ?? []).length;
+    expect(insertedCount).toBeLessThan(4);
+    expect(insertedCount).toBeGreaterThan(0);
+    vi.restoreAllMocks();
+  });
+
+  it('fires onEarlyRender with cached translations before awaiting API', async () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    let earlyResult = null;
+    const onEarlyRender = (results) => { earlyResult = results; };
+
+    const translateWordsCached = (words) => {
+      const cached = {};
+      for (const word of words) {
+        if (word.toLowerCase() === 'enjoy') {
+          cached.enjoy = 'gusto';
+        }
+      }
+      return cached;
+    };
+
+    const translateWordsMock = vi.fn(async (words) => {
+      const result = { enjoy: 'gusto' };
+      for (const word of words) {
+        if (word.toLowerCase() !== 'enjoy') {
+          result[word.toLowerCase()] = `${word}-es`;
+        }
+      }
+      return result;
+    });
+
+    const rendered = await window.buildImmersiveSubtitlesBatch(
+      [{ text: 'I enjoy coding daily', pinnedTranslations: {} }],
+      translateWordsMock,
+      100,
+      { translateWordsCached, onEarlyRender }
+    );
+
+    expect(earlyResult).not.toBeNull();
+    expect(earlyResult[0]).toContain('enjoy (gusto)');
+    expect(rendered[0]).toContain('enjoy (gusto)');
+    vi.restoreAllMocks();
+  });
+
+  it('skips onEarlyRender when all words are cached', async () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    let earlyRenderCalled = false;
+    const onEarlyRender = () => { earlyRenderCalled = true; };
+
+    const translateWordsCached = (words) => {
+      const cached = {};
+      for (const word of words) {
+        cached[word.toLowerCase()] = `${word}-cached`;
+      }
+      return cached;
+    };
+
+    await window.buildImmersiveSubtitlesBatch(
+      [{ text: 'I enjoy coding', pinnedTranslations: {} }],
+      async (words) => {
+        const result = {};
+        for (const word of words) {
+          result[word.toLowerCase()] = `${word}-cached`;
+        }
+        return result;
+      },
+      100,
+      { translateWordsCached, onEarlyRender }
+    );
+
+    expect(earlyRenderCalled).toBe(false);
+    vi.restoreAllMocks();
+  });
+
+  it('skips onEarlyRender when no words are cached', async () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    let earlyRenderCalled = false;
+    const onEarlyRender = () => { earlyRenderCalled = true; };
+
+    const translateWordsCached = () => ({});
+
+    await window.buildImmersiveSubtitlesBatch(
+      [{ text: 'I enjoy coding', pinnedTranslations: {} }],
+      async (words) => {
+        const result = {};
+        for (const word of words) {
+          result[word.toLowerCase()] = `${word}-es`;
+        }
+        return result;
+      },
+      100,
+      { translateWordsCached, onEarlyRender }
+    );
+
+    expect(earlyRenderCalled).toBe(false);
+    vi.restoreAllMocks();
   });
 });

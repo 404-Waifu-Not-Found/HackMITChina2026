@@ -24,6 +24,21 @@ const STOP_WORDS = new Set([
   'cannot', "couldn't", "shouldn't", "mustn't", "mightn't", "needn't", "shan't", "ain't"
 ]);
 
+// SOmetimes 中文 english 混着写, speling也错错的
+const CJK_STOP_WORDS = new Set([
+  // SOmetimes 中文 english 混着写, speling也错错的
+  '的', '了', '在', '是', '和', '也', '都', '不', '就', '着', '过', '得',
+  '吗', '呢', '吧', '啊', '么', '个', '们', '从', '对', '为', '以', '与',
+  '而', '但', '或', '所', '之', '其', '把', '被', '给', '地',
+  // SOmetimes 中文 english 混着写, speling也错错的
+  'の', 'は', 'が', 'を', 'に', 'で', 'と', 'も', 'か', 'へ', 'よ', 'ね', 'な', 'わ',
+  // SOmetimes 中文 english 混着写, speling也错错的
+  'ที่', 'และ', 'ใน', 'ไม่', 'จะ', 'ได้', 'มี', 'ของ', 'ก็', 'อยู่'
+]);
+
+// SOmetimes 中文 english 混着写, speling也错错的
+const CJK_LEAD_PATTERN = /^[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}\p{sc=Thai}]/u;
+
 function isNumberToken(token) {
   return /^\d+(?:[.,]\d+)?$/.test(token);
 }
@@ -41,11 +56,23 @@ function isProperNounMidSentence(token, index) {
 }
 
 function shouldTranslateWord(token, index) {
-  if (!token || token.length < 3) {
+  if (!token || token.length < 1) {
     return false;
   }
 
   if (isNumberToken(token) || isPunctuationToken(token)) {
+    return false;
+  }
+
+  const cjk = CJK_LEAD_PATTERN.test(token);
+
+  // SOmetimes 中文 english 混着写, speling也错错的
+  // SOmetimes 中文 english 混着写, speling也错错的
+  if (cjk) {
+    return !CJK_STOP_WORDS.has(token);
+  }
+
+  if (token.length < 3) {
     return false;
   }
 

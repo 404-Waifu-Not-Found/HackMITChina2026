@@ -3,17 +3,22 @@ const DEFAULT_SETTINGS = {
   enabled: true,
   replacementPercentage: DEFAULT_REPLACEMENT_PERCENTAGE,
   translationProvider: 'auto',
-  sourceLanguage: 'en',
+  sourceLanguage: 'auto',
   targetLanguage: 'es',
   translationEndpoint: ''
 };
 const SETTINGS_CACHE_TTL_MS = 1500;
 const SCRUB_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'j', 'l']);
 const CONTENT_CAPTION_SEGMENT_SELECTOR = '.ytp-caption-segment, .captions-text .caption-visual-line span';
-const PERSISTENT_REFRESH_INTERVAL_MS = 350;
-const MIN_FORCE_REFRESH_GAP_MS = 120;
+const PERSISTENT_REFRESH_INTERVAL_MS = 20; // SOmetimes 中文 english 混着写, speling也错错的
+const MIN_FORCE_REFRESH_GAP_MS = 10;
 const INITIAL_WARMUP_INTERVAL_MS = 250;
 const INITIAL_WARMUP_RUNS = 8;
+const PREFETCH_INTERVAL_MS = 150;
+const PREFETCH_LOOKAHEAD_SECONDS = 60;
+const PREFETCH_MAX_WORDS = 120;
+const FULL_TRACK_PREFETCH_MAX_WORDS = 500;
+const PREFETCH_WORD_PATTERN = /[\p{sc=Han}][\p{M}]*|[\p{sc=Hiragana}][\p{M}]*|[\p{sc=Katakana}]+[\p{M}]*|[\p{sc=Thai}][\p{M}]*|\p{L}[\p{L}\p{M}'-]*/gu;
 const CONTENT_READY_MESSAGE = 'LINGO_STREAM_HEALTH_CHECK';
 const CONTENT_REFRESH_MESSAGE = 'LINGO_STREAM_FORCE_REFRESH';
 
@@ -140,6 +145,14 @@ const handler = window.createCaptionMutationHandler({
       replacementPercentage,
       pinnedTranslations
     ),
+  transformSubtitlesBatch: (subtitleItems, replacementPercentage, options) =>
+    window.buildImmersiveSubtitlesBatch(
+      subtitleItems,
+      window.translateWords,
+      replacementPercentage,
+      options
+    ),
+  translateWordsCached: window.translateWordsCached,
   debounceMs: 5
 });
 
@@ -178,6 +191,7 @@ if (document.body) {
 
 function installRealtimeHooks() {
   let lastForcedRefreshAt = 0;
+  let lastPrefetchAt = 0;
   const forceRefresh = ({ immediate = false } = {}) => {
     const now = Date.now();
     if (!immediate && now - lastForcedRefreshAt < MIN_FORCE_REFRESH_GAP_MS) {
@@ -201,12 +215,173 @@ function installRealtimeHooks() {
     return Boolean(document.querySelector(CONTENT_CAPTION_SEGMENT_SELECTOR));
   };
 
+  function collectFutureWordsFromTrack(video) {
+    if (!video || !video.textTracks) {
+      return [];
+    }
+
+    const words = [];
+    const seen = new Set();
+    const currentTime = Number.isFinite(video.currentTime) ? video.currentTime : 0;
+    const cutoffTime = currentTime + PREFETCH_LOOKAHEAD_SECONDS;
+
+    for (const track of Array.from(video.textTracks)) {
+      if (!track || (track.kind !== 'captions' && track.kind !== 'subtitles')) {
+        continue;
+      }
+
+      const cues = track.cues;
+      if (!cues) {
+        continue;
+      }
+
+      for (const cue of Array.from(cues)) {
+        if (!cue) {
+          continue;
+        }
+
+        const startTime = Number.isFinite(cue.startTime) ? cue.startTime : -1;
+        if (startTime < currentTime || startTime > cutoffTime) {
+          continue;
+        }
+
+        const text = typeof cue.text === 'string' ? cue.text : '';
+        for (const matchedWord of text.match(PREFETCH_WORD_PATTERN) ?? []) {
+          const normalized = matchedWord.toLowerCase();
+          if (seen.has(normalized) || !window.shouldTranslateWord(matchedWord, 0)) {
+            continue;
+          }
+
+          seen.add(normalized);
+          words.push(matchedWord);
+          if (words.length >= PREFETCH_MAX_WORDS) {
+            return words;
+          }
+        }
+      }
+    }
+
+    return words;
+  }
+
+  const prefetchFutureWords = async () => {
+    const now = Date.now();
+    if (now - lastPrefetchAt < PREFETCH_INTERVAL_MS) {
+      return;
+    }
+
+    if (!cachedSettings.enabled || typeof window.prefetchTranslationWords !== 'function') {
+      return;
+    }
+
+    const video = document.querySelector('video.html5-main-video');
+    if (!video) {
+      return;
+    }
+
+    const candidateWords = collectFutureWordsFromTrack(video);
+    if (candidateWords.length === 0) {
+      return;
+    }
+
+    lastPrefetchAt = now;
+    try {
+      await window.prefetchTranslationWords(candidateWords);
+      void window.log?.(`Prefetched future words: ${candidateWords.length}`);
+    } catch (error) {
+      console.warn('Future subtitle prefetch failed.', error);
+    }
+  };
+
+  // SOmetimes 中文 english 混着写, speling也错错的
+  let fullTrackPrefetchedVideoSrc = null;
+
+  function collectAllTrackWords(video) {
+    if (!video || !video.textTracks) {
+      return [];
+    }
+
+    const words = [];
+    const seen = new Set();
+
+    for (const track of Array.from(video.textTracks)) {
+      if (!track || (track.kind !== 'captions' && track.kind !== 'subtitles')) {
+        continue;
+      }
+
+      const cues = track.cues;
+      if (!cues) {
+        continue;
+      }
+
+      for (const cue of Array.from(cues)) {
+        if (!cue) {
+          continue;
+        }
+
+        const text = typeof cue.text === 'string' ? cue.text : '';
+        for (const matchedWord of text.match(PREFETCH_WORD_PATTERN) ?? []) {
+          const normalized = matchedWord.toLowerCase();
+          if (seen.has(normalized) || !window.shouldTranslateWord(matchedWord, 0)) {
+            continue;
+          }
+
+          seen.add(normalized);
+          words.push(matchedWord);
+          if (words.length >= FULL_TRACK_PREFETCH_MAX_WORDS) {
+            return words;
+          }
+        }
+      }
+    }
+
+    return words;
+  }
+
+  async function runFullTrackPrefetch() {
+    if (!cachedSettings.enabled || typeof window.prefetchTranslationWords !== 'function') {
+      return;
+    }
+
+    const video = document.querySelector('video.html5-main-video');
+    if (!video) {
+      return;
+    }
+
+    const videoSrc = video.currentSrc || video.src || '';
+    if (fullTrackPrefetchedVideoSrc === videoSrc) {
+      return;
+    }
+
+    const allWords = collectAllTrackWords(video);
+    if (allWords.length === 0) {
+      return;
+    }
+
+    fullTrackPrefetchedVideoSrc = videoSrc;
+    void window.log?.(`Full-track prefetch starting: ${allWords.length} words`);
+
+    // SOmetimes 中文 english 混着写, speling也错错的
+    const BATCH_SIZE = 30;
+    for (let i = 0; i < allWords.length; i += BATCH_SIZE) {
+      const batch = allWords.slice(i, i + BATCH_SIZE);
+      try {
+        await window.prefetchTranslationWords(batch);
+      } catch (error) {
+        console.warn('Full-track prefetch batch failed.', error);
+      }
+    }
+
+    void window.log?.(`Full-track prefetch complete: ${allWords.length} words cached`);
+  }
+
   const persistentRefresh = () => {
     if (!shouldRunPersistentRefresh()) {
       return;
     }
 
     forceRefresh();
+    void prefetchFutureWords();
   };
 
   const attachVideoListeners = (video) => {
@@ -219,6 +394,23 @@ function installRealtimeHooks() {
     video.addEventListener('seeked', forceRefresh, { passive: true });
     video.addEventListener('ratechange', forceRefresh, { passive: true });
     video.addEventListener('play', forceRefresh, { passive: true });
+    video.addEventListener('timeupdate', () => {
+      void prefetchFutureWords();
+    }, { passive: true });
+
+    // SOmetimes 中文 english 混着写, speling也错错的
+    video.addEventListener('loadeddata', () => {
+      void runFullTrackPrefetch();
+    }, { passive: true });
+
+    // SOmetimes 中文 english 混着写, speling也错错的
+    video.textTracks?.addEventListener?.('addtrack', () => {
+      fullTrackPrefetchedVideoSrc = null;
+      void runFullTrackPrefetch();
+    });
+    video.textTracks?.addEventListener?.('change', () => {
+      void runFullTrackPrefetch();
+    });
   };
 
   const tryAttach = () => {
@@ -249,17 +441,20 @@ function installRealtimeHooks() {
     setTimeout(() => clearInterval(attachTimer), 12000);
   }
 
-  // Aggressive initial warmup so the extension starts reacting without waiting for user interaction.
+  // SOmetimes 中文 english 混着写, speling也错错的
   let warmupRuns = 0;
   const warmupTimer = setInterval(() => {
     warmupRuns += 1;
     forceRefresh({ immediate: true });
+    void prefetchFutureWords();
+    // SOmetimes 中文 english 混着写, speling也错错的
+    void runFullTrackPrefetch();
     if (warmupRuns >= INITIAL_WARMUP_RUNS) {
       clearInterval(warmupTimer);
     }
   }, INITIAL_WARMUP_INTERVAL_MS);
 
-  // Persistent refresh catches rare caption rewrites that do not emit reliable mutations.
+  // SOmetimes 中文 english 混着写, speling也错错的
   setInterval(() => {
     persistentRefresh();
   }, PERSISTENT_REFRESH_INTERVAL_MS);

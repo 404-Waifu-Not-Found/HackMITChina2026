@@ -1,0 +1,48 @@
+<!-- Quiz section -->
+<section id="quiz" class="screen pt-20 pb-12 lg:pt-0 lg:pb-0">
+  <div class="screen-inner w-full max-w-[1120px] mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-8 items-center">
+    <!-- Description -->
+    <div data-reveal>
+      <p class="text-brand-600 dark:text-brand-400 text-xs font-bold tracking-[0.08em] uppercase mb-3">Quiz Mode</p>
+      <h2 class="font-display text-2xl sm:text-3xl lg:text-[clamp(1.75rem,3.2vw,2.75rem)] leading-[1.1] tracking-tight max-w-[22ch]">Practice recent vocabulary with 5-word matching rounds</h2>
+      <p class="mt-4 text-zinc-500 dark:text-zinc-400 leading-relaxed text-sm sm:text-base">
+        Lingo Stream can turn your last hour of translated words into a focused matching drill. This keeps review short and contextual, right after watching.
+      </p>
+
+      <div class="mt-5 space-y-3">
+        <article class="p-4 rounded-2xl border border-brand-500/15 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-sm">
+          <strong class="font-display text-sm block">Recent-only dataset</strong>
+          <span class="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400 leading-snug block">Uses words translated in the previous 60 minutes.</span>
+        </article>
+        <article class="p-4 rounded-2xl border border-brand-500/15 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-sm">
+          <strong class="font-display text-sm block">5-word rounds</strong>
+          <span class="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400 leading-snug block">Each round uses exactly five pairs for quick daily repetition.</span>
+        </article>
+        <article class="p-4 rounded-2xl border border-brand-500/15 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-sm max-sm:hidden">
+          <strong class="font-display text-sm block">Live scoring</strong>
+          <span class="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400 leading-snug block">Tracks progress, accuracy, and current streak.</span>
+        </article>
+      </div>
+    </div>
+
+    <!-- Card demo -->
+    <div class="p-5 sm:p-6 rounded-2xl border border-zinc-200/70 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/60 backdrop-blur-sm" data-reveal data-delay="120">
+      <p class="text-brand-600 dark:text-brand-400 text-[11px] font-extrabold tracking-wider uppercase">Matching Preview</p>
+      <div class="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
+        <div class="space-y-2.5">
+          <span class="block text-zinc-400 dark:text-zinc-500 text-[11px] tracking-wider uppercase font-extrabold">Source</span>
+          <button class="quiz-match-card w-full text-left rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 px-3 py-2.5 text-sm font-bold cursor-default transition-all" data-pair="1">skills</button>
+          <button class="quiz-match-card w-full text-left rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 px-3 py-2.5 text-sm font-bold cursor-default transition-all" data-pair="2">friend</button>
+          <button class="quiz-match-card w-full text-left rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 px-3 py-2.5 text-sm font-bold cursor-default transition-all" data-pair="3">watch</button>
+        </div>
+        <div class="space-y-2.5">
+          <span class="block text-zinc-400 dark:text-zinc-500 text-[11px] tracking-wider uppercase font-extrabold">Translation</span>
+          <button class="quiz-match-card w-full text-left rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 px-3 py-2.5 text-sm font-bold cursor-default transition-all" data-pair="3">mirar</button>
+          <button class="quiz-match-card w-full text-left rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 px-3 py-2.5 text-sm font-bold cursor-default transition-all" data-pair="1">habilidades</button>
+          <button class="quiz-match-card w-full text-left rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 px-3 py-2.5 text-sm font-bold cursor-default transition-all" data-pair="2">amigo</button>
+        </div>
+      </div>
+      <p class="mt-4 text-xs text-zinc-400 dark:text-zinc-500">Cards animate through sample matches to demonstrate the quiz flow.</p>
+    </div>
+  </div>
+</section>

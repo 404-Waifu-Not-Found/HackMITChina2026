@@ -1,0 +1,48 @@
+<!-- Hero section -->
+<section id="hero" class="screen pt-24 pb-12 lg:pt-0 lg:pb-0">
+  <div class="screen-inner w-full max-w-[1120px] mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[1.15fr_0.85fr] gap-8 lg:gap-10 items-center">
+    <!-- Copy -->
+    <div>
+      <p class="text-brand-600 dark:text-brand-400 text-xs font-bold tracking-[0.08em] uppercase mb-3" data-reveal>Chrome Extension</p>
+      <h1 class="font-display text-3xl sm:text-4xl lg:text-[clamp(2.2rem,4.5vw,3.75rem)] leading-[1.22] sm:leading-[1.1] lg:leading-[1.1] tracking-tight max-w-[17ch] mb-3" data-reveal data-delay="80">
+        Turn YouTube subtitles into daily language practice.
+      </h1>
+      <p class="mt-4 sm:mt-5 max-w-[58ch] text-zinc-500 dark:text-zinc-400 text-base sm:text-lg lg:text-[clamp(1rem,1.4vw,1.25rem)] leading-relaxed" data-reveal data-delay="140">
+        Lingo Stream injects translated words into captions in real time, helping you absorb vocabulary naturally while watching videos you already enjoy.
+      </p>
+      <div class="mt-5 sm:mt-6 flex flex-col sm:flex-row gap-3" data-reveal data-delay="200">
+        <a class="btn btn-primary inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white text-sm font-bold px-5 py-3 shadow-md hover:-translate-y-0.5 hover:shadow-lg transition-all no-underline" href="#preview">Try Interactive Preview</a>
+        <a class="btn btn-ghost inline-flex items-center justify-center rounded-xl border border-brand-500/25 bg-brand-500/[0.06] text-brand-700 dark:text-brand-400 text-sm font-bold px-5 py-3 hover:-translate-y-0.5 transition-all no-underline" href="#" data-repo-link target="_blank" rel="noopener noreferrer">View GitHub</a>
+      </div>
+
+      <!-- Stat cards (hidden on very small screens to reduce clutter) -->
+      <div class="mt-5 hidden sm:grid grid-cols-2 gap-3 max-w-xl" data-reveal data-delay="240">
+        <article class="p-4 rounded-2xl border border-brand-500/15 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-sm">
+          <strong class="font-display text-sm block">Real-Time Injection</strong>
+          <p class="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400 leading-snug">Subtitles update instantly without leaving the video.</p>
+        </article>
+        <article class="p-4 rounded-2xl border border-brand-500/15 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-sm">
+          <strong class="font-display text-sm block">Adaptive Intensity</strong>
+          <p class="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400 leading-snug">Choose how many translated words appear per line.</p>
+        </article>
+      </div>
+    </div>
+
+    <!-- Browser mockup -->
+    <div data-reveal data-delay="260">
+      <div class="rounded-2xl border border-zinc-200/70 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/60 backdrop-blur-sm p-4 shadow-xl shadow-zinc-900/[.04] dark:shadow-black/20">
+        <div class="hidden sm:flex gap-1.5 mb-3">
+          <span class="w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+        </div>
+        <div class="relative min-h-[200px] sm:min-h-[260px] rounded-xl border border-zinc-200/50 dark:border-zinc-800 bg-gradient-to-br from-brand-950 via-brand-900 to-brand-950 overflow-hidden">
+          <div id="heroSubtitleLine" class="subtitle-live absolute left-3 right-3 bottom-3 rounded-lg px-3.5 py-2.5 text-white font-semibold text-sm bg-black/60 backdrop-blur-sm" aria-live="polite">
+            I really enjoy learning new <span class="word-pair">skills <span class="translation">(habilidades)</span></span> every day.
+          </div>
+        </div>
+      </div>
+      <p class="mt-3 text-[11px] text-zinc-400 dark:text-zinc-500 text-center tracking-wide">Live subtitle behavior</p>
+    </div>
+  </div>
+</section>

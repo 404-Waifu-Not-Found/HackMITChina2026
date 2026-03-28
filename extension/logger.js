@@ -1,6 +1,6 @@
 const DEBUG_KEY = 'debug';
 const LOGS_KEY = 'debugLogs';
-const MAX_LOG_ENTRIES = 200;
+const MAX_LOG_ENTRIES = 1000;
 
 function hasStorageApi() {
   return typeof chrome !== 'undefined' && Boolean(chrome.storage?.local);
@@ -43,15 +43,10 @@ async function log(message) {
   }
 
   const safeMessage = typeof message === 'string' ? message : String(message);
-  const { [DEBUG_KEY]: debugEnabled = false } = await getLocalStorage([DEBUG_KEY]);
-
   const { [LOGS_KEY]: existingLogs = [] } = await getLocalStorage([LOGS_KEY]);
   const nextLogs = [...existingLogs, `[${formatTimestamp()}] ${safeMessage}`].slice(-MAX_LOG_ENTRIES);
-  await setLocalStorage({ [LOGS_KEY]: nextLogs });
-
-  if (debugEnabled) {
-    console.debug(`[Lingo Stream] ${safeMessage}`);
-  }
+  await setLocalStorage({ [DEBUG_KEY]: true, [LOGS_KEY]: nextLogs });
+  console.debug(`[Lingo Stream] ${safeMessage}`);
 }
 
 window.log = log;

@@ -1,8 +1,8 @@
-import fs from 'node:fs';
+﻿import fs from 'node:fs';
 
 const requiredFiles = [
   'extension/manifest.json',
-  'extension/logo.svg',
+  'extension/logo.png',
   'extension/content.js',
   'extension/popup.html',
   'extension/stopwords.js',

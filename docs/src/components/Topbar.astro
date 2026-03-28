@@ -1,0 +1,56 @@
+<!-- Topbar navigation with mobile hamburger menu -->
+<header id="topbar" class="topbar fixed left-1/2 top-0 -translate-x-1/2 w-[min(1200px,calc(100%-16px))] max-sm:w-[calc(100%-8px)] border border-t-0 border-zinc-200/60 dark:border-zinc-800/70 rounded-b-3xl max-sm:rounded-b-2xl bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl shadow-lg shadow-zinc-900/[.04] dark:shadow-black/20 px-5 max-sm:px-3 py-3 max-sm:py-2 z-40 flex items-center justify-between gap-4 max-sm:gap-2 overflow-hidden">
+  <a class="flex items-center gap-2.5 no-underline text-inherit" href="#top" aria-label="Lingo Stream home">
+    <img class="w-8 h-8 max-sm:w-7 max-sm:h-7" src={`${import.meta.env.BASE_URL}/logo.png`} alt="Lingo Stream logo" />
+    <span class="font-display text-[15px] max-sm:text-[13px] font-bold tracking-tight">Lingo Stream</span>
+  </a>
+
+  <!-- Desktop nav -->
+  <nav class="hidden lg:flex items-center gap-5" aria-label="Main Navigation">
+    <a class="text-zinc-500 dark:text-zinc-400 text-[13px] font-semibold hover:text-brand-600 dark:hover:text-brand-400 transition-colors" href="#hero">Home</a>
+    <a class="text-zinc-500 dark:text-zinc-400 text-[13px] font-semibold hover:text-brand-600 dark:hover:text-brand-400 transition-colors" href="#features">Features</a>
+    <a class="text-zinc-500 dark:text-zinc-400 text-[13px] font-semibold hover:text-brand-600 dark:hover:text-brand-400 transition-colors" href="#preview">Preview</a>
+    <a class="text-zinc-500 dark:text-zinc-400 text-[13px] font-semibold hover:text-brand-600 dark:hover:text-brand-400 transition-colors" href="#quiz">Quiz</a>
+    <a class="text-zinc-500 dark:text-zinc-400 text-[13px] font-semibold hover:text-brand-600 dark:hover:text-brand-400 transition-colors" href="#install">Install</a>
+  </nav>
+
+  <!-- Mobile hamburger -->
+  <button id="mobileMenuBtn" type="button" class="lg:hidden p-2 -mr-1 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" aria-label="Open menu" aria-expanded="false">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+    </svg>
+  </button>
+
+  <!-- Desktop install CTA -->
+  <a class="hidden lg:inline-flex btn btn-primary shrink-0 items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white text-xs font-bold px-3.5 py-2 shadow-sm hover:-translate-y-px transition-transform no-underline" href="#install">Install</a>
+
+  <!-- Scroll progress bar -->
+  <div class="topbar-progress absolute left-4 right-4 bottom-0.5 h-[3px] rounded-full bg-brand-500/10 overflow-hidden pointer-events-none">
+    <span id="scrollProgressBar" class="block w-0 h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-700 transition-[width] duration-200"></span>
+  </div>
+</header>
+
+<!-- Mobile menu overlay -->
+<div id="mobileMenu" class="fixed inset-0 z-50 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl hidden lg:hidden" role="dialog" aria-label="Navigation menu">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-zinc-200/60 dark:border-zinc-800">
+    <div class="flex items-center gap-2.5">
+      <img class="w-7 h-7" src={`${import.meta.env.BASE_URL}/logo.png`} alt="" />
+      <span class="font-display text-[15px] font-bold">Menu</span>
+    </div>
+    <button id="mobileMenuClose" type="button" class="p-2 -mr-1 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" aria-label="Close menu">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  <nav class="flex flex-col px-4 mt-4 gap-1" aria-label="Mobile navigation">
+    <a class="mobile-nav-link text-lg font-semibold py-3.5 px-4 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-950/50 transition-colors" href="#hero">Home</a>
+    <a class="mobile-nav-link text-lg font-semibold py-3.5 px-4 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-950/50 transition-colors" href="#features">Features</a>
+    <a class="mobile-nav-link text-lg font-semibold py-3.5 px-4 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-950/50 transition-colors" href="#preview">Preview</a>
+    <a class="mobile-nav-link text-lg font-semibold py-3.5 px-4 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-950/50 transition-colors" href="#quiz">Quiz</a>
+    <a class="mobile-nav-link text-lg font-semibold py-3.5 px-4 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-950/50 transition-colors" href="#install">Install</a>
+  </nav>
+  <div class="px-4 mt-6">
+    <a class="block w-full text-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white font-bold py-3.5 shadow-sm no-underline text-base" href="#install">Install Extension</a>
+  </div>
+</div>

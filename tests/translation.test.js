@@ -3,8 +3,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 globalThis.window = globalThis;
 await import('../extension/translation.js');
 
-function createChromeMock({ storageItems = {}, response = null, runtimeErrorMessage = '' } = {}) {
-  const localStorageState = {};
+function createChromeMock({
+  storageItems = {},
+  localStorageItems = {},
+  response = null,
+  runtimeErrorMessage = ''
+} = {}) {
+  const localStorageState = { ...localStorageItems };
 
   return {
     storage: {
@@ -127,6 +132,28 @@ describe('translation bridge layer', () => {
     expect(sentWords).toEqual(['Hello']);
   });
 
+  it('prefetches future words through the same cache-aware translation pipeline', async () => {
+    globalThis.chrome = createChromeMock({
+      response: {
+        ok: true,
+        translations: {
+          future: 'futuro'
+        },
+        meta: {
+          providerByWord: { future: 'libre' },
+          failedProvidersByWord: {}
+        }
+      }
+    });
+
+    const prefetched = await window.prefetchTranslationWords(['future', 'FUTURE']);
+    const translated = await window.translateWords(['future']);
+
+    expect(prefetched).toEqual({ future: 'futuro' });
+    expect(translated).toEqual({ future: 'futuro' });
+    expect(globalThis.chrome.runtime.sendMessage).toHaveBeenCalledTimes(1);
+  });
+
   it('returns null from translateWord when runtime bridge reports no translation', async () => {
     globalThis.chrome = createChromeMock({
       response: {
@@ -243,7 +270,7 @@ describe('translation bridge layer', () => {
 
     const payload = globalThis.chrome.runtime.sendMessage.mock.calls[0][0].payload;
     expect(payload.translationProvider).toBe('auto');
-    expect(payload.sourceLanguage).toBe('en');
+    expect(payload.sourceLanguage).toBe('auto');
     expect(payload.targetLanguage).toBe('es');
     expect(payload.translationTimeoutMs).toBe(1200);
   });
@@ -332,6 +359,61 @@ describe('translation bridge layer', () => {
         count: 2
       })
     );
+
+    const buckets = globalThis.chrome._localStorageState.vocabularyQuizBuckets;
+    expect(buckets).toEqual(
+      expect.objectContaining({
+        notQuizzed: expect.any(Array),
+        correct: expect.any(Array),
+        incorrect: expect.any(Array)
+      })
+    );
+    expect(buckets.notQuizzed.length).toBe(1);
+    expect(buckets.correct.length).toBe(0);
+    expect(buckets.incorrect.length).toBe(0);
+  });
+
+  it('does not re-add words to notQuizzed when they already exist in correct bucket', async () => {
+    globalThis.chrome = createChromeMock({
+      storageItems: {
+        saveVocabulary: true,
+        sourceLanguage: 'en',
+        targetLanguage: 'es'
+      },
+      localStorageItems: {
+        vocabularyQuizBuckets: {
+          notQuizzed: [],
+          correct: [
+            {
+              source: 'hello',
+              translation: 'hola',
+              sourceLanguage: 'en',
+              targetLanguage: 'es',
+              provider: 'google',
+              count: 1,
+              firstSeenAt: Date.now() - 1000,
+              lastSeenAt: Date.now() - 1000
+            }
+          ],
+          incorrect: []
+        }
+      },
+      response: {
+        ok: true,
+        translations: { hello: 'hola' },
+        meta: {
+          providerByWord: { hello: 'mymemory' },
+          failedProvidersByWord: {}
+        }
+      }
+    });
+
+    await window.translateWords(['hello']);
+    await flushStorageWrites();
+
+    const buckets = globalThis.chrome._localStorageState.vocabularyQuizBuckets;
+    expect(buckets.correct.length).toBe(1);
+    expect(buckets.notQuizzed.length).toBe(0);
   });
 
   it('persists cached vocabulary hits even when new misses fail in bridge', async () => {
@@ -376,5 +458,30 @@ describe('translation bridge layer', () => {
         count: 2
       })
     );
+  });
+
+  it('synchronously returns only cached translations without hitting the bridge', () => {
+    window.translationCache.hello = 'hola';
+    window.translationCache.world = 'mundo';
+
+    const result = window.translateWordsCached(['Hello', 'World', 'Goodbye']);
+
+    expect(result).toEqual({ hello: 'hola', world: 'mundo' });
+    expect(globalThis.chrome.runtime.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('returns empty object from translateWordsCached when cache is empty', () => {
+    const result = window.translateWordsCached(['Hello', 'World']);
+
+    expect(result).toEqual({});
+    expect(globalThis.chrome.runtime.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('deduplicates words in translateWordsCached', () => {
+    window.translationCache.hello = 'hola';
+
+    const result = window.translateWordsCached(['Hello', 'hello', 'HELLO']);
+
+    expect(result).toEqual({ hello: 'hola' });
   });
 });

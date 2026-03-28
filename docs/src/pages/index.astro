@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro'
+import Topbar from '../components/Topbar.astro'
+import SectionDots from '../components/SectionDots.astro'
+import Splash from '../components/Splash.astro'
+import Hero from '../components/Hero.astro'
+import Features from '../components/Features.astro'
+import Preview from '../components/Preview.astro'
+import Quiz from '../components/Quiz.astro'
+import Install from '../components/Install.astro'
+import Footer from '../components/Footer.astro'
+---
+
+<Base>
+  <!-- Background decoration (desktop only) -->
+  <div class="backdrop-glow glow-a fixed -top-24 -right-28 w-80 h-80 rounded-full pointer-events-none z-[-2] will-change-transform bg-[radial-gradient(circle_at_40%_40%,rgba(34,197,94,0.18),transparent)] max-lg:hidden" aria-hidden="true"></div>
+  <div class="backdrop-glow glow-b fixed -bottom-32 -left-40 w-96 h-96 rounded-full pointer-events-none z-[-2] will-change-transform bg-[radial-gradient(circle_at_60%_50%,rgba(21,128,61,0.14),transparent)] max-lg:hidden" aria-hidden="true"></div>
+  <div id="floatingPlusField" class="floating-plus-field fixed inset-0 pointer-events-none overflow-hidden z-[-1] max-lg:hidden" aria-hidden="true"></div>
+
+  <Topbar />
+  <SectionDots />
+
+  <main id="top">
+    <Splash />
+    <Hero />
+    <Features />
+    <Preview />
+    <Quiz />
+    <Install />
+  </main>
+
+  <Footer />
+</Base>

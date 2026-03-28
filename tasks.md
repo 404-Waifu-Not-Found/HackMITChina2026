@@ -11,8 +11,17 @@
 - [x] Debounce and duplicate-processing guards implemented
 - [x] Debug logging panel implemented and always visible in popup
 - [x] Background diagnostics logging added for translation flow
+- [x] Vocabulary quiz page implemented with recent-word matching rounds
+- [x] Quiz interaction refined to fixed 5-word rounds with clearer UX states
+- [x] Documentation site updated with current release download + install information
+- [x] Vocabulary import workflow added (CSV/JSON)
+- [x] Quiz progression buckets added: not quizzed, answered correctly, answered incorrectly
+- [x] Randomized quiz selection updated to use not quizzed + low-probability incorrect words
+- [x] Nightly CI workflow added for fixture-based extension E2E smoke tests
+- [x] Vocabulary filters added in popup (text + language + provider + date range)
+- [x] UX polish added for vocabulary badges and export confirmation states
 
-## Completed In This Fix
+## Completed In v1.0.0 Release
 - [x] Added safer sender trust fallback for content-script messages with missing URL metadata
 - [x] Added `google` provider support and included it in auto fallback order
 - [x] Added `https://translate.googleapis.com/*` permission
@@ -22,19 +31,15 @@
 - [x] Added explicit popup health checks for content-script connection and last translation success
 - [x] Added optional vocabulary save/export workflow (toggle + CSV export + clear)
 - [x] Added translation health + vocabulary persistence tests
+- [x] Added dedicated quiz page + popup launch flow for quick vocabulary review
+- [x] Updated quiz UI to Duolingo-like interaction cues and completion states
+- [x] Published release package `Lingo.Stream.1.0.0.Release.zip`
 
-## Remaining TODO
-- [x] Add integration/e2e test that simulates caption DOM updates end-to-end
-- [x] Add explicit in-popup health check in ui panel (content script attached + last translation success)
-- [x] Add optional vocabulary save/export workflow
-
-## Future TODO (Planned)
-- [ ] Add vocabulary import workflow (CSV/JSON) so users can restore or migrate saved words
-- [ ] Add vocabulary filters/search in popup (language/provider/date)
+## Remaining TODO (Near Term)
 - [ ] Add backoff/rate-limit handling for provider throttling
 - [ ] Add last-translation failure diagnostics in popup health panel (error + provider fallback trace)
-- [ ] Add nightly CI job with extension E2E smoke test against a stable YouTube caption fixture
-- [ ] Add UX polish for saved vocabulary count badges and export confirmation states
+
+## Future TODO (Planned)
 
 ## Definition of Done (MVP)
 - [x] Extension installs successfully

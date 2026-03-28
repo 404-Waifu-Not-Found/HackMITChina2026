@@ -67,13 +67,29 @@ globalThis.document = createMockDocument();
 await import('../extension/captionObserver.js');
 
 function createCaptionNode(text) {
-  return {
+  const node = {
     nodeType: 1,
-    textContent: text,
+    _textContent: text,
     isConnected: true,
     matches: (selector) => selector.includes('.ytp-caption-segment'),
     querySelectorAll: () => []
   };
+  Object.defineProperty(node, 'textContent', {
+    get() { return node._textContent; },
+    set(value) { node._textContent = value; },
+    enumerable: true,
+    configurable: true
+  });
+  Object.defineProperty(node, 'innerHTML', {
+    get() { return node._innerHTML || node._textContent; },
+    set(html) {
+      node._innerHTML = html;
+      node._textContent = html.replace(/<[^>]*>/g, '');
+    },
+    enumerable: true,
+    configurable: true
+  });
+  return node;
 }
 
 function mutationForNode(node) {
@@ -129,6 +145,31 @@ describe('caption observer hardening', () => {
 
     expect(first.textContent).toBe('Same subtitle (x)');
     expect(second.textContent).toBe('Same subtitle (x)');
+    expect(transformSubtitle).toHaveBeenCalledTimes(1);
+
+    vi.useRealTimers();
+  });
+
+  it('reapplies recent transformed cache synchronously for a new matching segment', async () => {
+    vi.useFakeTimers();
+
+    const transformSubtitle = vi.fn(async (text) => `${text} (cached-fast)`);
+    const handler = window.createCaptionMutationHandler({
+      getSettings: async () => ({ enabled: true, replacementPercentage: 5 }),
+      transformSubtitle,
+      debounceMs: 500
+    });
+
+    const first = createCaptionNode('cache line');
+    handler.handleMutations(mutationForNode(first));
+    await vi.advanceTimersByTimeAsync(510);
+    expect(first.textContent).toBe('cache line (cached-fast)');
+    expect(transformSubtitle).toHaveBeenCalledTimes(1);
+
+    const second = createCaptionNode('cache line');
+    handler.handleMutations(mutationForNode(second));
+
+    expect(second.textContent).toBe('cache line (cached-fast)');
     expect(transformSubtitle).toHaveBeenCalledTimes(1);
 
     vi.useRealTimers();
@@ -318,6 +359,40 @@ describe('caption observer hardening', () => {
     vi.useRealTimers();
   });
 
+  it('uses batched subtitle transformation for multiple unseen segments', async () => {
+    vi.useFakeTimers();
+
+    const transformSubtitle = vi.fn(async (text) => `${text} (single)`);
+    const transformSubtitlesBatch = vi.fn(async (items) =>
+      items.map((item) => `${item.text} (batch)`)
+    );
+
+    const handler = window.createCaptionMutationHandler({
+      getSettings: async () => ({ enabled: true, replacementPercentage: 5 }),
+      transformSubtitle,
+      transformSubtitlesBatch,
+      debounceMs: 1
+    });
+
+    const firstNode = createCaptionNode('line one');
+    const secondNode = createCaptionNode('line two');
+    handler.handleMutations([
+      {
+        type: 'childList',
+        addedNodes: [firstNode, secondNode]
+      }
+    ]);
+
+    await vi.advanceTimersByTimeAsync(2);
+
+    expect(transformSubtitlesBatch).toHaveBeenCalledTimes(1);
+    expect(transformSubtitle).toHaveBeenCalledTimes(0);
+    expect(firstNode.textContent).toBe('line one (batch)');
+    expect(secondNode.textContent).toBe('line two (batch)');
+
+    vi.useRealTimers();
+  });
+
   it('renders transformed subtitle directly in native caption segments', async () => {
     vi.useFakeTimers();
 
@@ -353,7 +428,7 @@ describe('caption observer hardening', () => {
     await vi.advanceTimersByTimeAsync(2);
     expect(subtitleNode.textContent).toBe('same line (stable)');
 
-    // Simulate YouTube rewriting the DOM back to original text for the same cue.
+    // SOmetimes 中文 english 混着写, speling也错错的
     subtitleNode.textContent = 'same line';
     handler.handleMutations(mutationForNode(subtitleNode));
     await vi.advanceTimersByTimeAsync(2);
@@ -383,6 +458,32 @@ describe('caption observer hardening', () => {
     handler.handleMutations(mutationForNode(subtitleNode));
 
     expect(subtitleNode.textContent).toBe('quick line (fast)');
+    expect(transformSubtitle).toHaveBeenCalledTimes(1);
+
+    vi.useRealTimers();
+  });
+
+  it('reapplies known transformed text synchronously during priming', async () => {
+    vi.useFakeTimers();
+
+    const subtitleNode = createCaptionNode('prime line');
+    document.querySelectorAll = (selector) => (selector.includes('.ytp-caption-segment') ? [subtitleNode] : []);
+
+    const transformSubtitle = vi.fn(async (text) => `${text} (prime-fast)`);
+    const handler = window.createCaptionMutationHandler({
+      getSettings: async () => ({ enabled: true, replacementPercentage: 5 }),
+      transformSubtitle,
+      debounceMs: 500
+    });
+
+    handler.handleMutations(mutationForNode(subtitleNode));
+    await vi.advanceTimersByTimeAsync(510);
+    expect(subtitleNode.textContent).toBe('prime line (prime-fast)');
+
+    subtitleNode.textContent = 'prime line';
+    handler.primeFromCurrentCaptions();
+
+    expect(subtitleNode.textContent).toBe('prime line (prime-fast)');
     expect(transformSubtitle).toHaveBeenCalledTimes(1);
 
     vi.useRealTimers();
@@ -489,6 +590,94 @@ describe('caption observer hardening', () => {
     await vi.advanceTimersByTimeAsync(2);
 
     expect(transformSubtitle).toHaveBeenCalledTimes(0);
+    vi.useRealTimers();
+  });
+
+  it('passes translateWordsCached and onEarlyRender to batch transform options', async () => {
+    vi.useFakeTimers();
+
+    const transformSubtitlesBatch = vi.fn(async (items) =>
+      items.map((item) => `${item.text} (batch)`)
+    );
+    const translateWordsCached = vi.fn(() => ({}));
+
+    const handler = window.createCaptionMutationHandler({
+      getSettings: async () => ({ enabled: true, replacementPercentage: 5 }),
+      transformSubtitle: async (text) => `${text} (single)`,
+      transformSubtitlesBatch,
+      translateWordsCached,
+      debounceMs: 1
+    });
+
+    const node = createCaptionNode('test line');
+    handler.handleMutations(mutationForNode(node));
+    await vi.advanceTimersByTimeAsync(2);
+
+    expect(transformSubtitlesBatch).toHaveBeenCalledTimes(1);
+    const callArgs = transformSubtitlesBatch.mock.calls[0];
+    expect(callArgs[2]).toMatchObject({
+      translateWordsCached: expect.any(Function),
+      onEarlyRender: expect.any(Function)
+    });
+
+    vi.useRealTimers();
+  });
+
+  it('applies early-rendered text to segments before final batch completes', async () => {
+    vi.useFakeTimers();
+
+    let node;
+    const textLog = [];
+    const transformSubtitlesBatch = vi.fn(async (items, _pct, options) => {
+      if (typeof options?.onEarlyRender === 'function') {
+        options.onEarlyRender(items.map((item) => `${item.text} (cached)`));
+      }
+      textLog.push(node.textContent);
+      return items.map((item) => `${item.text} (full)`);
+    });
+
+    const handler = window.createCaptionMutationHandler({
+      getSettings: async () => ({ enabled: true, replacementPercentage: 5 }),
+      transformSubtitle: async (text) => `${text} (single)`,
+      transformSubtitlesBatch,
+      translateWordsCached: () => ({ word: 'cached' }),
+      debounceMs: 1
+    });
+
+    node = createCaptionNode('test line');
+    handler.handleMutations(mutationForNode(node));
+    await vi.advanceTimersByTimeAsync(2);
+
+    expect(textLog[0]).toBe('test line (cached)');
+    expect(node.textContent).toBe('test line (full)');
+
+    vi.useRealTimers();
+  });
+
+  it('does not pass early render options when translateWordsCached is not provided', async () => {
+    vi.useFakeTimers();
+
+    const transformSubtitlesBatch = vi.fn(async (items) =>
+      items.map((item) => `${item.text} (batch)`)
+    );
+
+    const handler = window.createCaptionMutationHandler({
+      getSettings: async () => ({ enabled: true, replacementPercentage: 5 }),
+      transformSubtitle: async (text) => `${text} (single)`,
+      transformSubtitlesBatch,
+      debounceMs: 1
+    });
+
+    const node = createCaptionNode('test line');
+    handler.handleMutations(mutationForNode(node));
+    await vi.advanceTimersByTimeAsync(2);
+
+    expect(transformSubtitlesBatch).toHaveBeenCalledTimes(1);
+    const callArgs = transformSubtitlesBatch.mock.calls[0];
+    const options = callArgs[2];
+    expect(options.translateWordsCached).toBeUndefined();
+    expect(options.onEarlyRender).toBeUndefined();
+
     vi.useRealTimers();
   });
 });

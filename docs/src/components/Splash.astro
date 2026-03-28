@@ -1,0 +1,19 @@
+<!-- Splash — section 0: full-screen logo + name + scroll hint -->
+<section id="splash" class="screen splash-screen">
+  <div class="flex flex-col items-center justify-center w-full h-full gap-6">
+
+    <!-- Invisible placeholder that reserves the exact space the fixed 3D overlay occupies -->
+    <div id="logo3d-anchor" aria-hidden="true" class="flex items-center gap-6">
+      <div id="logo3d-anchor-img" class="w-60 h-60 shrink-0 rounded-[22%]"></div>
+      <span id="logo3d-anchor-name" class="font-display font-bold tracking-tight opacity-0 select-none whitespace-nowrap" style="font-size:90px;line-height:1;">Lingo Stream</span>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="splash-hint" aria-label="Scroll to continue">
+      <span class="splash-hint__text">Scroll</span>
+      <svg class="splash-hint__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+    </div>
+  </div>
+</section>

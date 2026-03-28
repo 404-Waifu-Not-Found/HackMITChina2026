@@ -1,0 +1,62 @@
+<!-- Install section -->
+<section id="install" class="screen pt-20 pb-12 lg:pt-0 lg:pb-0">
+  <div class="screen-inner w-full max-w-[1120px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-8 items-center">
+      <!-- Instructions -->
+      <div data-reveal>
+        <p class="text-brand-600 dark:text-brand-400 text-xs font-bold tracking-[0.08em] uppercase mb-3">Install</p>
+        <h2 class="font-display text-2xl sm:text-3xl lg:text-[clamp(1.75rem,3.2vw,2.75rem)] leading-[1.1] tracking-tight">Install Lingo Stream v<span data-release-version>1.0.0</span></h2>
+
+        <div class="mt-5 p-4 rounded-2xl border border-brand-500/15 bg-white/60 dark:bg-zinc-900/50 space-y-2.5">
+          <p class="flex justify-between text-sm text-zinc-500 dark:text-zinc-400"><span class="font-semibold">Release</span> <strong class="text-brand-700 dark:text-brand-400">v<span data-release-version>1.0.0</span></strong></p>
+          <p class="flex justify-between text-sm text-zinc-500 dark:text-zinc-400"><span class="font-semibold">Channel</span> <strong class="text-brand-700 dark:text-brand-400" data-release-channel>Full Release</strong></p>
+          <p class="flex justify-between text-sm text-zinc-500 dark:text-zinc-400"><span class="font-semibold">Package</span> <strong class="text-brand-700 dark:text-brand-400 break-all" data-release-package>Lingo.Stream.1.0.0.Release.zip</strong></p>
+        </div>
+
+        <ol class="mt-5 space-y-2 text-sm text-zinc-600 dark:text-zinc-300 list-decimal list-inside marker:text-brand-600 marker:font-bold">
+          <li>Download the packed ZIP package below.</li>
+          <li>Extract the ZIP file.</li>
+          <li>Open <code class="rounded-md border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 text-xs font-mono">chrome://extensions</code>.</li>
+          <li>Enable <strong>Developer mode</strong>.</li>
+          <li>Click <strong>Load unpacked</strong> and select the extracted extension folder.</li>
+        </ol>
+
+        <a class="mt-5 inline-flex items-center rounded-xl border border-brand-500/25 bg-brand-500/[0.06] text-brand-700 dark:text-brand-400 font-bold text-sm px-4 py-2.5 no-underline hover:-translate-y-px transition-all max-sm:w-full max-sm:justify-center"
+          href="https://github.com/UnoxyRich/Lingo-Stream/releases/download/Full-Release/Lingo.Stream.1.0.0.Release.zip"
+          data-release-download-link target="_blank" rel="noopener noreferrer">
+          Download <span class="ml-1" data-release-package>Lingo.Stream.1.0.0.Release.zip</span>
+        </a>
+        <p class="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+          Need other builds? Check
+          <a class="text-brand-600 dark:text-brand-400 font-semibold no-underline hover:underline" href="#" data-releases-link target="_blank" rel="noopener noreferrer">GitHub Releases</a>.
+        </p>
+      </div>
+
+      <!-- Sidebar CTA card -->
+      <div class="p-5 sm:p-6 rounded-2xl border border-zinc-200/70 dark:border-zinc-800 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-sm space-y-4" data-reveal data-delay="120">
+        <img class="w-16 h-16" src={`${import.meta.env.BASE_URL}/logo.png`} alt="Lingo Stream logo" />
+        <p class="text-zinc-500 dark:text-zinc-400 leading-relaxed text-sm">
+          Current stable package: <strong class="text-zinc-900 dark:text-zinc-100">v<span data-release-version>1.0.0</span></strong>
+          (<span data-release-channel>Full Release</span>).
+        </p>
+        <a class="btn btn-primary block w-full text-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white text-sm font-bold px-4 py-2.5 shadow-sm hover:-translate-y-px transition-all no-underline"
+          href="https://github.com/UnoxyRich/Lingo-Stream/releases/download/Full-Release/Lingo.Stream.1.0.0.Release.zip"
+          data-release-download-link target="_blank" rel="noopener noreferrer">
+          Download v1.0.0 ZIP
+        </a>
+        <a class="btn btn-ghost block w-full text-center rounded-xl border border-brand-500/25 bg-brand-500/[0.06] text-brand-700 dark:text-brand-400 text-sm font-bold px-4 py-2.5 hover:-translate-y-px transition-all no-underline" href="#" data-releases-link target="_blank" rel="noopener noreferrer">
+          Open Releases
+        </a>
+        <a class="btn btn-ghost block w-full text-center rounded-xl border border-brand-500/25 bg-brand-500/[0.06] text-brand-700 dark:text-brand-400 text-sm font-bold px-4 py-2.5 hover:-translate-y-px transition-all no-underline" href="#" data-repo-link target="_blank" rel="noopener noreferrer">
+          Open GitHub Repository
+        </a>
+      </div>
+    </div>
+
+    <!-- Inline footer for desktop snap view -->
+    <p class="hidden lg:block mt-10 text-xs text-zinc-400 dark:text-zinc-500 text-center">
+      &copy; <span class="year-value"></span> Lingo Stream &mdash;
+      <a class="text-brand-600 dark:text-brand-400 no-underline hover:underline" href="#" data-repo-link target="_blank" rel="noopener noreferrer">GitHub</a>
+    </p>
+  </div>
+</section>
