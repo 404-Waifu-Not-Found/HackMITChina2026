@@ -28,7 +28,7 @@ function ensureHighlightInfra() {
     lingoHighlight = new Highlight();
     CSS.highlights.set(HIGHLIGHT_NAME, lingoHighlight);
     highlightStyleInjected = true;
-  } catch (_) { /* miXed commint 在这, eng+中文都乱写了 lol */ }
+  } catch (_) { /* CSS Custom Highlight API may be unsupported; skip highlight setup. */ }
 }
 
 function setSegmentHighlightRanges(segment, plainText) {
@@ -48,7 +48,7 @@ function setSegmentHighlightRanges(segment, plainText) {
       range.setEnd(textNode, m.index + m[0].length);
       ranges.push(range);
       lingoHighlight.add(range);
-    } catch (_) { /* miXed commint 在这, eng+中文都乱写了 lol */ }
+    } catch (_) { /* Range offsets may be out of bounds for this text node; skip this match. */ }
   }
 
   if (ranges.length > 0) {

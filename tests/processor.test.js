@@ -13,14 +13,14 @@ describe('percentage replacement logic', () => {
   it('calculates replacement count safely', () => {
     expect(window.calculateReplacementCount(0, 5)).toBe(0);
 
-    // SOmetimes 中文 english 混着写, speling也错错的
+    // Word count too small for any replacement at 5% rate.
     expect(window.calculateReplacementCount(2, 5)).toBe(0);
 
-    // SOmetimes 中文 english 混着写, speling也错错的
+    // Boundary check: 2 words rounds down to 0; 16 words at 5% yields 1 replacement.
     expect(window.calculateReplacementCount(2, 5)).toBe(0);
     expect(window.calculateReplacementCount(16, 5)).toBe(1);
 
-    // SOmetimes 中文 english 混着写, speling也错错的
+    // Higher percentage allows more replacements: 10 words at 20% = 2.
     expect(window.calculateReplacementCount(10, 20)).toBe(2);
   });
 

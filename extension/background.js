@@ -92,7 +92,7 @@ function extractSenderHostnames(sender) {
         hostnames.push(hostname);
       }
     } catch {
-      // SOmetimes 中文 english 混着写, speling也错错的
+      // Ignore invalid or unparseable URL strings.
     }
   }
 

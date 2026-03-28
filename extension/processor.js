@@ -321,7 +321,7 @@ function buildSubtitleRenderPlan(text, replacementPercentage, pinnedTranslations
   const pinnedCandidates = candidateWordInfos.filter(({ normalized }) =>
     Object.prototype.hasOwnProperty.call(pinnedByNormalized, normalized)
   );
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Prioritize pinned words first, then fill remaining slots with randomly picked unpinned words.
   const pinnedSelected = pinnedCandidates.slice(0, replacementCount);
   const selectedPinnedTokenIndexes = new Set(pinnedSelected.map(({ tokenIndex }) => tokenIndex));
   const unpinnedCandidates = candidateWordInfos.filter(({ tokenIndex }) => !selectedPinnedTokenIndexes.has(tokenIndex));
@@ -456,7 +456,7 @@ async function buildImmersiveSubtitlesBatch(
     }
   }
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // If some words are already cached, trigger an early render before the full async fetch completes.
   if (typeof translateWordsCached === 'function' && typeof onEarlyRender === 'function' && uniqueWords.length > 0) {
     const cachedOnly = translateWordsCached(uniqueWords);
     const cachedCount = Object.keys(cachedOnly).length;
@@ -466,7 +466,7 @@ async function buildImmersiveSubtitlesBatch(
     }
   }
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Fetch translations for all unique words, then render each subtitle plan with the results.
   const translatedByNormalized = uniqueWords.length > 0 ? await translateWords(uniqueWords) : {};
   return plans.map((plan) => renderSubtitleFromPlan(plan, translatedByNormalized));
 }

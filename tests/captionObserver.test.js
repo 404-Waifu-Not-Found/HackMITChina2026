@@ -428,7 +428,7 @@ describe('caption observer hardening', () => {
     await vi.advanceTimersByTimeAsync(2);
     expect(subtitleNode.textContent).toBe('same line (stable)');
 
-    // SOmetimes 中文 english 混着写, speling也错错的
+    // Resetting to the same text should not trigger a duplicate transform call.
     subtitleNode.textContent = 'same line';
     handler.handleMutations(mutationForNode(subtitleNode));
     await vi.advanceTimersByTimeAsync(2);

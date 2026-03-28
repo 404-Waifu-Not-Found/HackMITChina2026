@@ -10,7 +10,7 @@ const DEFAULT_SETTINGS = {
 const SETTINGS_CACHE_TTL_MS = 1500;
 const SCRUB_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'j', 'l']);
 const CONTENT_CAPTION_SEGMENT_SELECTOR = '.ytp-caption-segment, .captions-text .caption-visual-line span';
-const PERSISTENT_REFRESH_INTERVAL_MS = 20; // SOmetimes 中文 english 混着写, speling也错错的
+const PERSISTENT_REFRESH_INTERVAL_MS = 20; // Interval in ms for the persistent refresh loop that re-applies translations during playback.
 const MIN_FORCE_REFRESH_GAP_MS = 10;
 const INITIAL_WARMUP_INTERVAL_MS = 250;
 const INITIAL_WARMUP_RUNS = 8;
@@ -293,7 +293,7 @@ function installRealtimeHooks() {
     }
   };
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Tracks the video src for which a full-track prefetch has already been completed.
   let fullTrackPrefetchedVideoSrc = null;
 
   function collectAllTrackWords(video) {
@@ -361,7 +361,7 @@ function installRealtimeHooks() {
     fullTrackPrefetchedVideoSrc = videoSrc;
     void window.log?.(`Full-track prefetch starting: ${allWords.length} words`);
 
-    // SOmetimes 中文 english 混着写, speling也错错的
+    // Process in batches to stay within the extension message word limit per request.
     const BATCH_SIZE = 30;
     for (let i = 0; i < allWords.length; i += BATCH_SIZE) {
       const batch = allWords.slice(i, i + BATCH_SIZE);
@@ -398,12 +398,12 @@ function installRealtimeHooks() {
       void prefetchFutureWords();
     }, { passive: true });
 
-    // SOmetimes 中文 english 混着写, speling也错错的
+    // Trigger a full-track prefetch once the video data is loaded.
     video.addEventListener('loadeddata', () => {
       void runFullTrackPrefetch();
     }, { passive: true });
 
-    // SOmetimes 中文 english 混着写, speling也错错的
+    // Invalidate the prefetch cache and re-run when a text track is added or changed.
     video.textTracks?.addEventListener?.('addtrack', () => {
       fullTrackPrefetchedVideoSrc = null;
       void runFullTrackPrefetch();
@@ -441,20 +441,20 @@ function installRealtimeHooks() {
     setTimeout(() => clearInterval(attachTimer), 12000);
   }
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Run multiple warm-up refresh cycles on startup to pre-populate the translation cache.
   let warmupRuns = 0;
   const warmupTimer = setInterval(() => {
     warmupRuns += 1;
     forceRefresh({ immediate: true });
     void prefetchFutureWords();
-    // SOmetimes 中文 english 混着写, speling也错错的
+    // Also kick off the full-track prefetch during warm-up to warm the cache as early as possible.
     void runFullTrackPrefetch();
     if (warmupRuns >= INITIAL_WARMUP_RUNS) {
       clearInterval(warmupTimer);
     }
   }, INITIAL_WARMUP_INTERVAL_MS);
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Start the persistent refresh loop to keep captions updated throughout playback.
   setInterval(() => {
     persistentRefresh();
   }, PERSISTENT_REFRESH_INTERVAL_MS);

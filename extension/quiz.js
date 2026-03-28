@@ -1241,7 +1241,7 @@ function hasSeenQuizIntro() {
 }
 
 function markQuizIntroSeen() {
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Placeholder: persistence for this flag is not yet implemented.
 }
 
 function showFirstQuizModalIfNeeded() {
@@ -1970,7 +1970,7 @@ function attachEventHandlers() {
   });
 }
 
-/* miXed commint 在这, eng+中文都乱写了 lol */
+/* AI settings and chat initialisation. */
 
 async function loadAiSettings() {
   const items = await getLocalStorage([AI_STORAGE_KEY]);
@@ -2147,7 +2147,7 @@ function restoreChatMessagesUi() {
     return;
   }
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Clear the message container and re-render all messages from the current chat state.
   elements.chatMessages.innerHTML = '';
 
   for (const msg of chatState.messages) {
@@ -2300,43 +2300,43 @@ function renderMarkdown(text) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Convert fenced code blocks to <pre><code> elements.
   html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, _lang, code) =>
     `<pre><code>${code.trim()}</code></pre>`
   );
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Wrap inline code spans.
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Convert **bold** markers to <strong>.
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Convert *italic* markers to <em>.
   html = html.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Convert # heading markers to h2/h3/h4 elements.
   html = html.replace(/^### (.+)$/gm, '<h4>$1</h4>');
   html = html.replace(/^## (.+)$/gm, '<h3>$1</h3>');
   html = html.replace(/^# (.+)$/gm, '<h2>$1</h2>');
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Convert unordered list items (* or -) to <li>, then wrap consecutive items in <ul>.
   html = html.replace(/^[*-] (.+)$/gm, '<li>$1</li>');
   html = html.replace(/((?:<li>[\s\S]*?<\/li>\s*)+)/g, '<ul>$1</ul>');
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Convert ordered list items (1. 2. ...) to <li> elements.
   html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Strip extra newlines before and after block-level elements to avoid spurious whitespace.
   html = html.replace(/\n*(<\/?(?:pre|ul|ol|li|h[2-4]|blockquote)(?:[ >]))/g, '$1');
   html = html.replace(/(<\/(?:pre|ul|ol|li|h[2-4]|blockquote)>)\n*/g, '$1');
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Convert double newlines to paragraph breaks.
   html = html.replace(/\n{2,}/g, '</p><p>');
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Convert remaining single newlines to <br>.
   html = html.replace(/\n/g, '<br>');
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Wrap in a paragraph and strip any empty <p> tags left by block elements.
   html = `<p>${html}</p>`;
   html = html.replace(/<p>\s*<\/p>/g, '');
 
@@ -2349,7 +2349,7 @@ function setChatStatus(text) {
   }
 }
 
-// 根据对话上下文 generate sujestion chips, 用来让 user 快速继续聊 lol
+// Generates follow-up suggestion chips based on current conversation context and quiz results.
 function buildFollowUpSuggestions(assistantReply, userMessage) {
   const wrongWords = getWrongWordsForChat();
   const correctWords = getCorrectWordsForChat();
@@ -2360,21 +2360,21 @@ function buildFollowUpSuggestions(assistantReply, userMessage) {
   const wordSample = allWords.slice(0, 3).map((w) => w.source).join(', ');
   const wrongSample = wrongWords.slice(0, 3).map((w) => w.source).join(', ');
 
-  // base 建议池, always available regardless of contxt
+  // Base suggestions always available regardless of context.
   const baseSuggestions = [
     { label: '📖 Create a mini story', text: hasWords ? `Help me create a short mini story using these words so I can remember them: ${wordSample}` : 'Help me create a mini story with vocabulary words to practice' },
     { label: '🧠 Memory tricks', text: hasWords ? `Give me memory tricks or mnemonics for these words: ${wordSample}` : 'Teach me some memory tricks for learning vocabulary' },
     { label: '💬 Example sentences', text: hasWords ? `Show me natural example sentences using each of these words: ${wordSample}` : 'Give me example sentences with common vocabulary words' },
   ];
 
-  // 错误词 specific 的建议, only when user got somthing wrong ya
+  // Wrong-word-specific suggestions, only shown when the user got something wrong.
   const wrongWordSuggestions = wrongOnly ? [
     { label: '❌ Why did I get these wrong?', text: `Why might I have confused these words? Help me understand the tricky parts: ${wrongSample}` },
     { label: '🔁 Quiz me again', text: `Quiz me on the words I got wrong — ask me to translate them one by one: ${wrongSample}` },
     { label: '🎯 Common mistakes', text: `What are common mistakes learners make with these words: ${wrongSample}` },
   ] : [];
 
-  // 深入学习类的 sugestions, good for continuing the topic
+  // Deeper learning suggestions for extending the current topic.
   const deeperSuggestions = [
     { label: '🗣️ Dialogue practice', text: hasWords ? `Create a short dialogue between two people that naturally uses these words: ${wordSample}` : 'Create a practice dialogue for me using vocabulary words' },
     { label: '📝 Fill in the blanks', text: hasWords ? `Give me fill-in-the-blank exercises using: ${wordSample}` : 'Give me fill-in-the-blank vocabulary exercises' },
@@ -2383,7 +2383,7 @@ function buildFollowUpSuggestions(assistantReply, userMessage) {
     { label: '🎵 Rhyme or song', text: hasWords ? `Make a short rhyme or catchy phrase to help me remember: ${wordSample}` : 'Create a catchy rhyme to help me remember vocabulary' },
   ];
 
-  // reply content 检查, pick smarter suggestion based on what the AI just said
+  // Pick context-aware suggestions based on keywords in the latest AI reply and user message.
   const replyLower = (assistantReply || '').toLowerCase();
   const userLower = (userMessage || '').toLowerCase();
   const contextSuggestions = [];
@@ -2410,10 +2410,10 @@ function buildFollowUpSuggestions(assistantReply, userMessage) {
     contextSuggestions.push({ label: '🎤 Role play', text: 'Let\'s role play — you be one person and I\'ll respond as the other. Start the conversation!' });
   }
 
-  // assemble 最终 list: context stuff first 比较 relevant, then random picks from pools
+  // Assemble the final list: context-relevant suggestions first, then the broader pools.
   const pool = [...contextSuggestions, ...wrongWordSuggestions, ...baseSuggestions, ...deeperSuggestions];
 
-  // dedupe by label 避免重复
+  // Deduplicate by label to avoid repeating the same chip.
   const seen = new Set();
   const unique = [];
   for (const s of pool) {
@@ -2423,15 +2423,15 @@ function buildFollowUpSuggestions(assistantReply, userMessage) {
     }
   }
 
-  // 最多显示 3 个 chip, nto too many 不然太乱
+  // Cap at 3 chips to avoid cluttering the chat UI.
   return unique.slice(0, 3);
 }
 
-// render那些 suggestion chip 到 chat area 底部去
+// Renders follow-up suggestion chips below the latest chat message.
 function renderSuggestionChips(suggestions) {
   if (!elements.chatMessages || suggestions.length === 0) return;
 
-  // 先删掉旧的 chip 容器, only keep latest one
+  // Remove any existing chip container so only the latest set is shown.
   const oldChips = elements.chatMessages.querySelector('.chat-suggestions');
   if (oldChips) oldChips.remove();
 
@@ -2445,7 +2445,7 @@ function renderSuggestionChips(suggestions) {
     chip.textContent = s.label;
     chip.title = s.text;
     chip.addEventListener('click', () => {
-      // 点击后 chip 消失, 发送 message 出去
+      // Dismiss the chips and send the selected suggestion as a new chat message.
       container.remove();
       void sendChatMessage(s.text);
     });
@@ -2539,7 +2539,7 @@ async function sendChatMessage(userMessage) {
       buffer += decoder.decode(value, { stream: true });
 
       const lines = buffer.split('\n');
-      // SOmetimes 中文 english 混着写, speling也错错的
+      // Keep the last incomplete chunk in the buffer to be processed with the next chunk.
       buffer = lines.pop() ?? '';
 
       for (const line of lines) {
@@ -2566,7 +2566,7 @@ async function sendChatMessage(userMessage) {
             }
           }
         } catch {
-          // SOmetimes 中文 english 混着写, speling也错错的
+          // Ignore malformed SSE JSON lines.
         }
       }
     }
@@ -2604,7 +2604,7 @@ function openChatDrawer() {
   updateChatContext();
   elements.chatDrawer?.classList.remove('hidden');
   elements.chatOverlay?.classList.remove('hidden');
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Set a brief ignore window so the overlay click handler doesn't immediately close the drawer.
   chatState.overlayIgnoreUntil = Date.now() + 350;
   requestAnimationFrame(() => {
     elements.chatDrawer?.classList.add('visible');
@@ -2648,10 +2648,10 @@ function attachChatEventHandlers() {
     void saveAiSettingsFromQuiz();
   });
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Guard against the overlay click firing immediately after the drawer opens.
   elements.chatOverlay?.addEventListener('click', (evt) => {
     if (Date.now() < (chatState.overlayIgnoreUntil || 0)) {
-      // SOmetimes 中文 english 混着写, speling也错错的
+      // Swallow the click if it falls within the ignore window.
       evt.stopPropagation();
       return;
     }

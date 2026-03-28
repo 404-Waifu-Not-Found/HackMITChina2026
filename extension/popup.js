@@ -790,7 +790,7 @@ function saveAiSettings() {
       try {
         setAiChatCollapsed(Boolean(settings.apiKey));
       } catch (e) {
-        // SOmetimes 中文 english 混着写, speling也错错的
+        // Silently ignore errors from collapsing the chat panel on settings load.
       }
 
       if (saveAiButton) {
@@ -2276,7 +2276,7 @@ function initPopupPanelNavigation() {
     try {
       window.localStorage?.setItem('lingoStreamPopupPanel', normalizedPanelId);
     } catch {
-      // SOmetimes 中文 english 混着写, speling也错错的
+      // localStorage may be unavailable (e.g. in private mode); ignore the error.
     }
   };
 
@@ -2332,7 +2332,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPopupPanelNavigation();
   loadSettings();
   loadAiSettings();
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Defer chat collapse check slightly so the API key input value is guaranteed to be populated.
   setTimeout(() => setAiChatCollapsed(Boolean((aiApiKeyInput?.value ?? '').trim())), 200);
   loadDebugSettings();
   startLogPolling();

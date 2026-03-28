@@ -67,7 +67,7 @@ async function loadPersistentCache(sourceLanguage, targetLanguage) {
     return;
   }
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Flush any unsaved changes from the previous language pair before switching.
   if (persistentCacheDirty && activeCacheLanguagePair) {
     await flushPersistentCache();
   }
@@ -114,7 +114,7 @@ async function flushPersistentCache() {
     ? stored[PERSISTENT_CACHE_KEY]
     : {};
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Fall back to an empty object if no existing cache entry for this language pair.
   const existing = (allPairs[activeCacheLanguagePair] && typeof allPairs[activeCacheLanguagePair] === 'object')
     ? allPairs[activeCacheLanguagePair]
     : {};
@@ -126,7 +126,7 @@ async function flushPersistentCache() {
     }
   }
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Trim the oldest entries if the merged cache exceeds the maximum allowed size.
   const entries = Object.entries(merged);
   if (entries.length > PERSISTENT_CACHE_MAX_ENTRIES) {
     const trimmed = entries.slice(entries.length - PERSISTENT_CACHE_MAX_ENTRIES);
@@ -182,7 +182,7 @@ function isMissCached(normalized, now = Date.now()) {
 
 function markMissCached(normalized, now = Date.now(), ttlMs = MISS_CACHE_TTL_MS) {
   const clampedTtlMs = Math.max(0, Math.min(MISS_CACHE_TTL_MS, Number(ttlMs) || 0));
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Store the timestamp offset so the miss entry expires at the correct future time.
   missCache[normalized] = now - MISS_CACHE_TTL_MS + clampedTtlMs;
 }
 
@@ -609,7 +609,7 @@ async function translateWords(words) {
   const misses = [];
   const now = Date.now();
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Load settings and warm the persistent cache before processing words.
   const settings = await getTranslationSettings();
   await loadPersistentCache(settings.sourceLanguage, settings.targetLanguage);
 
@@ -705,7 +705,7 @@ async function translateWords(words) {
     providerByWord
   });
 
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Schedule a cache save if any new translations were added this cycle.
   if (newTranslationsAdded) {
     schedulePersistentCacheSave();
   }

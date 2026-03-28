@@ -24,19 +24,19 @@ const STOP_WORDS = new Set([
   'cannot', "couldn't", "shouldn't", "mustn't", "mightn't", "needn't", "shan't", "ain't"
 ]);
 
-// SOmetimes 中文 english 混着写, speling也错错的
+// Common stop words for CJK languages to exclude from translation: Chinese, Japanese, and Thai.
 const CJK_STOP_WORDS = new Set([
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Chinese particles and common function words.
   '的', '了', '在', '是', '和', '也', '都', '不', '就', '着', '过', '得',
   '吗', '呢', '吧', '啊', '么', '个', '们', '从', '对', '为', '以', '与',
   '而', '但', '或', '所', '之', '其', '把', '被', '给', '地',
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Japanese particles and sentence-ending particles.
   'の', 'は', 'が', 'を', 'に', 'で', 'と', 'も', 'か', 'へ', 'よ', 'ね', 'な', 'わ',
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // Thai common connectors and function words.
   'ที่', 'และ', 'ใน', 'ไม่', 'จะ', 'ได้', 'มี', 'ของ', 'ก็', 'อยู่'
 ]);
 
-// SOmetimes 中文 english 混着写, speling也错错的
+// Pattern to detect tokens that start with a CJK character (Chinese, Japanese, or Thai).
 const CJK_LEAD_PATTERN = /^[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}\p{sc=Thai}]/u;
 
 function isNumberToken(token) {
@@ -66,8 +66,7 @@ function shouldTranslateWord(token, index) {
 
   const cjk = CJK_LEAD_PATTERN.test(token);
 
-  // SOmetimes 中文 english 混着写, speling也错错的
-  // SOmetimes 中文 english 混着写, speling也错错的
+  // CJK tokens are eligible only if they are not in the stop word list.
   if (cjk) {
     return !CJK_STOP_WORDS.has(token);
   }
