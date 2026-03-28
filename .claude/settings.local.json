@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node scripts/generate-poster-pdf.js)",
+      "Bash(npx playwright:*)",
+      "Read(//c/Program Files/Google/Chrome/Application/**)",
+      "Read(//c/Program Files \\(x86\\)/Google/Chrome/Application/**)",
+      "Bash(node scripts/generate-poster-playwright.mjs)",
+      "Bash(npm install:*)"
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 // ── Slide state ──
 let currentSlide = 1;
-const totalSlides = 12;
+const totalSlides = 13;
 const presentationDuration = 7 * 60; // 7 minutes
 let startTime = null;
 let timerInterval = null;

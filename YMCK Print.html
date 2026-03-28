@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Lingo Stream — A1 Poster</title>
+<style>
+@page { size:1200mm 2000mm; margin:0; }
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+html{
+  zoom:2.0202;
+}
+
+html,body{
+  width:594mm;height:990mm;
+  margin:0;padding:0;
+  overflow:hidden;
+  background:#050d08;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+}
+
+.poster{
+  width:594mm;height:990mm;
+  display:flex;flex-direction:column;
+  background:
+    radial-gradient(ellipse 700px 550px at 10% 4%,rgba(34,197,94,0.14),transparent),
+    radial-gradient(ellipse 500px 420px at 90% 6%,rgba(74,222,128,0.08),transparent),
+    radial-gradient(ellipse 800px 400px at 50% 98%,rgba(22,163,74,0.07),transparent),
+    linear-gradient(to bottom, #050d08 0%, #050d08 40%, #071409 75%, #09180b 100%);
+  color:#cde8d4;
+  font-family:'Segoe UI','Inter',sans-serif;
+  overflow:hidden;
+}
+
+/* top/bottom bars — real elements, pseudo-elements don't render in headless PDF */
+.bar{
+  flex-shrink:0;
+  height:5mm;width:100%;
+  background:linear-gradient(90deg,#15803d,#22c55e,#4ade80,#22c55e,#15803d);
+}
+.bar.bot{height:4mm;}
+
+/* ─── HEADER ───────────────────────────────── */
+.header{
+  flex-shrink:0;
+  display:flex;align-items:center;
+  gap:28mm;
+  padding:22mm 44mm 14mm;
+}
+.hero{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-height:115mm;
+}
+.logo-wrap{
+  flex-shrink:0;
+  width:115mm;height:115mm;
+  border-radius:32px;
+  overflow:hidden;
+  box-shadow:
+    0 6px 28px rgba(0,0,0,0.38);
+}
+.logo-wrap img{
+  width:100%;height:100%;
+  object-fit:cover;
+  image-rendering:high-quality;
+}
+
+.hero h1{
+  display:flex;
+  align-items:baseline;
+  gap:7mm;
+  font-size:84pt;font-weight:900;
+  letter-spacing:-1px;line-height:0.96;
+  color:#fff;margin-bottom:8mm;
+}
+.hero h1 .accent{color:#4ade80;}
+.hero .tag{
+  font-size:28pt;font-weight:400;
+  color:#93c5a4;line-height:1.35;
+  max-width:340mm;margin-bottom:12mm;
+}
+.badges{display:flex;flex-wrap:wrap;gap:5mm;}
+.b{
+  font-size:15pt;font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;
+  padding:4mm 9mm;border-radius:999px;
+  background:rgba(34,197,94,0.12);
+  border:2px solid rgba(74,222,128,0.25);
+  color:#86efac;
+}
+.b.g{background:#16a34a;color:#fff;border-color:#22c55e;}
+
+/* ─── MID SECTION — loose 2-col ────────────── */
+.mid{
+  flex-shrink:1;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10mm 10mm;
+  padding:0 44mm;
+  align-content:start;
+}
+
+.card{
+  background:linear-gradient(135deg,#0f2218 0%,#0a1a10 60%,#0d2016 100%);
+  border:1px solid rgba(74,222,128,0.18);
+  box-shadow:0 6px 24px rgba(0,0,0,0.45);
+  border-radius:24px;
+  padding:12mm 14mm;
+  display:flex;flex-direction:column;
+}
+.card-t{
+  font-size:28pt;font-weight:800;
+  color:#4ade80;
+  margin-bottom:8mm;
+  display:flex;align-items:center;gap:5mm;
+}
+.card-t svg{width:28pt;height:28pt;flex-shrink:0;}
+
+.card p{font-size:17pt;line-height:1.45;color:#b8dcc2;margin-bottom:4mm;}
+.card strong{color:#86efac;}
+.card em{color:#4ade80;font-style:italic;}
+.card ul{padding-left:8mm;margin-bottom:3mm;}
+.card li{font-size:16pt;line-height:1.6;color:#b8dcc2;margin-bottom:4mm;}
+.card li::marker{color:#4ade80;}
+.lead{font-size:20pt;line-height:1.32;margin-bottom:4mm;}
+
+/* demo */
+.demo{
+  background:#070f0a;
+  border-radius:16px;
+  padding:5.5mm 7mm;margin:3.5mm 0 4.5mm;
+  font-family:'Cascadia Code','Fira Code',monospace;
+  font-size:17pt;line-height:1.55;color:#93c5a4;
+}
+.demo .hl{color:#4ade80;font-weight:700;}
+
+/* stats */
+.stats{display:flex;gap:6mm;margin-top:3mm;}
+.st{
+  flex:1;text-align:center;
+  background:rgba(74,222,128,0.06);
+  border-radius:16px;padding:5mm 4mm;
+}
+.st .n{font-size:36pt;font-weight:900;color:#4ade80;line-height:1;}
+.st .l{font-size:12pt;text-transform:uppercase;letter-spacing:1px;color:#6aaa7e;margin-top:2mm;}
+
+/* features */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:7mm;margin-top:6mm;}
+.fi{display:flex;align-items:flex-start;gap:4mm;font-size:17pt;font-weight:800;color:#b8dcc2;line-height:1.5;}
+.fi .fd{font-size:12pt;font-weight:400;color:#7aaa8e;margin-top:1mm;line-height:1.4;}
+.fi .ck{
+  flex-shrink:0;width:9mm;height:9mm;border-radius:50%;
+  background:#16a34a;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13pt;font-weight:800;
+}
+.fi .ck svg{width:5mm;height:5mm;}
+
+/* tech grid — icon + label */
+.tg{display:grid;grid-template-columns:repeat(5,1fr);gap:6mm;margin-top:5mm;}
+.ti{
+  display:flex;flex-direction:column;align-items:center;
+  gap:3mm;
+}
+.ti svg{width:22mm;height:22mm;}
+.ti span{
+  font-size:11pt;font-weight:600;color:#86efac;
+  text-align:center;line-height:1.2;
+}
+
+/* arch */
+.af{display:flex;flex-wrap:wrap;align-items:center;gap:4mm;margin:6mm 0;}
+.an{
+  background:rgba(74,222,128,0.08);
+  border-radius:14px;padding:5mm 6mm;
+  font-size:16pt;font-weight:700;color:#86efac;text-align:center;line-height:1.25;
+}
+.aa{font-size:22pt;color:#4ade80;font-weight:800;}
+
+/* full-width */
+.full{grid-column:1/-1;}
+
+/* journey steps */
+.jg{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:5mm;align-items:center;margin-top:6mm;}
+.jstep{background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.14);border-radius:18px;padding:8mm 10mm;text-align:center;}
+.jstep .jnum{font-size:32pt;font-weight:900;color:#4ade80;line-height:1;margin-bottom:2mm;}
+.jstep .jtitle{font-size:16pt;font-weight:800;color:#fff;margin-bottom:2mm;}
+.jstep .jdesc{font-size:13pt;color:#6aaa7e;line-height:1.4;}
+.jarrow{font-size:28pt;color:#4ade80;font-weight:800;text-align:center;}
+
+/* roadmap */
+.roadmap{display:grid;grid-template-columns:repeat(4,1fr);gap:7mm;}
+.rm{background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.12);border-radius:18px;padding:7mm 8mm;}
+.rm .rmtag{font-size:10pt;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#4ade80;margin-bottom:3mm;}
+.rm .rmtitle{font-size:16pt;font-weight:800;color:#fff;margin-bottom:2.5mm;}
+.rm .rmdesc{font-size:12pt;color:#6aaa7e;line-height:1.4;}
+
+/* section label */
+.sec-label{font-size:22pt;font-weight:800;color:#4ade80;margin-bottom:6mm;display:flex;align-items:center;gap:4mm;}
+.sec-label svg{width:22pt;height:22pt;flex-shrink:0;}
+
+/* ─── TEAM BAR ─────────────────────────────── */
+.team-bar{
+  flex-shrink:0;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8mm;
+  align-items:start;
+  padding:0;
+}
+
+/* bottom zone — fills gap between cards and page bottom, centers content */
+.bottom-zone{
+  flex:1;
+  display:flex;flex-direction:column;
+  align-items:stretch;justify-content:space-between;
+  gap:7mm;
+  padding:8mm 44mm 12mm;
+}
+.tm{
+  text-align:center;
+  width:auto;flex:none;
+}
+.tm img{
+  width:40mm;height:40mm;border-radius:50%;
+  object-fit:cover;
+  box-shadow:0 6px 24px rgba(0,0,0,0.45), 0 0 32px rgba(74,222,128,0.10);
+  margin-bottom:4mm;
+}
+.tm .nm{font-size:20pt;font-weight:800;color:#fff;margin-bottom:2mm;}
+.tm .rl{font-size:13pt;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#4ade80;margin-bottom:2.5mm;}
+.tm .ds{max-width:140mm;margin:0 auto;font-size:14pt;color:#93c5a4;line-height:1.4;}
+
+/* ─── FOOTER ───────────────────────────────── */
+.footer{
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  gap:10mm;
+  padding:0;
+}
+.footer img{
+  width:26mm;height:26mm;border-radius:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+}
+.ft{text-align:center;}
+.ft .t1{font-size:26pt;font-weight:900;color:#fff;}
+.ft .t2{font-size:14pt;color:#4ade80;margin-top:2mm;}
+.ft .t3{font-size:12pt;color:#6aaa7e;margin-top:2mm;font-family:'Cascadia Code',monospace;}
+
+@media print{
+  html,body{width:594mm;height:990mm;background:#050d08;}
+}
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="bar"></div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo-wrap">
+      <img src="./logo.png" alt="Lingo Stream" width="500" height="500"/>
+    </div>
+    <div class="hero">
+      <h1><span>Lingo</span><span class="accent">Stream</span></h1>
+      <p class="tag">Ambient language learning directly inside YouTube subtitles.</p>
+      <div class="badges">
+        <span class="b g">HackMIT China 2026</span>
+        <span class="b">404 Waifu Not Found</span>
+        <span class="b">Chrome Extension · MV3</span>
+        <span class="b">v1.0.0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MID — 2 columns, spacious -->
+  <div class="mid">
+
+    <div class="card">
+      <div class="card-t"><svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> What It Does</div>
+      <p class="lead">
+        A Chrome Extension that injects <strong>micro-immersion</strong> into live
+        YouTube captions — replacing meaningful words with inline translations.
+      </p>
+      <div class="demo">
+        Original: &nbsp;I really enjoy learning new skills every day.<br/>
+        Lingo Stream: I really enjoy learning <span class="hl">new</span> <span class="hl">スキル</span> every day.
+      </div>
+      <div class="stats">
+        <div class="st"><div class="n">95+</div><div class="l">Languages</div></div>
+        <div class="st"><div class="n">3+</div><div class="l">Providers</div></div>
+        <div class="st"><div class="n">67</div><div class="l">Tests</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-t"><svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg> Inspiration</div>
+      <p>
+        Language learners spend hours watching YouTube with subtitles — yet those
+        hours remain <strong>entirely passive</strong>.
+      </p>
+      <p>
+        We asked: <em>what if the subtitles themselves could teach you?</em>
+        Replace a handful of words inline, and the viewer absorbs vocabulary
+        through context — the same mechanism behind natural language acquisition.
+      </p>
+      <p>
+        <strong>Ambient UX</strong> meets <strong>spaced-exposure pedagogy</strong> —
+        learning that happens while you watch.
+      </p>
+      <p>
+        No flashcard decks, no separate apps, no extra effort. Just press play
+        and let your subtitles do the teaching. The result is a frictionless
+        bridge between entertainment and education.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-t"><svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Architecture</div>
+      <p>
+        A <strong>Caption Observer</strong> watches YouTube's subtitle DOM and feeds
+        each new segment to the <strong>Processor</strong>, which tokenises text,
+        strips stopwords, and picks candidate words at the user's chosen rate.
+      </p>
+      <p>
+        Candidates hit the <strong>Translation Bridge</strong> — up to five providers
+        with auto-fallback and local caching. Translated tokens replace the
+        originals <strong>inline</strong>, and every swap is saved to
+        <strong>Vocabulary Storage</strong> for quiz review or CSV export.
+      </p>
+      <p>
+        The <strong>Background Service Worker</strong> coordinates messaging between
+        the content script and the popup UI, managing state persistence across
+        tab navigations and browser restarts via Chrome's storage API.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-t"><svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Key Features</div>
+      <div class="fg">
+        <div class="fi"><div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div>Real-time subtitle observation<div class="fd">Watches YouTube's caption DOM live and reacts to every new segment instantly.</div></div></div>
+        <div class="fi"><div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div>Smart stopword filtering<div class="fd">Skips common words like "the" and "is" so only meaningful vocabulary gets replaced.</div></div></div>
+        <div class="fi"><div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div>Configurable replacement %<div class="fd">Users choose how many words per caption are swapped, from subtle to immersive.</div></div></div>
+        <div class="fi"><div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div>Provider auto-fallback<div class="fd">Cycles through up to five translation APIs so one outage never breaks the flow.</div></div></div>
+        <div class="fi"><div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div>Translation caching<div class="fd">Previously translated words are stored locally, eliminating repeated network calls.</div></div></div>
+        <div class="fi"><div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div>Vocabulary + CSV export<div class="fd">Every learned word is saved and exportable for use with Anki or spreadsheets.</div></div></div>
+        <div class="fi"><div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div>Quiz with score tracking<div class="fd">Built-in active recall quiz reinforces retention and tracks progress over time.</div></div></div>
+        <div class="fi"><div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div>50+ target languages<div class="fd">From Spanish and Japanese to Swahili — learn virtually any language you choose.</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-t"><svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Tech Stack</div>
+      <div class="tg">
+        <div class="ti"><svg viewBox="0 0 48 48" fill="none"><rect x="4" y="4" width="40" height="40" rx="4" fill="rgba(74,222,128,0.10)" stroke="#86efac" stroke-width="2"/><text x="24" y="32" text-anchor="middle" fill="#86efac" font-size="20" font-weight="700" font-family="sans-serif">JS</text></svg><span>JavaScript</span></div>
+        <div class="ti"><svg viewBox="0 0 48 48" fill="none"><polygon points="24,4 44,14 44,34 24,44 4,34 4,14" stroke="#86efac" stroke-width="2" fill="rgba(74,222,128,0.10)"/><text x="24" y="31" text-anchor="middle" fill="#86efac" font-size="13" font-weight="700" font-family="sans-serif">&lt;/&gt;</text></svg><span>HTML / CSS</span></div>
+        <div class="ti"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="#86efac" stroke-width="2" fill="rgba(74,222,128,0.10)"/><path d="M18 18h5v12h-5zM25 18h5v5h-5z" fill="#86efac" opacity="0.6"/></svg><span>Chrome MV3</span></div>
+        <div class="ti"><svg viewBox="0 0 48 48" fill="none"><polygon points="24,4 42,14 42,34 24,44 6,34 6,14" stroke="#86efac" stroke-width="2" fill="rgba(74,222,128,0.10)"/><text x="24" y="32" text-anchor="middle" fill="#86efac" font-size="20" font-weight="700" font-family="sans-serif">N</text></svg><span>Node.js</span></div>
+        <div class="ti"><svg viewBox="0 0 48 48" fill="none"><rect x="6" y="8" width="36" height="32" rx="4" stroke="#86efac" stroke-width="2" fill="rgba(74,222,128,0.10)"/><polyline points="16 24 22 30 32 18" stroke="#86efac" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Vitest</span></div>
+        <div class="ti"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="#86efac" stroke-width="2" fill="rgba(74,222,128,0.10)"/><circle cx="16" cy="18" r="3" fill="#86efac" opacity="0.6"/><circle cx="32" cy="18" r="3" fill="#86efac" opacity="0.6"/><circle cx="24" cy="32" r="3" fill="#86efac" opacity="0.6"/></svg><span>ESLint</span></div>
+        <div class="ti"><svg viewBox="0 0 48 48" fill="none"><path d="M24 4 L38 40 H30 L24 24 L18 40 H10 Z" stroke="#86efac" stroke-width="2" fill="rgba(74,222,128,0.10)"/></svg><span>Astro</span></div>
+        <div class="ti"><svg viewBox="0 0 48 48" fill="none"><path d="M6 18 Q14 6 24 18 Q34 6 42 18" stroke="#86efac" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M6 30 Q14 18 24 30 Q34 18 42 30" stroke="#86efac" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg><span>Tailwind</span></div>
+        <div class="ti"><svg viewBox="0 0 48 48" fill="none"><polygon points="24,4 44,24 24,44 4,24" stroke="#86efac" stroke-width="2" fill="rgba(74,222,128,0.10)"/><line x1="24" y1="14" x2="24" y2="34" stroke="#86efac" stroke-width="3" stroke-linecap="round"/></svg><span>Vite</span></div>
+        <div class="ti"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="#86efac" stroke-width="2" fill="rgba(74,222,128,0.10)"/><circle cx="24" cy="24" r="4" fill="#86efac"/><line x1="24" y1="4" x2="24" y2="16" stroke="#86efac" stroke-width="2"/><line x1="24" y1="32" x2="24" y2="44" stroke="#86efac" stroke-width="2"/><line x1="4" y1="24" x2="16" y2="24" stroke="#86efac" stroke-width="2"/><line x1="32" y1="24" x2="44" y2="24" stroke="#86efac" stroke-width="2"/></svg><span>GitHub CI</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-t"><svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> Accomplishments</div>
+      <ul>
+        <li>Shipped v1.0.0 with quiz and vocabulary tracking.</li>
+        <li>CI pipeline with Vitest, lint, and coverage on every push to main.</li>
+        <li>Modular event-driven architecture with clean layer separation, ready for iteration.</li>
+        <li>Full documentation site built with Astro and Tailwind CSS.</li>
+        <li>CSV export compatible with Anki and other flashcard tools.</li>
+      </ul>
+    </div>
+
+    <!-- Full-width Science card -->
+    <div class="card full">
+      <div class="card-t">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 1 0 5 5"/><path d="M12 12v9"/><path d="M8.5 12.5l7 7"/><path d="M15.5 12.5l-7 7"/><circle cx="18" cy="5" r="3"/></svg>
+        The Science — Why Ambient Learning Works
+      </div>
+      <p>
+        Linguist Stephen Krashen's <strong>Input Hypothesis</strong> shows that language is acquired when learners encounter
+        <em>comprehensible input</em> — material that is mostly understood, with a small stretch of new vocabulary in context.
+        Lingo Stream operationalises this at zero extra effort: the surrounding sentence provides meaning, making each translated
+        word instantly memorable without interrupting the viewing experience.
+      </p>
+      <div class="jg">
+        <div class="jstep">
+          <div class="jnum">01</div>
+          <div class="jtitle">Passive Exposure</div>
+          <div class="jdesc">Encounter target words inside familiar sentence contexts — the brain anchors new vocabulary to known meaning automatically.</div>
+        </div>
+        <div class="jarrow">&#8594;</div>
+        <div class="jstep">
+          <div class="jnum">02</div>
+          <div class="jtitle">Spaced Repetition</div>
+          <div class="jdesc">Words recur naturally across videos. Each re-encounter strengthens the neural pathway without any manual deck management.</div>
+        </div>
+        <div class="jarrow">&#8594;</div>
+        <div class="jstep">
+          <div class="jnum">03</div>
+          <div class="jtitle">Active Recall</div>
+          <div class="jdesc">The built-in quiz surfaces saved words at the right moment, converting passive recognition into long-term retention.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM ZONE — centered between cards and green line -->
+  <div class="bottom-zone">
+
+  <!-- ROADMAP -->
+  <div>
+    <div class="sec-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18"/><path d="M3 9h12"/><path d="M3 15h15"/><path d="M3 21h9"/></svg>
+      What's Next — Roadmap
+    </div>
+    <div class="roadmap">
+      <div class="rm">
+        <div class="rmtag">v1.1 · Near Term</div>
+        <div class="rmtitle">Difficulty Adaptive Rate</div>
+        <div class="rmdesc">Auto-adjust the word-swap percentage based on the learner's quiz accuracy — harder for experts, gentler for beginners.</div>
+      </div>
+      <div class="rm">
+        <div class="rmtag">v1.2 · Near Term</div>
+        <div class="rmtitle">Word Hover Tooltips</div>
+        <div class="rmdesc">Hovering over a translated word shows the original, pronunciation guide, and a usage example — all inline without pausing.</div>
+      </div>
+      <div class="rm">
+        <div class="rmtag">v2.0 · Mid Term</div>
+        <div class="rmtitle">Multi-Platform Support</div>
+        <div class="rmdesc">Extend beyond YouTube to Netflix, Coursera, and other captioned streaming platforms using the same caption pipeline.</div>
+      </div>
+      <div class="rm">
+        <div class="rmtag">v2.1 · Mid Term</div>
+        <div class="rmtitle">AI-Personalised Vocab</div>
+        <div class="rmdesc">Use an on-device model to prioritise words at the learner's frontier — maximising acquisition speed per hour watched.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEAM -->
+  <div class="team-bar">
+    <div class="tm">
+      <img src="https://github.com/Justin-Yonardo.png?s=300" alt="Justin-Yonardo" width="140" height="140"/>
+      <div class="nm">Justin-Yonardo</div>
+      <div class="rl">Team Leader</div>
+      <div class="ds">Primary Engineer — caption pipeline, processor, translation bridge, background worker.</div>
+    </div>
+    <div class="tm">
+      <img src="https://github.com/UnoxyRich.png?s=300" alt="UnoxyRich" width="140" height="140"/>
+      <div class="nm">UnoxyRich</div>
+      <div class="rl">UI Design &amp; Ops</div>
+      <div class="ds">UI Design, Video Editing, Communication Materials, GitHub Actions &amp; org setup.</div>
+    </div>
+    <div class="tm">
+      <img src="https://github.com/LeoLiu32.png?s=300" alt="LeoLiu32" width="140" height="140"/>
+      <div class="nm">LeoLiu32</div>
+      <div class="rl">UI Implementation</div>
+      <div class="ds">User Interaction, UI Coding, popup interface, quiz flow &amp; frontend polish.</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <img src="./logo.png" alt="Logo" width="120" height="120"/>
+    <div class="ft">
+      <div class="t1">Lingo <span style="color:#4ade80;">Stream</span></div>
+      <div class="t2">Learn languages while you watch.</div>
+      <div class="t3">github.com/404-Waifu-Not-Found/HackMITChina2026</div>
+    </div>
+    <img src="./logo.png" alt="Logo" width="120" height="120"/>
+  </div>
+
+  </div> <!-- /bottom-zone -->
+  <div class="bar bot"></div>
+
+</div>
+</body>
+</html>

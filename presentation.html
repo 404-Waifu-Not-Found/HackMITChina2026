@@ -4,7 +4,666 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lingo Stream - Demo Presentation</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --brand-50: #f0fdf4;
+    --brand-100: #dcfce7;
+    --brand-200: #bbf7d0;
+    --brand-300: #86efac;
+    --brand-400: #4ade80;
+    --brand-500: #22c55e;
+    --brand-600: #16a34a;
+    --brand-700: #15803d;
+    --brand-800: #166534;
+    --brand-900: #14532d;
+    --brand-950: #052e16;
+
+    --card-bg: rgba(255, 255, 255, 0.04);
+    --card-bg-hover: rgba(74, 222, 128, 0.10);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --arch-bg: rgba(255, 255, 255, 0.05);
+    --arch-border: rgba(74, 222, 128, 0.25);
+    --team-bg: rgba(255, 255, 255, 0.03);
+    --roadmap-bg: rgba(255, 255, 255, 0.04);
+    --roadmap-border: rgba(255, 255, 255, 0.10);
+
+    --glow: rgba(74, 222, 128, 0.15);
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #050d09;
+    color: white;
+    overflow: hidden;
+}
+
+.presentation {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+/* ── Slide transitions ── */
+.slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    transform: translateY(40px) scale(0.97);
+    transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+    filter: blur(4px);
+}
+
+.slide.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+    filter: blur(0);
+}
+
+.slide.prev {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.97);
+    filter: blur(4px);
+}
+
+/* ── Staggered content entrance ── */
+.slide.active .slide-content > *,
+.slide.active .logo-container,
+.slide.active > h1,
+.slide.active > .tagline,
+.slide.active > .version {
+    animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.slide.active .slide-content > *:nth-child(1) { animation-delay: 0.08s; }
+.slide.active .slide-content > *:nth-child(2) { animation-delay: 0.16s; }
+.slide.active .slide-content > *:nth-child(3) { animation-delay: 0.24s; }
+.slide.active .slide-content > *:nth-child(4) { animation-delay: 0.32s; }
+.slide.active .logo-container { animation-delay: 0s; }
+.slide.active > h1 { animation-delay: 0.12s; }
+.slide.active > .tagline { animation-delay: 0.22s; }
+.slide.active > .version { animation-delay: 0.32s; }
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Card stagger in grids ── */
+.slide.active .feature-card,
+.slide.active .arch-box,
+.slide.active .team-member,
+.slide.active .roadmap-item,
+.slide.active .stat-item {
+    animation: popIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.slide.active :nth-child(1) { animation-delay: 0.1s; }
+.slide.active :nth-child(2) { animation-delay: 0.2s; }
+.slide.active :nth-child(3) { animation-delay: 0.3s; }
+.slide.active :nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ── Slide 1 - Title ── */
+.slide-1 {
+    background: radial-gradient(ellipse at 50% 80%, rgba(22, 163, 74, 0.12) 0%, transparent 60%),
+                linear-gradient(180deg, #050d09 0%, #071a10 100%);
+}
+
+.logo-container {
+    margin-bottom: 36px;
+}
+
+.logo {
+    width: 130px;
+    height: 130px;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 0 80px var(--glow), 0 0 160px rgba(74, 222, 128, 0.06);
+    animation: logoPulse 4s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+    0%, 100% { box-shadow: 0 0 60px var(--glow), 0 0 120px rgba(74, 222, 128, 0.04); }
+    50% { box-shadow: 0 0 100px rgba(74, 222, 128, 0.25), 0 0 200px rgba(74, 222, 128, 0.08); }
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.slide-1 h1 {
+    font-size: 80px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 0%, var(--brand-300) 50%, var(--brand-500) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+    letter-spacing: -3px;
+}
+
+.slide-1 .tagline {
+    font-size: 26px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 300;
+    margin-bottom: 36px;
+    letter-spacing: 0.5px;
+}
+
+.slide-1 .version {
+    font-size: 16px;
+    color: var(--brand-400);
+    padding: 8px 22px;
+    border: 1px solid rgba(74, 222, 128, 0.25);
+    border-radius: 100px;
+    background: rgba(74, 222, 128, 0.06);
+}
+
+/* ── Floating words ── */
+.floating-words {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.floating-word {
+    position: absolute;
+    bottom: -40px;
+    font-weight: 400;
+    white-space: nowrap;
+    will-change: transform, opacity;
+    letter-spacing: 1px;
+}
+
+/* ── Content slides ── */
+.content-slide {
+    background: radial-gradient(ellipse at 50% 0%, rgba(22, 163, 74, 0.06) 0%, transparent 50%),
+                linear-gradient(180deg, #050d09 0%, #071a10 100%);
+}
+
+.slide-header {
+    position: absolute;
+    top: 50px;
+    left: 80px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.slide-header .icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(74, 222, 128, 0.10);
+    border: 1px solid rgba(74, 222, 128, 0.20);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.slide-header h2 {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: 500;
+}
+
+.slide-number {
+    position: absolute;
+    top: 50px;
+    right: 80px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.2);
+    font-family: monospace;
+}
+
+.slide-content {
+    max-width: 1100px;
+    width: 100%;
+}
+
+.slide-content h3 {
+    font-size: 50px;
+    font-weight: 700;
+    margin-bottom: 32px;
+    line-height: 1.15;
+    letter-spacing: -1px;
+}
+
+.slide-content h3 .highlight {
+    background: linear-gradient(135deg, var(--brand-400), var(--brand-300));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.slide-content p {
+    font-size: 22px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 24px;
+}
+
+.slide-content strong {
+    color: white;
+    font-weight: 600;
+}
+
+/* ── Feature cards ── */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 36px;
+}
+
+.feature-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    backdrop-filter: blur(8px);
+}
+
+.feature-card:hover {
+    background: var(--card-bg-hover);
+    border-color: rgba(74, 222, 128, 0.20);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.feature-card .icon {
+    width: 52px;
+    height: 52px;
+    background: rgba(74, 222, 128, 0.08);
+    border: 1px solid rgba(74, 222, 128, 0.15);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 18px;
+}
+
+.feature-card h4 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: white;
+    font-weight: 600;
+}
+
+.feature-card p {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ── Stats ── */
+.stats-row {
+    display: flex;
+    gap: 60px;
+    margin-top: 48px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-item .number {
+    font-size: 60px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--brand-400), var(--brand-300));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+}
+
+.stat-item .label {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 12px;
+    font-weight: 400;
+}
+
+/* ── Code block ── */
+.code-block {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 28px;
+    font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
+    font-size: 15px;
+    line-height: 1.9;
+    margin-top: 28px;
+    backdrop-filter: blur(8px);
+}
+
+.code-block .comment {
+    color: rgba(74, 222, 128, 0.6);
+}
+
+.code-block .keyword {
+    color: var(--brand-300);
+    font-weight: 600;
+}
+
+/* ── Architecture diagram ── */
+.arch-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 40px;
+}
+
+.arch-box {
+    background: var(--arch-bg);
+    border: 1px solid var(--arch-border);
+    border-radius: 14px;
+    padding: 22px 32px;
+    text-align: center;
+    min-width: 170px;
+    backdrop-filter: blur(8px);
+}
+
+.arch-box h5 {
+    font-size: 17px;
+    color: white;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.arch-box p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0;
+}
+
+.arch-arrow {
+    font-size: 24px;
+    color: rgba(74, 222, 128, 0.4);
+}
+
+/* ── Team ── */
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-top: 44px;
+}
+
+.team-member {
+    text-align: center;
+    padding: 36px;
+    background: var(--team-bg);
+    border-radius: 18px;
+    border: 1px solid var(--card-border);
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.team-member:hover {
+    background: var(--card-bg-hover);
+    border-color: rgba(74, 222, 128, 0.15);
+    transform: translateY(-4px);
+}
+
+.team-member .avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    overflow: hidden;
+    border: 2px solid rgba(74, 222, 128, 0.20);
+    box-shadow: 0 0 30px rgba(74, 222, 128, 0.08);
+}
+
+.team-member .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.team-member h4 {
+    font-size: 22px;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.team-member .role {
+    font-size: 14px;
+    color: var(--brand-400);
+    margin-bottom: 14px;
+    font-weight: 500;
+}
+
+.team-member .desc {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.45);
+    line-height: 1.6;
+}
+
+/* ── Feature list ── */
+.feature-list {
+    list-style: none;
+    margin-top: 28px;
+}
+
+.feature-list li {
+    font-size: 21px;
+    padding: 14px 0;
+    padding-left: 36px;
+    position: relative;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.feature-list li::before {
+    content: "\2192";
+    position: absolute;
+    left: 0;
+    color: var(--brand-400);
+    font-weight: bold;
+    font-size: 20px;
+}
+
+/* ── Progress bar ── */
+.progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--brand-500), var(--brand-400));
+    transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 100;
+    box-shadow: 0 0 12px var(--glow);
+}
+
+/* ── Navigation hint ── */
+.nav-hint {
+    position: fixed;
+    bottom: 28px;
+    right: 36px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Timer ── */
+.timer {
+    position: fixed;
+    bottom: 28px;
+    left: 36px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.25);
+    font-family: monospace;
+}
+
+/* ── Final slide ── */
+.slide-final {
+    background: radial-gradient(ellipse at 50% 60%, rgba(22, 163, 74, 0.10) 0%, transparent 60%),
+                linear-gradient(180deg, #050d09 0%, #071a10 100%);
+    text-align: center;
+}
+
+.slide-final h2 {
+    font-size: 56px;
+    margin-bottom: 24px;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.slide-final .cta {
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 44px;
+    font-weight: 300;
+}
+
+/* ── Roadmap ── */
+.roadmap {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 36px;
+}
+
+.roadmap-item {
+    background: var(--roadmap-bg);
+    border: 1px solid var(--roadmap-border);
+    border-radius: 14px;
+    padding: 24px 30px;
+    text-align: left;
+    max-width: 280px;
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.roadmap-item:hover {
+    background: var(--card-bg-hover);
+    border-color: rgba(74, 222, 128, 0.20);
+    transform: translateY(-3px);
+}
+
+.roadmap-item .phase {
+    font-size: 12px;
+    color: var(--brand-400);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.roadmap-item h5 {
+    font-size: 19px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.roadmap-item p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.45);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ── Demo mockup ── */
+.demo-mockup {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 14px;
+    padding: 32px;
+    margin-top: 28px;
+    border: 1px solid var(--card-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.demo-mockup::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(74, 222, 128, 0.3), transparent);
+}
+
+.demo-mockup .subtitle-line {
+    font-size: 24px;
+    line-height: 2;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.demo-mockup .translated {
+    color: var(--brand-400);
+    font-weight: 600;
+    text-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+}
+
+.demo-mockup .original {
+    opacity: 0.7;
+}
+
+/* ── Big quote / emphasis text ── */
+.big-quote {
+    font-size: 36px;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+    text-align: center;
+    margin-top: 40px;
+    line-height: 1.6;
+}
+
+.big-quote strong {
+    color: white;
+    font-weight: 600;
+    font-style: normal;
+}
+    </style>
 </head>
 <body>
     <div class="presentation">
@@ -19,7 +678,7 @@
             <div class="floating-words" id="floatingWords1"></div>
             <div class="logo-container">
                 <div class="logo">
-                    <img src="../extension/logo.png" alt="Lingo Stream Logo">
+                    <img src="extension/logo.png" alt="Lingo Stream Logo">
                 </div>
             </div>
             <h1>Lingo Stream</h1>
@@ -310,7 +969,6 @@
             </div>
         </div>
 
-        <!-- Slide 12: Closing -->
         <!-- Slide 12: AI Use Declaration -->
         <div class="slide content-slide" data-slide="12">
             <div class="slide-header">
@@ -371,7 +1029,7 @@
             <div class="floating-words" id="floatingWords12"></div>
             <div class="logo-container">
                 <div class="logo">
-                    <img src="../extension/logo.png" alt="Lingo Stream Logo">
+                    <img src="extension/logo.png" alt="Lingo Stream Logo">
                 </div>
             </div>
             <h2>Lingo Stream</h2>
@@ -388,6 +1046,213 @@
         <div class="nav-hint">← → to navigate</div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+// ── Slide state ──
+let currentSlide = 1;
+const totalSlides = 13;
+const presentationDuration = 7 * 60; // 7 minutes
+let startTime = null;
+let timerInterval = null;
+
+// ── Slide navigation ──
+
+function updateSlide() {
+    document.querySelectorAll('.slide').forEach((slide, index) => {
+        const slideNum = index + 1;
+        slide.classList.remove('active', 'prev');
+        if (slideNum === currentSlide) {
+            slide.classList.add('active');
+        } else if (slideNum < currentSlide) {
+            slide.classList.add('prev');
+        }
+    });
+
+    const progress = (currentSlide / totalSlides) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+}
+
+function nextSlide() {
+    if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlide();
+    }
+}
+
+function prevSlide() {
+    if (currentSlide > 1) {
+        currentSlide--;
+        updateSlide();
+    }
+}
+
+// ── Timer ──
+
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function updateTimer() {
+    if (!startTime) return;
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const remaining = Math.max(0, presentationDuration - elapsed);
+    document.getElementById('timer').textContent =
+        `${formatTime(elapsed)} / 07:00`;
+
+    if (remaining === 0) {
+        document.getElementById('timer').style.color = '#ef4444';
+    }
+}
+
+// ── Keyboard navigation ──
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        nextSlide();
+    } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+    } else if (e.key === 'Home') {
+        e.preventDefault();
+        currentSlide = 1;
+        updateSlide();
+    } else if (e.key === 'End') {
+        e.preventDefault();
+        currentSlide = totalSlides;
+        updateSlide();
+    }
+});
+
+// ── Touch / swipe support ──
+
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+});
+
+document.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+});
+
+function handleSwipe() {
+    const swipeThreshold = 50;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) nextSlide();
+        else prevSlide();
+    }
+}
+
+// ── Floating words ──
+
+const floatingWords = [
+    'Hello', 'World', 'Learn', 'Speak', 'Think',
+    '你好', '学习', '语言', '世界', '知识',
+    'Hola', 'Mundo', 'Hablar', 'Idioma',
+    'Bonjour', 'Monde', 'Parler', 'Langue',
+    'Hallo', 'Welt', 'Lernen', 'Sprache',
+    'こんにちは', '世界', '学ぶ', '言葉',
+    '안녕', '세계', '배우다', '말',
+    'مرحبا', 'عالم', 'تعلم', 'لغة',
+    'Привет', 'Мир', 'Учить', 'Язык',
+    'Olá', 'Mundo', 'Falar', 'Língua',
+    'Ciao', 'Mondo', 'Parlare', 'Lingua'
+];
+
+// Soft, varied tints per word (randomly assigned)
+const floatColors = [
+    'rgba(74, 222, 128, 0.12)',
+    'rgba(134, 239, 172, 0.10)',
+    'rgba(187, 247, 208, 0.08)',
+    'rgba(167, 139, 250, 0.10)',
+    'rgba(96, 165, 250, 0.09)',
+    'rgba(244, 114, 182, 0.09)',
+    'rgba(251, 191, 36, 0.08)',
+    'rgba(45, 212, 191, 0.10)',
+];
+
+function createFloatingWord(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const text = floatingWords[Math.floor(Math.random() * floatingWords.length)];
+    const el = document.createElement('div');
+    el.className = 'floating-word';
+    el.textContent = text;
+
+    const startX = 5 + Math.random() * 90;
+    const fontSize = 13 + Math.random() * 16;
+    const peakOpacity = 0.06 + Math.random() * 0.14;
+    const duration = 20000 + Math.random() * 22000;
+    const swayAmount = 20 + Math.random() * 50;
+    const swayCycles = 1.5 + Math.random() * 2;
+    const startRotation = -8 + Math.random() * 16;
+
+    el.style.left = startX + '%';
+    el.style.fontSize = fontSize + 'px';
+    el.style.color = floatColors[Math.floor(Math.random() * floatColors.length)];
+
+    container.appendChild(el);
+
+    const keyframes = [];
+    const steps = 80;
+    for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const y = (1 - t) * 110 - 5;
+        const xOffset = Math.sin(t * Math.PI * 2 * swayCycles) * swayAmount;
+        const rot = startRotation * Math.cos(t * Math.PI * 2);
+        let opacity;
+        if (t < 0.12) opacity = (t / 0.12) * peakOpacity;
+        else if (t > 0.88) opacity = ((1 - t) / 0.12) * peakOpacity;
+        else opacity = peakOpacity;
+
+        keyframes.push({
+            transform: `translate(${xOffset}px, ${y}vh) rotate(${rot}deg)`,
+            opacity: opacity,
+            offset: t
+        });
+    }
+
+    const anim = el.animate(keyframes, {
+        duration: duration,
+        easing: 'linear',
+        fill: 'forwards'
+    });
+
+    anim.onfinish = () => el.remove();
+}
+
+function initFloatingWords() {
+    for (let i = 0; i < 18; i++) {
+        const delay = Math.random() * 8000;
+        setTimeout(() => createFloatingWord('floatingWords1'), delay);
+        setTimeout(() => createFloatingWord('floatingWords12'), delay);
+    }
+
+    function scheduleNext(id) {
+        const delay = 1200 + Math.random() * 2800;
+        setTimeout(() => {
+            if (document.getElementById(id)) {
+                createFloatingWord(id);
+            }
+            scheduleNext(id);
+        }, delay);
+    }
+    scheduleNext('floatingWords1');
+    scheduleNext('floatingWords12');
+}
+
+// ── Initialise ──
+
+startTime = Date.now();
+timerInterval = setInterval(updateTimer, 1000);
+updateSlide();
+initFloatingWords();
+    </script>
 </body>
 </html>
