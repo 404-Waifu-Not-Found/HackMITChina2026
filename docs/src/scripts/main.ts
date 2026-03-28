@@ -69,9 +69,9 @@ const DEFAULT_SENTENCE = 'I really enjoy learning new skills every day.'
 const CURRENT_RELEASE = {
   version: '1.0.0',
   channel: 'Full Release',
-  packageName: 'Lingo.Stream.1.0.0.Release.zip',
+  packageName: 'Lingo.Stream.v1.0.0.zip',
   downloadUrl:
-    'https://github.com/UnoxyRich/Lingo-Stream/releases/download/Full-Release/Lingo.Stream.1.0.0.Release.zip',
+    'https://github.com/404-Waifu-Not-Found/HackMITChina2026/releases/download/Extention/Lingo.Stream.v1.0.0.zip',
 }
 
 const WORD_PRIORITY: string[] = [
