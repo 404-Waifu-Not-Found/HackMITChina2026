@@ -560,12 +560,14 @@ function initLogoMorph(): void {
 
   function getSourceRect(): { lx: number; ly: number; imgSize: number; fontSize: number } {
     const anchorImgEl = document.getElementById('logo3d-anchor-img')
+    const anchorNameEl = document.getElementById('logo3d-anchor-name')
     const imgSize = anchorImgEl ? anchorImgEl.offsetWidth : 240
+    const fontSize = anchorNameEl ? parseFloat(getComputedStyle(anchorNameEl).fontSize) || 90 : 90
     if (anchor) {
       const r = anchor.getBoundingClientRect()
-      return { lx: r.left + imgSize / 2, ly: r.top + r.height / 2, imgSize, fontSize: 90 }
+      return { lx: r.left + imgSize / 2, ly: r.top + r.height / 2, imgSize, fontSize }
     }
-    return { lx: window.innerWidth / 2, ly: window.innerHeight / 2, imgSize, fontSize: 90 }
+    return { lx: window.innerWidth / 2, ly: window.innerHeight / 2, imgSize, fontSize }
   }
 
   let raf = 0
