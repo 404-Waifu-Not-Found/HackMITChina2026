@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lingo Stream - Demo Presentation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="presentation">
+        <!-- Progress bar -->
+        <div class="progress-bar" id="progressBar"></div>
+
+        <!-- Timer -->
+        <div class="timer" id="timer">00:00 / 07:00</div>
+
+        <!-- Slide 1: Title -->
+        <div class="slide slide-1 active" data-slide="1">
+            <div class="floating-words" id="floatingWords1"></div>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="../extension/logo.png" alt="Lingo Stream Logo">
+                </div>
+            </div>
+            <h1>Lingo Stream</h1>
+            <p class="tagline">Learn any language just by watching YouTube.</p>
+            <span class="version">HackMIT China 2026</span>
+        </div>
+
+        <!-- Slide 2: The Problem -->
+        <div class="slide content-slide" data-slide="2">
+            <div class="slide-header">
+                <div class="icon">💡</div>
+                <h2>The Problem</h2>
+            </div>
+            <span class="slide-number">02 / 12</span>
+            <div class="slide-content">
+                <h3>We watch <span class="highlight">2.5 hours</span> of YouTube every day.</h3>
+                <p>That's <strong>900 hours a year</strong> of passive screen time — and <strong>zero</strong> of it helps us learn a new language.</p>
+                <p>Language apps like Duolingo ask for <strong>extra time</strong> most people don't have. So they quit. Within 2 weeks, 80% of users stop.</p>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="number">2.5h</div>
+                        <div class="label">Watched per day</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number">0%</div>
+                        <div class="label">Language learned</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number">80%</div>
+                        <div class="label">Quit within 2 weeks</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: The Solution -->
+        <div class="slide content-slide" data-slide="3">
+            <div class="slide-header">
+                <div class="icon">🎯</div>
+                <h2>Our Solution</h2>
+            </div>
+            <span class="slide-number">03 / 12</span>
+            <div class="slide-content">
+                <h3>What if YouTube <span class="highlight">taught you</span> a language?</h3>
+                <p>Lingo Stream is a Chrome extension that <strong>swaps a few words</strong> in YouTube subtitles into your target language — right while you watch.</p>
+                <div class="demo-mockup">
+                    <div class="subtitle-line">
+                        "The <span class="translated">government (政府)</span> announced a new <span class="translated">policy (政策)</span> to <span class="translated">address (解决)</span> the <span class="translated">crisis (危机)</span>."
+                    </div>
+                </div>
+                <p style="margin-top: 28px; font-size: 19px; color: rgba(255,255,255,0.45);">
+                    No extra study time. No new app to open. Just watch what you already watch.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 4: How It Works -->
+        <div class="slide content-slide" data-slide="4">
+            <div class="slide-header">
+                <div class="icon">⚙️</div>
+                <h2>How It Works</h2>
+            </div>
+            <span class="slide-number">04 / 12</span>
+            <div class="slide-content">
+                <h3>Four steps, <span class="highlight">zero friction.</span></h3>
+                <p>We hook into YouTube's real-time subtitle renderer — no external APIs needed for caption access.</p>
+                <div class="arch-diagram">
+                    <div class="arch-box">
+                        <h5>YouTube</h5>
+                        <p>Live subtitles</p>
+                    </div>
+                    <span class="arch-arrow">→</span>
+                    <div class="arch-box">
+                        <h5>Observe</h5>
+                        <p>Detect new text</p>
+                    </div>
+                    <span class="arch-arrow">→</span>
+                    <div class="arch-box">
+                        <h5>Pick Words</h5>
+                        <p>Smart filtering</p>
+                    </div>
+                    <span class="arch-arrow">→</span>
+                    <div class="arch-box">
+                        <h5>Translate</h5>
+                        <p>Instant swap</p>
+                    </div>
+                </div>
+                <p class="big-quote">"It feels like the subtitles were <strong>always bilingual.</strong>"</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Smart Processing -->
+        <div class="slide content-slide" data-slide="5">
+            <div class="slide-header">
+                <div class="icon">🧠</div>
+                <h2>Smart Engine</h2>
+            </div>
+            <span class="slide-number">05 / 12</span>
+            <div class="slide-content">
+                <h3>Only <span class="highlight">the right words</span> get swapped.</h3>
+                <p>We don't just replace random words. Our processor picks <strong>high-value vocabulary</strong> that actually helps you learn.</p>
+                <ul class="feature-list">
+                    <li>Skips stop-words, numbers, and punctuation automatically</li>
+                    <li>Keeps replacement rate at 5-15% so you still follow the video</li>
+                    <li>Carries over missed words to the next subtitle line</li>
+                    <li>Lets you pin words you want to see every time</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 6: Reliability -->
+        <div class="slide content-slide" data-slide="6">
+            <div class="slide-header">
+                <div class="icon">🛡️</div>
+                <h2>Reliability</h2>
+            </div>
+            <span class="slide-number">06 / 12</span>
+            <div class="slide-content">
+                <h3>Three translation engines. <span class="highlight">One always works.</span></h3>
+                <p>If one provider goes down, we silently switch to the next. You never notice a thing.</p>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="icon">🌐</div>
+                        <h4>Google Translate</h4>
+                        <p>Primary — fast, accurate, 100+ languages</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">📖</div>
+                        <h4>LibreTranslate</h4>
+                        <p>Open-source fallback, runs locally for privacy</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🔧</div>
+                        <h4>Apertium</h4>
+                        <p>Specialist for European language pairs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Speed -->
+        <div class="slide content-slide" data-slide="7">
+            <div class="slide-header">
+                <div class="icon">⚡</div>
+                <h2>Speed</h2>
+            </div>
+            <span class="slide-number">07 / 12</span>
+            <div class="slide-content">
+                <h3>Translations arrive <span class="highlight">before you read them.</span></h3>
+                <p>We prefetch and cache words ahead of playback. By the time a subtitle appears, the translation is already waiting.</p>
+                <div class="code-block">
+                    <span class="comment">// Look 60 seconds ahead in the subtitle track</span><br>
+                    <span class="keyword">const</span> PREFETCH_LOOKAHEAD = <span class="keyword">60</span>; <span class="comment">// seconds</span><br>
+                    <span class="keyword">const</span> BATCH_SIZE = <span class="keyword">120</span>; <span class="comment">// words per batch</span><br>
+                    <span class="keyword">const</span> FULL_TRACK_MAX = <span class="keyword">500</span>; <span class="comment">// preload the whole video</span><br><br>
+                    <span class="keyword">await</span> prefetchTranslations(upcoming);
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Features -->
+        <div class="slide content-slide" data-slide="8">
+            <div class="slide-header">
+                <div class="icon">✨</div>
+                <h2>Features</h2>
+            </div>
+            <span class="slide-number">08 / 12</span>
+            <div class="slide-content">
+                <h3>Watch. Learn. <span class="highlight">Remember.</span></h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="icon">📊</div>
+                        <h4>Export to CSV</h4>
+                        <p>Take your vocabulary into Anki, Quizlet, or anywhere</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">📝</div>
+                        <h4>Built-in Quiz</h4>
+                        <p>Test yourself on words you just learned — right in the browser</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">📚</div>
+                        <h4>Word History</h4>
+                        <p>Browse every word you've encountered across all videos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Team -->
+        <div class="slide content-slide" data-slide="9">
+            <div class="slide-header">
+                <div class="icon">👥</div>
+                <h2>Team</h2>
+            </div>
+            <span class="slide-number">09 / 12</span>
+            <div class="slide-content">
+                <h3>Built in <span class="highlight">32 hours</span> by three people.</h3>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="avatar">
+                            <img src="https://avatars.githubusercontent.com/u/226900635?v=4" alt="Justin-Yonardo">
+                        </div>
+                        <h4>Justin-Yonardo</h4>
+                        <div class="role">Lead Engineer</div>
+                        <div class="desc">Built the subtitle observer and translation engine from scratch</div>
+                    </div>
+                    <div class="team-member">
+                        <div class="avatar">
+                            <img src="https://avatars.githubusercontent.com/u/146935872?v=4" alt="UnoxyRich">
+                        </div>
+                        <h4>UnoxyRich</h4>
+                        <div class="role">Systems &amp; UI</div>
+                        <div class="desc">Built CI/CD pipeline, docs site, and the entire visual identity</div>
+                    </div>
+                    <div class="team-member">
+                        <div class="avatar">
+                            <img src="https://avatars.githubusercontent.com/u/207811268?v=4" alt="LeoLiu32">
+                        </div>
+                        <h4>LeoLiu32</h4>
+                        <div class="role">UX &amp; Interaction</div>
+                        <div class="desc">Designed the popup, quiz flow, and frictionless user experience</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Tech Stack -->
+        <div class="slide content-slide" data-slide="10">
+            <div class="slide-header">
+                <div class="icon">🔨</div>
+                <h2>Under the Hood</h2>
+            </div>
+            <span class="slide-number">10 / 12</span>
+            <div class="slide-content">
+                <h3>Clean, modern, <span class="highlight">production-ready.</span></h3>
+                <div class="feature-grid" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="feature-card">
+                        <div class="icon">⚡</div>
+                        <h4>Manifest V3</h4>
+                        <p>Latest Chrome extension platform — ready for the Web Store</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🧪</div>
+                        <h4>76 Tests Passing</h4>
+                        <p>Vitest suite with E2E smoke tests and coverage reporting</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">📦</div>
+                        <h4>Zero Build Step</h4>
+                        <p>Pure ES Modules — no webpack, no bundler, no compile time</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🔍</div>
+                        <h4>CI/CD Pipeline</h4>
+                        <p>ESLint + automated tests on every pull request</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: What's Next -->
+        <div class="slide content-slide" data-slide="11">
+            <div class="slide-header">
+                <div class="icon">🚀</div>
+                <h2>What's Next</h2>
+            </div>
+            <span class="slide-number">11 / 12</span>
+            <div class="slide-content">
+                <h3>This is just <span class="highlight">the beginning.</span></h3>
+                <div class="roadmap">
+                    <div class="roadmap-item">
+                        <div class="phase">Next Month</div>
+                        <h5>AI-Powered Selection</h5>
+                        <p>Use context to pick the most teachable words for each viewer</p>
+                    </div>
+                    <div class="roadmap-item">
+                        <div class="phase">Q2 2026</div>
+                        <h5>Health Dashboard</h5>
+                        <p>Real-time stats on translation accuracy and service uptime</p>
+                    </div>
+                    <div class="roadmap-item">
+                        <div class="phase">Q3 2026</div>
+                        <h5>Spaced Repetition</h5>
+                        <p>Resurface words you're about to forget — scientifically timed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Closing -->
+        <div class="slide slide-final" data-slide="12">
+            <div class="floating-words" id="floatingWords12"></div>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="../extension/logo.png" alt="Lingo Stream Logo">
+                </div>
+            </div>
+            <h2>Lingo Stream</h2>
+            <p class="cta">Turn every video into a language lesson.</p>
+            <div style="margin-top: 36px;">
+                <span style="font-size: 19px; color: rgba(255,255,255,0.4);">Install it. Watch anything. Start learning.</span>
+            </div>
+            <div style="margin-top: 56px; font-size: 16px; color: rgba(255,255,255,0.2);">
+                Thank you — we'd love to show you a live demo.
+            </div>
+        </div>
+
+        <!-- Navigation hint -->
+        <div class="nav-hint">← → to navigate</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
