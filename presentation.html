@@ -923,7 +923,7 @@ body {
                     </div>
                     <div class="feature-card">
                         <div class="icon">🧪</div>
-                        <h4>76 Tests Passing</h4>
+                        <h4>67 Tests Passing</h4>
                         <p>Vitest suite with E2E smoke tests and coverage reporting</p>
                     </div>
                     <div class="feature-card">
@@ -946,7 +946,7 @@ body {
                 <div class="icon">🚀</div>
                 <h2>What's Next</h2>
             </div>
-            <span class="slide-number">11 / 13</span>
+            <span class="slide-number">11 / 15</span>
             <div class="slide-content">
                 <h3>This is just <span class="highlight">the beginning.</span></h3>
                 <div class="roadmap">
@@ -969,13 +969,49 @@ body {
             </div>
         </div>
 
-        <!-- Slide 12: AI Use Declaration -->
+        <!-- Slide 12: Proud Accomplishment -->
         <div class="slide content-slide" data-slide="12">
+            <div class="slide-header">
+                <div class="icon">🏆</div>
+                <h2>Accomplishment We&apos;re Proud Of</h2>
+            </div>
+            <span class="slide-number">12 / 15</span>
+            <div class="slide-content">
+                <h1 style="font-size:42px;margin-bottom:20px;line-height:1.1;color:#fff;">Milestone: Launch-Ready Core</h1>
+                <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:10px;font-size:18px;line-height:1.5;">
+                    <li>✅ Delivered a working Chrome extension from prototype to polished release.</li>
+                    <li>✅ Built reliable end-to-end flow: caption observation → translation → inline mutation.</li>
+                    <li>✅ Validated with a real vitest suite and automated CI checks for maintainability.</li>
+                    <li>✅ Designed a quiz system that closes the loop from passive exposure to active recall.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 13: Problem We Ran Into -->
+        <div class="slide content-slide" data-slide="13">
+            <div class="slide-header">
+                <div class="icon">⚠️</div>
+                <h2>Problem We Ran Into</h2>
+            </div>
+            <span class="slide-number">13 / 15</span>
+            <div class="slide-content">
+                <h1 style="font-size:42px;margin-bottom:20px;line-height:1.1;color:#fff;">Roadblock: Runtime Reliability</h1>
+                <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:10px;font-size:18px;line-height:1.5;">
+                    <li>🔎 YouTube caption DOM updates are extremely dynamic — we built robust mutation logic to avoid duplicate rewrites.</li>
+                    <li>🌐 API latency & provider availability vary; we implemented provider fallback + caching to preserve playback performance.</li>
+                    <li>⚡ Balancing translation density with readability required refined token filtering for user comfort.</li>
+                    <li>🧪 Achieving stable tests across real-time caption changes took extra fixture work and E2E smoke coverage.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 14: AI Use Declaration -->
+        <div class="slide content-slide" data-slide="14">
             <div class="slide-header">
                 <div class="icon">🤖</div>
                 <h2>AI Use Declaration</h2>
             </div>
-            <span class="slide-number">12 / 13</span>
+            <span class="slide-number">14 / 15</span>
             <div class="slide-content">
                 <p style="color:rgba(255,255,255,0.55);font-size:15px;letter-spacing:2px;text-transform:uppercase;margin-bottom:28px;">Transparent disclosure of AI-assisted development</p>
 
@@ -1025,7 +1061,7 @@ body {
             </div>
         </div>
 
-        <div class="slide slide-final" data-slide="13">
+        <div class="slide slide-final" data-slide="15">
             <div class="floating-words" id="floatingWords12"></div>
             <div class="logo-container">
                 <div class="logo">
@@ -1049,7 +1085,7 @@ body {
     <script>
 // ── Slide state ──
 let currentSlide = 1;
-const totalSlides = 13;
+const totalSlides = 15;
 const presentationDuration = 7 * 60; // 7 minutes
 let startTime = null;
 let timerInterval = null;
