@@ -47,6 +47,9 @@
       chat_error_api: 'No API key configured. Go to extension popup → Vocabulary tab to add one.',
       chat_error_model: 'No model selected. Go to extension popup → Vocabulary tab, save your API key, then pick a model.',
       chat_thinking: 'Thinking...',
+      chat_thinking_label: 'Thinking process',
+      chat_thinking_show: 'Show thinking',
+      chat_thinking_hide: 'Hide thinking',
       chat_none_yet: 'None yet — keep playing!',
       ai_setup_required: 'AI Setup Required',
       ai_setup_title: 'Add your API settings to start chatting',
@@ -1841,9 +1844,13 @@
     const code = typeof langCode === 'string'
       ? langCode.toLowerCase().split('-')[0].split('_')[0]
       : 'en';
-    return Object.prototype.hasOwnProperty.call(translations, code)
+    const selected = Object.prototype.hasOwnProperty.call(translations, code)
       ? translations[code]
-      : translations['en'];
+      : {};
+    return {
+      ...translations['en'],
+      ...selected
+    };
   }
 
   /**

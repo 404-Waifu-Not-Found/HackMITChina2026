@@ -69,6 +69,7 @@ const elements = {
   chatContextWords: null,
   chatStatus: null,
   chatClearButton: null,
+  chatResizeHandle: null,
   chatSetupPanel: null,
   chatSetupProvider: null,
   chatSetupModel: null,
@@ -84,6 +85,9 @@ const CHOICE_REFLECTION_SETTLE_DELTA = 0.16;
 
 const AI_STORAGE_KEY = 'aiSettings';
 const CHAT_HISTORY_KEY = 'chatHistory';
+const CHAT_DRAWER_WIDTH_KEY = 'chatDrawerWidth';
+const CHAT_DRAWER_MIN_WIDTH = 320;
+const CHAT_DRAWER_MAX_WIDTH_RATIO = 0.84;
 const AI_ENDPOINTS = {
   openai: 'https://api.openai.com/v1/chat/completions',
   groq: 'https://api.groq.com/openai/v1/chat/completions',
@@ -150,15 +154,64 @@ function flattenAiContentParts(value) {
   return '';
 }
 
-export function extractAiTextFromPayload(payload, options = {}) {
-  const shouldTrim = options.trim !== false;
+function flattenAiThinkingParts(value) {
+  if (typeof value === 'string') {
+    return value;
+  }
 
-  if (!payload || typeof payload !== 'object') {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => flattenAiThinkingParts(item))
+      .filter(Boolean)
+      .join('');
+  }
+
+  if (!value || typeof value !== 'object') {
     return '';
   }
 
+  if (typeof value.reasoning_content === 'string') {
+    return value.reasoning_content;
+  }
+
+  if (typeof value.reasoning === 'string') {
+    return value.reasoning;
+  }
+
+  if (typeof value.thinking === 'string') {
+    return value.thinking;
+  }
+
+  if (typeof value.thought === 'string') {
+    return value.thought;
+  }
+
+  if (typeof value.type === 'string' && /reason|think/i.test(value.type)) {
+    if (typeof value.text === 'string') {
+      return value.text;
+    }
+
+    if (typeof value.content === 'string') {
+      return value.content;
+    }
+  }
+
+  if (Array.isArray(value.content)) {
+    return flattenAiThinkingParts(value.content);
+  }
+
+  return '';
+}
+
+function extractAiResponsePartsFromPayload(payload, options = {}) {
+  const shouldTrim = options.trim !== false;
+
+  if (!payload || typeof payload !== 'object') {
+    return { text: '', thinking: '' };
+  }
+
   const choice = Array.isArray(payload.choices) ? payload.choices[0] : null;
-  const candidates = [
+  const textCandidates = [
     choice?.delta?.content,
     choice?.message?.content,
     choice?.delta?.text,
@@ -170,20 +223,54 @@ export function extractAiTextFromPayload(payload, options = {}) {
     payload.content,
     payload.answer
   ];
+  const thinkingCandidates = [
+    choice?.delta?.reasoning_content,
+    choice?.message?.reasoning_content,
+    choice?.delta?.reasoning,
+    choice?.message?.reasoning,
+    choice?.delta?.thinking,
+    choice?.message?.thinking,
+    choice?.delta?.thought,
+    choice?.message?.thought,
+    payload.reasoning_content,
+    payload.reasoning,
+    payload.thinking,
+    payload.thought,
+    choice?.delta?.content,
+    choice?.message?.content,
+    payload.content
+  ];
 
-  for (const candidate of candidates) {
+  let text = '';
+  for (const candidate of textCandidates) {
     const rawText = flattenAiContentParts(candidate);
-    const text = shouldTrim ? rawText.trim() : rawText;
-    if (text) {
-      return text;
+    const normalized = shouldTrim ? rawText.trim() : rawText;
+    if (normalized) {
+      text = normalized;
+      break;
     }
   }
 
-  return '';
+  let thinking = '';
+  for (const candidate of thinkingCandidates) {
+    const rawThinking = flattenAiThinkingParts(candidate);
+    const normalized = shouldTrim ? rawThinking.trim() : rawThinking;
+    if (normalized) {
+      thinking = normalized;
+      break;
+    }
+  }
+
+  return { text, thinking };
+}
+
+export function extractAiTextFromPayload(payload, options = {}) {
+  return extractAiResponsePartsFromPayload(payload, options).text;
 }
 
 export function extractAiTextFromStreamChunk(chunkText) {
   let collectedText = '';
+  let collectedThinking = '';
   let reachedDone = false;
   const lines = String(chunkText ?? '').split(/\r?\n/);
 
@@ -205,9 +292,12 @@ export function extractAiTextFromStreamChunk(chunkText) {
 
     try {
       const parsed = JSON.parse(data);
-      const token = extractAiTextFromPayload(parsed, { trim: false });
-      if (token) {
-        collectedText += token;
+      const { text, thinking } = extractAiResponsePartsFromPayload(parsed, { trim: false });
+      if (text) {
+        collectedText += text;
+      }
+      if (thinking) {
+        collectedThinking += thinking;
       }
     } catch {
       // Some providers may emit non-JSON keepalive lines; ignore them.
@@ -216,6 +306,7 @@ export function extractAiTextFromStreamChunk(chunkText) {
 
   return {
     text: collectedText,
+    thinking: collectedThinking,
     done: reachedDone
   };
 }
@@ -225,7 +316,9 @@ const chatState = {
   isStreaming: false,
   aiSettings: null,
   lastWrongPair: null,
-  overlayIgnoreUntil: 0
+  overlayIgnoreUntil: 0,
+  drawerWidth: null,
+  isResizingDrawer: false
 };
 
 function clamp(value, minimum, maximum) {
@@ -1174,6 +1267,7 @@ function cacheElements() {
   elements.chatContextWords = document.getElementById('chatContextWords');
   elements.chatStatus = document.getElementById('chatStatus');
   elements.chatClearButton = document.getElementById('chatClearButton');
+  elements.chatResizeHandle = document.getElementById('chatResizeHandle');
   elements.chatSetupPanel = document.getElementById('chatSetupPanel');
   elements.chatSetupProvider = document.getElementById('chatSetupProvider');
   elements.chatSetupModel = document.getElementById('chatSetupModel');
@@ -2266,7 +2360,11 @@ function restoreChatMessagesUi() {
   elements.chatMessages.innerHTML = '';
 
   for (const msg of chatState.messages) {
-    appendChatMessage(msg.role === 'user' ? 'user' : 'assistant', msg.content, true);
+    appendChatMessage(msg.role === 'user' ? 'user' : 'assistant', msg.content, true, {
+      thinkingText: msg.role === 'assistant' ? msg.thinking ?? '' : '',
+      includeThinking: Boolean(msg.role === 'assistant' && msg.thinking),
+      collapseThinking: true
+    });
   }
 }
 
@@ -2377,7 +2475,19 @@ STRICT FORMATTING RULES (follow these in EVERY response, no exceptions):
 - When comparing or listing multiple items, ALWAYS use bullet lists or numbered lists instead.${contextBlock}`;
 }
 
-function appendChatMessage(role, text, skipPersist = false) {
+function setThinkingCollapsedState(uiRefs, collapsed) {
+  if (!uiRefs?.thinkingPanel || !uiRefs?.thinkingToggle) {
+    return;
+  }
+
+  const t = window.LingoStreamI18n?.getTranslations() || {};
+  uiRefs.thinkingPanel.classList.toggle('is-collapsed', collapsed);
+  uiRefs.thinkingToggle.textContent = collapsed
+    ? (t.chat_thinking_show || 'Show thinking')
+    : (t.chat_thinking_hide || 'Hide thinking');
+}
+
+function appendChatMessage(role, text, skipPersist = false, options = {}) {
   const messagesContainer = elements.chatMessages;
   if (!messagesContainer) {
     return null;
@@ -2388,6 +2498,60 @@ function appendChatMessage(role, text, skipPersist = false) {
 
   const content = document.createElement('div');
   content.className = 'chat-message__content';
+
+  const uiRefs = {
+    messageDiv,
+    content,
+    thinkingPanel: null,
+    thinkingContent: null,
+    thinkingToggle: null
+  };
+
+  const shouldShowThinking = role === 'assistant' && (options.includeThinking || options.thinkingText || options.pendingThinking);
+  if (shouldShowThinking) {
+    const t = window.LingoStreamI18n?.getTranslations() || {};
+    const thinkingPanel = document.createElement('div');
+    thinkingPanel.className = 'chat-thinking';
+
+    const thinkingHeader = document.createElement('div');
+    thinkingHeader.className = 'chat-thinking__header';
+
+    const thinkingLabel = document.createElement('span');
+    thinkingLabel.className = 'chat-thinking__label';
+    thinkingLabel.textContent = t.chat_thinking_label || 'Thinking process';
+
+    const thinkingToggle = document.createElement('button');
+    thinkingToggle.type = 'button';
+    thinkingToggle.className = 'chat-thinking__toggle';
+
+    const thinkingBody = document.createElement('div');
+    thinkingBody.className = 'chat-thinking__body chat-message__content';
+    if (options.thinkingText) {
+      thinkingBody.innerHTML = renderMarkdown(options.thinkingText);
+    } else if (options.pendingThinking) {
+      // Show placeholder while thinking is being generated
+      thinkingBody.innerHTML = '<span style="opacity: 0.5;">Thinking...</span>';
+    }
+
+    thinkingToggle.addEventListener('click', () => {
+      const collapsed = !thinkingPanel.classList.contains('is-collapsed');
+      setThinkingCollapsedState(uiRefs, collapsed);
+    });
+
+    thinkingHeader.append(thinkingLabel, thinkingToggle);
+    thinkingPanel.append(thinkingHeader, thinkingBody);
+
+    if (options.pendingThinking) {
+      thinkingPanel.classList.add('chat-thinking--pending');
+      messageDiv.classList.add('is-thinking');
+    }
+
+    messageDiv.appendChild(thinkingPanel);
+    uiRefs.thinkingPanel = thinkingPanel;
+    uiRefs.thinkingContent = thinkingBody;
+    uiRefs.thinkingToggle = thinkingToggle;
+    setThinkingCollapsedState(uiRefs, Boolean(options.collapseThinking));
+  }
 
   if (role === 'assistant' || role === 'error') {
     content.innerHTML = renderMarkdown(text);
@@ -2403,7 +2567,7 @@ function appendChatMessage(role, text, skipPersist = false) {
     saveChatHistory();
   }
 
-  return content;
+  return uiRefs;
 }
 
 function renderMarkdown(text) {
@@ -2463,6 +2627,86 @@ function setChatStatus(text) {
   if (elements.chatStatus) {
     elements.chatStatus.textContent = text;
   }
+}
+
+function applyChatDrawerWidth(widthPx) {
+  if (!elements.chatDrawer || !Number.isFinite(widthPx)) {
+    return;
+  }
+
+  const maxWidth = Math.max(CHAT_DRAWER_MIN_WIDTH, Math.floor(window.innerWidth * CHAT_DRAWER_MAX_WIDTH_RATIO));
+  const clampedWidth = clamp(Math.round(widthPx), CHAT_DRAWER_MIN_WIDTH, maxWidth);
+  chatState.drawerWidth = clampedWidth;
+
+  if (window.matchMedia('(max-width: 620px)').matches) {
+    elements.chatDrawer.style.width = '100vw';
+    return;
+  }
+
+  elements.chatDrawer.style.width = `${clampedWidth}px`;
+}
+
+async function loadChatDrawerWidth() {
+  const items = await getLocalStorage([CHAT_DRAWER_WIDTH_KEY]);
+  const savedWidth = Number(items[CHAT_DRAWER_WIDTH_KEY]);
+  if (Number.isFinite(savedWidth)) {
+    applyChatDrawerWidth(savedWidth);
+  }
+}
+
+function saveChatDrawerWidth() {
+  if (!Number.isFinite(chatState.drawerWidth)) {
+    return;
+  }
+
+  void setLocalStorage({ [CHAT_DRAWER_WIDTH_KEY]: chatState.drawerWidth });
+}
+
+function attachChatResizeHandler() {
+  if (!elements.chatResizeHandle || !elements.chatDrawer) {
+    return;
+  }
+
+  elements.chatResizeHandle.addEventListener('pointerdown', (event) => {
+    if (window.matchMedia('(max-width: 620px)').matches) {
+      return;
+    }
+
+    event.preventDefault();
+    const drawerRect = elements.chatDrawer.getBoundingClientRect();
+    const startX = event.clientX;
+    const startWidth = drawerRect.width;
+
+    chatState.isResizingDrawer = true;
+    elements.chatDrawer.classList.add('is-resizing');
+    document.body.style.cursor = 'ew-resize';
+    elements.chatResizeHandle?.setPointerCapture(event.pointerId);
+
+    const onPointerMove = (moveEvent) => {
+      const delta = startX - moveEvent.clientX;
+      applyChatDrawerWidth(startWidth + delta);
+    };
+
+    const finishResize = () => {
+      chatState.isResizingDrawer = false;
+      elements.chatDrawer?.classList.remove('is-resizing');
+      document.body.style.cursor = '';
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', finishResize);
+      window.removeEventListener('pointercancel', finishResize);
+      saveChatDrawerWidth();
+    };
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', finishResize);
+    window.addEventListener('pointercancel', finishResize);
+  });
+
+  window.addEventListener('resize', () => {
+    if (Number.isFinite(chatState.drawerWidth)) {
+      applyChatDrawerWidth(chatState.drawerWidth);
+    }
+  });
 }
 
 // Generates follow-up suggestion chips based on current conversation context and quiz results.
@@ -2689,8 +2933,13 @@ async function sendChatMessage(userMessage) {
   const tStatus = window.LingoStreamI18n?.getTranslations() || {};
   setChatStatus(tStatus.chat_thinking || 'Thinking...');
 
-  const assistantContent = appendChatMessage('assistant', '');
+  const assistantUi = appendChatMessage('assistant', '', true, {
+    includeThinking: true,
+    pendingThinking: true,
+    collapseThinking: false
+  });
   let fullReply = '';
+  let fullThinking = '';
 
   try {
     const response = await fetch(endpoint, {
@@ -2716,16 +2965,24 @@ async function sendChatMessage(userMessage) {
     const reader = response.body?.getReader();
     if (!reader) {
       const fallbackPayload = await response.json().catch(() => null);
-      fullReply = extractAiTextFromPayload(fallbackPayload);
+      const parsedFallback = extractAiResponsePartsFromPayload(fallbackPayload);
+      fullReply = parsedFallback.text;
+      fullThinking = parsedFallback.thinking;
       if (!fullReply) {
         throw new Error('Streaming not supported by this browser.');
       }
 
-      if (assistantContent) {
-        assistantContent.innerHTML = renderMarkdown(fullReply);
+      if (assistantUi?.content) {
+        assistantUi.content.innerHTML = renderMarkdown(fullReply);
       }
+      if (assistantUi?.thinkingContent && fullThinking) {
+        assistantUi.thinkingContent.innerHTML = renderMarkdown(fullThinking);
+      }
+      assistantUi?.thinkingPanel?.classList.remove('chat-thinking--pending');
+      assistantUi?.messageDiv?.classList.remove('is-thinking');
+      setThinkingCollapsedState(assistantUi, Boolean(fullThinking));
 
-      chatState.messages.push({ role: 'assistant', content: fullReply });
+      chatState.messages.push({ role: 'assistant', content: fullReply, thinking: fullThinking || undefined });
       saveChatHistory();
       setChatStatus('');
 
@@ -2756,11 +3013,19 @@ async function sendChatMessage(userMessage) {
       const parsedChunk = extractAiTextFromStreamChunk(lines.join('\n'));
       if (parsedChunk.text) {
         fullReply += parsedChunk.text;
-        if (assistantContent) {
-          assistantContent.innerHTML = renderMarkdown(fullReply);
+        if (assistantUi?.content) {
+          assistantUi.content.innerHTML = renderMarkdown(fullReply);
           if (elements.chatMessages) {
             elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
           }
+        }
+      }
+
+      if (parsedChunk.thinking) {
+        fullThinking += parsedChunk.thinking;
+        if (assistantUi?.thinkingContent) {
+          assistantUi.thinkingContent.innerHTML = renderMarkdown(fullThinking);
+          assistantUi.thinkingContent.scrollTop = assistantUi.thinkingContent.scrollHeight;
         }
       }
 
@@ -2777,6 +3042,9 @@ async function sendChatMessage(userMessage) {
       if (parsedFinalChunk.text) {
         fullReply += parsedFinalChunk.text;
       }
+      if (parsedFinalChunk.thinking) {
+        fullThinking += parsedFinalChunk.thinking;
+      }
       reachedDoneMarker = reachedDoneMarker || parsedFinalChunk.done;
     }
 
@@ -2789,19 +3057,37 @@ async function sendChatMessage(userMessage) {
         }
       })();
 
-      fullReply = extractAiTextFromPayload(fallbackPayload);
+      const parsedFallback = extractAiResponsePartsFromPayload(fallbackPayload);
+      fullReply = parsedFallback.text;
+      if (!fullThinking && parsedFallback.thinking) {
+        fullThinking = parsedFallback.thinking;
+      }
     }
 
     if (!fullReply) {
       fullReply = 'No response received.';
-      if (assistantContent) {
-        assistantContent.innerHTML = renderMarkdown(fullReply);
+      if (assistantUi?.content) {
+        assistantUi.content.innerHTML = renderMarkdown(fullReply);
       }
-    } else if (assistantContent && !reachedDoneMarker) {
-      assistantContent.innerHTML = renderMarkdown(fullReply);
+    } else if (assistantUi?.content && !reachedDoneMarker) {
+      assistantUi.content.innerHTML = renderMarkdown(fullReply);
     }
 
-    chatState.messages.push({ role: 'assistant', content: fullReply });
+    if (assistantUi?.thinkingContent && fullThinking) {
+      assistantUi.thinkingContent.innerHTML = renderMarkdown(fullThinking);
+    }
+
+    if (assistantUi?.thinkingPanel) {
+      assistantUi.thinkingPanel.classList.remove('chat-thinking--pending');
+      if (fullThinking) {
+        setThinkingCollapsedState(assistantUi, true);
+      } else {
+        assistantUi.thinkingPanel.remove();
+      }
+    }
+    assistantUi?.messageDiv?.classList.remove('is-thinking');
+
+    chatState.messages.push({ role: 'assistant', content: fullReply, thinking: fullThinking || undefined });
     saveChatHistory();
     setChatStatus('');
 
@@ -2810,9 +3096,11 @@ async function sendChatMessage(userMessage) {
     renderSuggestionChips(suggestions);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    if (assistantContent) {
-      assistantContent.innerHTML = '';
+    if (assistantUi?.content) {
+      assistantUi.content.innerHTML = '';
     }
+    assistantUi?.thinkingPanel?.remove();
+    assistantUi?.messageDiv?.classList.remove('is-thinking');
     appendChatMessage('error', errorMessage);
     setChatStatus('');
   } finally {
@@ -2862,6 +3150,7 @@ function attachChatEventHandlers() {
   elements.chatToggleButton?.addEventListener('click', openChatDrawer);
   elements.chatCloseButton?.addEventListener('click', closeChatDrawer);
   elements.chatClearButton?.addEventListener('click', clearChatHistory);
+  attachChatResizeHandler();
   elements.chatSetupProvider?.addEventListener('change', () => {
     void refreshAiModelChoices('');
   });
@@ -2916,6 +3205,7 @@ export async function initQuizPage() {
   attachTextEntranceMotion();
   attachEventHandlers();
   attachChatEventHandlers();
+  await loadChatDrawerWidth();
   resetScoreState();
   updateBucketStats();
   await loadAiSettings();

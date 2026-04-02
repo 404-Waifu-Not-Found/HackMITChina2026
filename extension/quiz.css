@@ -898,6 +898,36 @@ body {
   transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.chat-drawer__resize-handle {
+  position: absolute;
+  top: 0;
+  left: -4px;
+  bottom: 0;
+  width: 8px;
+  cursor: ew-resize;
+  touch-action: none;
+  background: transparent;
+  z-index: 2;
+}
+
+.chat-drawer__resize-handle::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, rgba(var(--accent-rgb), 0.28), transparent);
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.chat-drawer:hover .chat-drawer__resize-handle::before,
+.chat-drawer.is-resizing .chat-drawer__resize-handle::before,
+.chat-drawer__resize-handle:hover::before {
+  opacity: 1;
+}
+
 .chat-drawer:not(.visible) {
   transform: translateX(100%);
   pointer-events: none;
@@ -1107,12 +1137,76 @@ body {
   border-bottom-left-radius: 4px;
 }
 
+.chat-message--assistant.is-thinking {
+  opacity: 0.72;
+}
+
+.chat-message--assistant.is-thinking .chat-message__content {
+  display: none;
+}
+
 .chat-message--assistant p {
   margin: 0;
 }
 
 .chat-message__content {
   overflow-wrap: break-word;
+}
+
+.chat-thinking {
+  margin-bottom: 8px;
+  border: 1px solid rgba(var(--accent-rgb), 0.24);
+  border-radius: 10px;
+  background: rgba(var(--accent-rgb), 0.05);
+  overflow: hidden;
+}
+
+.chat-thinking.chat-thinking--pending {
+  opacity: 0.56;
+}
+
+.chat-thinking__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(var(--accent-rgb), 0.16);
+}
+
+.chat-thinking__label {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.chat-thinking__toggle {
+  border: 1px solid rgba(var(--accent-rgb), 0.28);
+  background: rgba(var(--accent-rgb), 0.08);
+  color: var(--text);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.chat-thinking__body {
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 8px 10px 10px;
+  font-size: 12px;
+  line-height: 1.52;
+}
+
+.chat-thinking.is-collapsed .chat-thinking__body {
+  display: none;
+}
+
+.chat-thinking.is-collapsed .chat-thinking__header {
+  border-bottom: 0;
 }
 
 .chat-message__content p {
@@ -1327,6 +1421,11 @@ body {
   .chat-drawer {
     width: 100vw;
   }
+
+  .chat-drawer__resize-handle {
+    display: none;
+  }
+
   .chat-suggestion-chip {
     font-size: 11px;
     padding: 5px 10px;
