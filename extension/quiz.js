@@ -2674,9 +2674,18 @@ function attachChatEventHandlers() {
   });
 }
 
+function applyInterfaceLanguage() {
+  if (typeof chrome === 'undefined' || !chrome.storage?.sync) return;
+  chrome.storage.sync.get(['interfaceLanguage'], (items) => {
+    const lang = (items && items.interfaceLanguage) || 'en';
+    window.LingoStreamI18n?.applyTranslations(lang);
+  });
+}
+
 export async function initQuizPage() {
   attachChromeAppearanceHueSync();
   cacheElements();
+  applyInterfaceLanguage();
   attachRevealAnimation();
   attachFloatingPlusField();
   attachBackgroundParallax();
@@ -2696,4 +2705,12 @@ if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
     void initQuizPage();
   });
+
+  if (typeof chrome !== 'undefined' && chrome.storage?.onChanged) {
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === 'sync' && changes.interfaceLanguage) {
+        window.LingoStreamI18n?.applyTranslations(changes.interfaceLanguage.newValue || 'en');
+      }
+    });
+  }
 }

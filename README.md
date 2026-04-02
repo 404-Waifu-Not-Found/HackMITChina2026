@@ -77,6 +77,7 @@ Release:
 - Caches translation hits/misses to reduce repeat requests
 - Saves optional vocabulary entries and exports CSV
 - Includes review quiz with fast, score-tracked rounds
+- **Interface language selector** — choose from 50+ languages to translate the popup and quiz UI itself (Settings → Interface Language)
 
 > [!WARNING]
 > Public translation providers can throttle or become temporarily unavailable; provider fallback helps but cannot fully eliminate third-party instability.
@@ -254,6 +255,10 @@ The popup includes 50+ target languages. The list below shows the language, its 
 
 Note: Availability may vary by translation provider; provider-specific coverage may be more limited for some codes.
 
+### Interface Language
+
+The popup and quiz UI can be displayed in your preferred language. Go to **Settings → Interface Language**, choose any of the 50+ options (same list as the source/target language selects), then click **Save Settings**. The entire UI — both the popup and the quiz window — will update immediately. Full UI translations are provided for: English, Spanish, French, German, Chinese, Japanese, Korean, Portuguese, Russian, Arabic, Italian, Hindi, Dutch, Polish, Turkish, Vietnamese, Indonesian, Ukrainian, and Swedish. All other languages fall back to English.
+
 ## Installation
 
 1. `npm install`
@@ -270,6 +275,7 @@ Note: Availability may vary by translation provider; provider-specific coverage 
 3. Save settings and refresh captions if needed.
 4. Recheck health in popup.
 5. Export vocabulary CSV and practice in Quiz mode.
+6. To change the UI language: open **Settings → Interface Language**, select a language, and click **Save Settings**.
 
 ## Development
 

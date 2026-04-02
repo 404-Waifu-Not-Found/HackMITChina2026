@@ -4,7 +4,8 @@ const DEFAULT_SETTINGS = {
   targetLanguage: 'es',
   replacementPercentage: 5,
   enabled: true,
-  saveVocabulary: true
+  saveVocabulary: true,
+  interfaceLanguage: 'en'
 };
 const DEBUG_STORAGE_KEYS = {
   enabled: 'debug',
@@ -67,6 +68,8 @@ const logPanel = document.getElementById('logPanel');
 const aiProviderSelect = document.getElementById('aiProvider');
 const aiModelSelect = document.getElementById('aiModel');
 const aiApiKeyInput = document.getElementById('aiApiKey');
+const interfaceLanguageSelect = document.getElementById('interfaceLanguage');
+const interfaceLangHint = document.getElementById('interfaceLangHint');
 
 const AI_STORAGE_KEY = 'aiSettings';
 const AI_MODEL_ENDPOINTS = {
@@ -625,7 +628,10 @@ function readFormSettings() {
       ? Math.max(0, Math.min(100, replacementPercentage))
       : DEFAULT_SETTINGS.replacementPercentage,
     enabled: enabledInput.checked,
-    saveVocabulary: saveVocabularyInput.checked
+    saveVocabulary: saveVocabularyInput.checked,
+    interfaceLanguage: interfaceLanguageSelect
+      ? (interfaceLanguageSelect.value || DEFAULT_SETTINGS.interfaceLanguage)
+      : DEFAULT_SETTINGS.interfaceLanguage
   };
 }
 
@@ -643,6 +649,12 @@ function applySettingsToForm(settings) {
   enabledInput.checked = settings.enabled;
   saveVocabularyInput.checked = settings.saveVocabulary === true;
   updateReplacementLabel(settings.replacementPercentage);
+  if (interfaceLanguageSelect) {
+    interfaceLanguageSelect.value = settings.interfaceLanguage || DEFAULT_SETTINGS.interfaceLanguage;
+  }
+  if (typeof window.LingoStreamI18n?.applyTranslations === 'function') {
+    window.LingoStreamI18n.applyTranslations(settings.interfaceLanguage || DEFAULT_SETTINGS.interfaceLanguage);
+  }
 }
 
 function populateAiModelOptions(models, selectedModel) {
@@ -2096,6 +2108,12 @@ function saveSettings() {
 
     console.log('Popup settings saved.', settings);
     showStatus('Saved.');
+    if (interfaceLangHint) {
+      interfaceLangHint.hidden = true;
+    }
+    if (typeof window.LingoStreamI18n?.applyTranslations === 'function') {
+      window.LingoStreamI18n.applyTranslations(settings.interfaceLanguage || DEFAULT_SETTINGS.interfaceLanguage);
+    }
     setTimeout(() => {
       if (saveStatus.textContent === 'Saved.') {
         showStatus('');
@@ -2171,6 +2189,18 @@ aiProviderSelect?.addEventListener('change', () => {
   }
 });
 saveAiButton?.addEventListener('click', saveAiSettings);
+
+if (interfaceLanguageSelect) {
+  interfaceLanguageSelect.addEventListener('change', () => {
+    if (interfaceLangHint) {
+      const t = window.LingoStreamI18n?.getTranslations(interfaceLanguageSelect.value);
+      if (t && interfaceLangHint.dataset.i18n) {
+        interfaceLangHint.textContent = t[interfaceLangHint.dataset.i18n] || interfaceLangHint.textContent;
+      }
+      interfaceLangHint.hidden = false;
+    }
+  });
+}
 
 chrome.storage.onChanged?.addListener((changes, areaName) => {
   if (areaName !== 'local') {

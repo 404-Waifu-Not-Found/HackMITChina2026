@@ -30,6 +30,7 @@
             class="ls-btn ls-btn--soft"
             type="button"
             aria-label="Open quiz in a new tab"
+            data-i18n="open_quiz"
           >
             Open Quiz
           </button>
@@ -46,6 +47,7 @@
             aria-controls="panel-settings"
             id="tab-settings"
             data-popup-target="panel-settings"
+            data-i18n="tab_settings"
           >
             Settings
           </button>
@@ -57,6 +59,7 @@
             aria-controls="panel-vocabulary"
             id="tab-vocabulary"
             data-popup-target="panel-vocabulary"
+            data-i18n="tab_vocabulary"
           >
             Vocabulary
           </button>
@@ -68,6 +71,7 @@
             aria-controls="panel-vocabulary-search"
             id="tab-vocabulary-search"
             data-popup-target="panel-vocabulary-search"
+            data-i18n="tab_search"
           >
             Search
           </button>
@@ -79,6 +83,7 @@
             aria-controls="panel-debug"
             id="tab-debug"
             data-popup-target="panel-debug"
+            data-i18n="tab_debug"
           >
             Debug
           </button>
@@ -86,13 +91,13 @@
 
         <section class="ls-panel is-active" id="panel-settings" data-popup-panel role="tabpanel" aria-labelledby="tab-settings">
         <div class="ls-panel__head">
-          <h2 class="ls-panel-title">Translation Controls</h2>
-          <p class="ls-panel-subtitle">Configure replacement behavior and runtime connection.</p>
+          <h2 class="ls-panel-title" data-i18n="settings_title">Translation Controls</h2>
+          <p class="ls-panel-subtitle" data-i18n="settings_subtitle">Configure replacement behavior and runtime connection.</p>
         </div>
 
         <div class="ls-grid ls-grid--two">
           <div class="ls-field">
-            <label for="translationProvider">Provider</label>
+            <label for="translationProvider" data-i18n="provider">Provider</label>
             <select id="translationProvider" name="translationProvider">
               <option value="auto">Auto (Recommended)</option>
               <option value="google">Google</option>
@@ -103,7 +108,7 @@
           </div>
 
           <div class="ls-field">
-            <label for="sourceLanguage">Source Language</label>
+            <label for="sourceLanguage" data-i18n="source_language">Source Language</label>
             <select id="sourceLanguage" name="sourceLanguage">
               <option value="auto">Auto (Default)</option>
               <option value="af">🇿🇦 Afrikaans</option>
@@ -183,7 +188,7 @@
           </div>
 
           <div class="ls-field">
-            <label for="targetLanguage">Target Language</label>
+            <label for="targetLanguage" data-i18n="target_language">Target Language</label>
             <select id="targetLanguage" name="targetLanguage">
               <option value="af">🇿🇦 Afrikaans</option>
               <option value="sq">🇦🇱 Albanian</option>
@@ -263,13 +268,13 @@
 
           <div class="ls-field ls-field--wide">
             <label for="replacementPercentage">
-              Caption mix ratio: <span id="replacementPercentageValue">5%</span>
+              <span data-i18n="caption_mix_ratio">Caption mix ratio:</span> <span id="replacementPercentageValue">5%</span>
             </label>
             <input id="replacementPercentage" name="replacementPercentage" type="range" min="1" max="100" step="1" />
           </div>
 
           <div class="ls-field ls-switch-field">
-            <label for="enabled">Extension enabled</label>
+            <label for="enabled" data-i18n="extension_enabled">Extension enabled</label>
             <label class="ls-toggle">
               <input id="enabled" name="enabled" type="checkbox" />
               <span class="ls-toggle__slider"></span>
@@ -277,7 +282,7 @@
           </div>
 
           <div class="ls-field ls-switch-field">
-            <label for="saveVocabulary">Save words for quiz</label>
+            <label for="saveVocabulary" data-i18n="save_words_for_quiz">Save words for quiz</label>
             <label class="ls-toggle">
               <input id="saveVocabulary" name="saveVocabulary" type="checkbox" />
               <span class="ls-toggle__slider"></span>
@@ -285,13 +290,93 @@
           </div>
 
           <div class="ls-field">
-            <p class="ls-note">Store words locally for review and export.</p>
+            <p class="ls-note" data-i18n="store_words_note">Store words locally for review and export.</p>
+          </div>
+
+          <div class="ls-field">
+            <label for="interfaceLanguage" data-i18n="interface_language">Interface Language</label>
+            <select id="interfaceLanguage" name="interfaceLanguage">
+              <option value="en">🇬🇧 English</option>
+              <option value="af">🇿🇦 Afrikaans</option>
+              <option value="sq">🇦🇱 Albanian</option>
+              <option value="am">🇪🇹 Amharic</option>
+              <option value="ar">🇸🇦 Arabic</option>
+              <option value="hy">🇦🇲 Armenian</option>
+              <option value="az">🇦🇿 Azerbaijani</option>
+              <option value="eu">🇪🇸 Basque</option>
+              <option value="be">🇧🇾 Belarusian</option>
+              <option value="bn">🇧🇩 Bengali</option>
+              <option value="bs">🇧🇦 Bosnian</option>
+              <option value="bg">🇧🇬 Bulgarian</option>
+              <option value="ca">🇪🇸 Catalan</option>
+              <option value="zh">🇨🇳 Chinese</option>
+              <option value="hr">🇭🇷 Croatian</option>
+              <option value="cs">🇨🇿 Czech</option>
+              <option value="da">🇩🇰 Danish</option>
+              <option value="nl">🇳🇱 Dutch</option>
+              <option value="eo">🌐 Esperanto</option>
+              <option value="et">🇪🇪 Estonian</option>
+              <option value="tl">🇵🇭 Filipino</option>
+              <option value="fi">🇫🇮 Finnish</option>
+              <option value="fr">🇫🇷 French</option>
+              <option value="gl">🇪🇸 Galician</option>
+              <option value="ka">🇬🇪 Georgian</option>
+              <option value="de">🇩🇪 German</option>
+              <option value="el">🇬🇷 Greek</option>
+              <option value="gu">🇮🇳 Gujarati</option>
+              <option value="ht">🇭🇹 Haitian Creole</option>
+              <option value="he">🇮🇱 Hebrew</option>
+              <option value="hi">🇮🇳 Hindi</option>
+              <option value="hu">🇭🇺 Hungarian</option>
+              <option value="is">🇮🇸 Icelandic</option>
+              <option value="id">🇮🇩 Indonesian</option>
+              <option value="ga">🇮🇪 Irish</option>
+              <option value="it">🇮🇹 Italian</option>
+              <option value="ja">🇯🇵 Japanese</option>
+              <option value="kn">🇮🇳 Kannada</option>
+              <option value="kk">🇰🇿 Kazakh</option>
+              <option value="ko">🇰🇷 Korean</option>
+              <option value="lv">🇱🇻 Latvian</option>
+              <option value="lt">🇱🇹 Lithuanian</option>
+              <option value="ms">🇲🇾 Malay</option>
+              <option value="mr">🇮🇳 Marathi</option>
+              <option value="mn">🇲🇳 Mongolian</option>
+              <option value="ne">🇳🇵 Nepali</option>
+              <option value="no">🇳🇴 Norwegian</option>
+              <option value="fa">🇮🇷 Persian</option>
+              <option value="pl">🇵🇱 Polish</option>
+              <option value="pt">🇵🇹 Portuguese</option>
+              <option value="pa">🇮🇳 Punjabi</option>
+              <option value="ro">🇷🇴 Romanian</option>
+              <option value="ru">🇷🇺 Russian</option>
+              <option value="gd">🏴 Scottish Gaelic</option>
+              <option value="sr">🇷🇸 Serbian</option>
+              <option value="si">🇱🇰 Sinhala</option>
+              <option value="sk">🇸🇰 Slovak</option>
+              <option value="sl">🇸🇮 Slovenian</option>
+              <option value="es">🇪🇸 Spanish</option>
+              <option value="sw">🇰🇪 Swahili</option>
+              <option value="sv">🇸🇪 Swedish</option>
+              <option value="ta">🇮🇳 Tamil</option>
+              <option value="te">🇮🇳 Telugu</option>
+              <option value="th">🇹🇭 Thai</option>
+              <option value="tr">🇹🇷 Turkish</option>
+              <option value="uk">🇺🇦 Ukrainian</option>
+              <option value="ur">🇵🇰 Urdu</option>
+              <option value="uz">🇺🇿 Uzbek</option>
+              <option value="vi">🇻🇳 Vietnamese</option>
+              <option value="cy">🏴 Welsh</option>
+              <option value="yi">🌐 Yiddish</option>
+              <option value="yo">🇳🇬 Yoruba</option>
+              <option value="zu">🇿🇦 Zulu</option>
+            </select>
+            <p id="interfaceLangHint" class="ls-note ls-note--hint" hidden data-i18n="lang_save_hint">Click Save to apply the new interface language.</p>
           </div>
         </div>
 
         <div class="ls-actions-row">
-          <button id="saveButton" class="ls-btn ls-btn--primary" type="button">Save Settings</button>
-          <button id="attachButton" class="ls-btn ls-btn--ghost" type="button">Refresh Captions</button>
+          <button id="saveButton" class="ls-btn ls-btn--primary" type="button" data-i18n="save_settings">Save Settings</button>
+          <button id="attachButton" class="ls-btn ls-btn--ghost" type="button" data-i18n="refresh_captions">Refresh Captions</button>
         </div>
         <p id="saveStatus" class="ls-inline-status" role="status" aria-live="polite"></p>
         <p id="runtimeStatus" class="ls-inline-status" role="status" aria-live="polite"></p>
@@ -299,8 +384,8 @@
 
       <section class="ls-panel" id="panel-vocabulary" data-popup-panel role="tabpanel" aria-labelledby="tab-vocabulary" hidden>
         <div class="ls-panel__head">
-          <h2 class="ls-panel-title">Vocabulary Review</h2>
-          <p class="ls-panel-subtitle">Review saved words and open search tools.</p>
+          <h2 class="ls-panel-title" data-i18n="vocabulary_review_title">Vocabulary Review</h2>
+          <p class="ls-panel-subtitle" data-i18n="vocabulary_review_subtitle">Review saved words and open search tools.</p>
         </div>
 
         <div class="ls-vocab-stats">
@@ -313,7 +398,7 @@
               </svg>
             </span>
             <div class="ls-vocab-stat__content">
-              <p class="ls-vocab-stat__label">Vocabulary</p>
+              <p class="ls-vocab-stat__label" data-i18n="vocabulary_label">Vocabulary</p>
               <p id="vocabularyStatus" class="ls-inline-status" role="status" aria-live="polite">Saved words: 0</p>
               <p class="ls-vocab-stat__line">Total: <strong id="vocabularyTotalBadge">0</strong> &middot; Filtered: <strong id="vocabularyFilteredBadge">0</strong></p>
             </div>
@@ -328,7 +413,7 @@
               </svg>
             </span>
             <div class="ls-vocab-stat__content">
-              <p class="ls-vocab-stat__label">Quiz buckets</p>
+              <p class="ls-vocab-stat__label" data-i18n="quiz_buckets_label">Quiz buckets</p>
               <p id="quizBucketStatus" class="ls-inline-status" role="status" aria-live="polite">
                 Not quizzed: 0 | Correct: 0 | Incorrect: 0
               </p>
@@ -346,7 +431,7 @@
               </svg>
             </span>
             <div class="ls-vocab-stat__content">
-              <p class="ls-vocab-stat__label">Providers</p>
+              <p class="ls-vocab-stat__label" data-i18n="providers_label">Providers</p>
               <p class="ls-vocab-stat__line"><strong id="vocabularyProviderBadge">0</strong> connected</p>
             </div>
           </article>
@@ -354,8 +439,8 @@
 
         <div id="aiChatBlock" class="ai-chat-block">
           <div class="ls-panel__head ai-chat-head" style="margin-top: 14px;">
-            <h2 class="ls-panel-title">AI Chat (Quiz)</h2>
-            <p class="ls-panel-subtitle">Configure an AI provider to chat about wrong words in the quiz.</p>
+            <h2 class="ls-panel-title" data-i18n="ai_chat_title">AI Chat (Quiz)</h2>
+            <p class="ls-panel-subtitle" data-i18n="ai_chat_subtitle">Configure an AI provider to chat about wrong words in the quiz.</p>
             <button id="aiChatSummary" class="ai-chat-summary" aria-expanded="true" type="button" hidden>
               <span class="ai-chat-summary__label">AI Chat configured</span>
               <span class="ai-chat-summary__chev">▾</span>
@@ -365,7 +450,7 @@
           <div class="ai-chat-content">
             <div class="ls-grid ls-grid--two">
               <div class="ls-field">
-                <label for="aiProvider">AI Provider</label>
+                <label for="aiProvider" data-i18n="ai_provider">AI Provider</label>
                 <select id="aiProvider" name="aiProvider">
                   <option value="openai">OpenAI</option>
                   <option value="groq">Groq</option>
@@ -376,25 +461,25 @@
               </div>
 
               <div class="ls-field">
-                <label for="aiModel">Model</label>
+                <label for="aiModel" data-i18n="model_label">Model</label>
                 <select id="aiModel" name="aiModel">
                   <option value="">Default</option>
                 </select>
               </div>
 
               <div class="ls-field ls-field--wide">
-                <label for="aiApiKey">API Key</label>
+                <label for="aiApiKey" data-i18n="api_key">API Key</label>
                 <input id="aiApiKey" class="ls-text-input" type="password" placeholder="sk-..." autocomplete="off" />
               </div>
 
               <div class="ls-field">
-                <p class="ls-note">Keys are stored locally and never leave your device except to call the selected provider.</p>
+                <p class="ls-note" data-i18n="api_key_note">Keys are stored locally and never leave your device except to call the selected provider.</p>
               </div>
             </div>
 
             <div class="ls-actions-row">
-              <button id="saveAiButton" class="ls-btn ls-btn--primary" type="button">Save AI Settings</button>
-              <button id="openVocabularySearchButton" class="ls-btn ls-btn--ghost" type="button">Open search & filters</button>
+              <button id="saveAiButton" class="ls-btn ls-btn--primary" type="button" data-i18n="save_ai_settings">Save AI Settings</button>
+              <button id="openVocabularySearchButton" class="ls-btn ls-btn--ghost" type="button" data-i18n="open_search_filters">Open search &amp; filters</button>
             </div>
           </div>
         </div>
@@ -402,12 +487,12 @@
 
       <section class="ls-panel" id="panel-vocabulary-search" data-popup-panel role="tabpanel" aria-labelledby="tab-vocabulary-search" hidden>
         <div class="ls-panel__head">
-          <h2 class="ls-panel-title">Search</h2>
-          <p class="ls-panel-subtitle">Search, filter, export, and manage saved words.</p>
+          <h2 class="ls-panel-title" data-i18n="search_title">Search</h2>
+          <p class="ls-panel-subtitle" data-i18n="search_subtitle">Search, filter, export, and manage saved words.</p>
         </div>
 
         <div class="ls-actions-row">
-          <button id="backToVocabularyButton" class="ls-btn ls-btn--ghost" type="button">Back to vocabulary list</button>
+          <button id="backToVocabularyButton" class="ls-btn ls-btn--ghost" type="button" data-i18n="back_to_vocabulary">Back to vocabulary list</button>
         </div>
 
         <div class="ls-vocab-toolbar ls-vocab-toolbar--compact">
@@ -420,26 +505,26 @@
               aria-label="Filter saved vocabulary"
             />
             <details class="ls-vocab-actions-menu">
-              <summary class="ls-vocab-actions-summary">Actions</summary>
+              <summary class="ls-vocab-actions-summary" data-i18n="actions">Actions</summary>
               <div class="ls-vocab-action-panel">
-                <button id="importVocabularyButton" class="ls-btn ls-btn--ghost" type="button">Import</button>
-                <button id="exportVocabularyButton" class="ls-btn ls-btn--ghost" type="button">Export</button>
-                <button id="clearVocabularyButton" class="ls-btn ls-btn--danger" type="button">Reset</button>
-                <button id="vocabularyClearFiltersButton" class="ls-btn ls-btn--ghost" type="button">Clear filters</button>
+                <button id="importVocabularyButton" class="ls-btn ls-btn--ghost" type="button" data-i18n="import_btn">Import</button>
+                <button id="exportVocabularyButton" class="ls-btn ls-btn--ghost" type="button" data-i18n="export_btn">Export</button>
+                <button id="clearVocabularyButton" class="ls-btn ls-btn--danger" type="button" data-i18n="reset_btn">Reset</button>
+                <button id="vocabularyClearFiltersButton" class="ls-btn ls-btn--ghost" type="button" data-i18n="clear_filters">Clear filters</button>
               </div>
             </details>
           </div>
         </div>
 
         <div class="ls-word-snippet">
-          <p class="ls-word-snippet__label">Top matches</p>
+          <p class="ls-word-snippet__label" data-i18n="top_matches">Top matches</p>
           <p id="vocabularyEmptyState" class="ls-inline-status">No saved words yet.</p>
           <div id="vocabularyList" class="ls-list hidden" aria-live="polite">
             <div class="ls-match-list" role="table" aria-label="Saved vocabulary top matches">
               <div class="ls-match-list__head" role="row">
-                <span class="ls-match-list__cell ls-match-list__cell--source" role="columnheader">Source</span>
-                <span class="ls-match-list__cell ls-match-list__cell--translation" role="columnheader">Translation</span>
-                <span class="ls-match-list__cell ls-match-list__cell--count" role="columnheader">Count</span>
+                <span class="ls-match-list__cell ls-match-list__cell--source" role="columnheader" data-i18n="col_source">Source</span>
+                <span class="ls-match-list__cell ls-match-list__cell--translation" role="columnheader" data-i18n="col_translation">Translation</span>
+                <span class="ls-match-list__cell ls-match-list__cell--count" role="columnheader" data-i18n="col_count">Count</span>
               </div>
               <div id="vocabularyMatches" class="ls-match-list__body" role="rowgroup"></div>
             </div>
@@ -458,20 +543,20 @@
 
       <section class="ls-panel" id="panel-debug" data-popup-panel role="tabpanel" aria-labelledby="tab-debug" hidden>
         <div class="ls-panel__head">
-          <h2 class="ls-panel-title">Debug</h2>
-          <p class="ls-panel-subtitle">Monitor health checks and debugging output.</p>
+          <h2 class="ls-panel-title" data-i18n="debug_title">Debug</h2>
+          <p class="ls-panel-subtitle" data-i18n="debug_subtitle">Monitor health checks and debugging output.</p>
         </div>
 
         <div class="ls-health-grid">
           <article class="ls-metric-card">
-            <p class="ls-kicker">Content Script</p>
+            <p class="ls-kicker" data-i18n="content_script">Content Script</p>
             <p id="contentHealthStatus" class="ls-inline-status" role="status" aria-live="polite">
               Content script: checking active tab...
             </p>
           </article>
 
           <article class="ls-metric-card">
-            <p class="ls-kicker">Translation Bridge</p>
+            <p class="ls-kicker" data-i18n="translation_bridge">Translation Bridge</p>
             <p id="translationHealthStatus" class="ls-inline-status" role="status" aria-live="polite">
               Last translation success: none yet.
             </p>
@@ -484,6 +569,7 @@
     </main>
 
     <script src="vendor/anime.min.js"></script>
+    <script src="i18n.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

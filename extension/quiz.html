@@ -34,10 +34,10 @@
       </div>
 
       <div class="quiz-topbar-actions">
-        <button id="chatToggleButton" class="quiz-btn quiz-btn--ghost" type="button" aria-label="Open AI chat">
+        <button id="chatToggleButton" class="quiz-btn quiz-btn--ghost" type="button" aria-label="Open AI chat" data-i18n="chat_btn">
           💬 Chat
         </button>
-        <button id="nextRoundButton" class="quiz-btn quiz-btn--primary" type="button" disabled>
+        <button id="nextRoundButton" class="quiz-btn quiz-btn--primary" type="button" disabled data-i18n="next_round">
           Next Round
         </button>
       </div>
@@ -47,19 +47,19 @@
       <section id="quizPanel" class="quiz-panel hidden" data-reveal data-delay="70">
         <section class="quiz-stat-grid quiz-stat-grid--primary" aria-live="polite">
           <article class="stat-chip stat-chip--feature stat-chip--minimal">
-            <span>Round</span>
+            <span data-i18n="round">Round</span>
             <strong id="roundValue">1</strong>
           </article>
           <article class="stat-chip stat-chip--feature stat-chip--minimal">
-            <span>Done</span>
+            <span data-i18n="done">Done</span>
             <strong id="pairValue">0/5</strong>
           </article>
           <article class="stat-chip stat-chip--feature stat-chip--minimal">
-            <span>Score</span>
+            <span data-i18n="score">Score</span>
             <strong id="scoreValue">0</strong>
           </article>
           <article class="stat-chip stat-chip--feature stat-chip--minimal">
-            <span>Accuracy</span>
+            <span data-i18n="accuracy">Accuracy</span>
             <strong id="accuracyValue">100%</strong>
           </article>
         </section>
@@ -75,21 +75,21 @@
       </section>
 
       <section id="emptyState" class="quiz-empty hidden" data-reveal data-delay="140">
-        <h2>Need more words</h2>
-        <p>Add at least 5 words in New or Retry to start a round.</p>
+        <h2 data-i18n="need_more_words">Need more words</h2>
+        <p data-i18n="add_five_words">Add at least 5 words in New or Retry to start a round.</p>
       </section>
     </main>
 
     <div id="firstQuizModal" class="intro-modal hidden" role="dialog" aria-modal="true" aria-labelledby="introTitle">
       <div class="intro-card">
-        <p class="intro-kicker">How To Play</p>
-        <h2 id="introTitle" class="intro-title">Match each pair, starting from either side.</h2>
-        <p class="intro-copy">1. Pick any word from either column.</p>
-        <p class="intro-copy">2. Pick its matching word on the opposite side.</p>
-        <p class="intro-copy">3. Click the same word again to cancel your selection.</p>
-        <p class="intro-copy">4. Finish all 5 pairs to unlock the next round.</p>
-        <p class="intro-copy">Good luck!</p>
-        <button id="startQuizButton" class="quiz-btn quiz-btn--primary intro-start-btn" type="button">
+        <p class="intro-kicker" data-i18n="how_to_play">How To Play</p>
+        <h2 id="introTitle" class="intro-title" data-i18n="modal_title">Match each pair, starting from either side.</h2>
+        <p class="intro-copy" data-i18n="step1">1. Pick any word from either column.</p>
+        <p class="intro-copy" data-i18n="step2">2. Pick its matching word on the opposite side.</p>
+        <p class="intro-copy" data-i18n="step3">3. Click the same word again to cancel your selection.</p>
+        <p class="intro-copy" data-i18n="step4">4. Finish all 5 pairs to unlock the next round.</p>
+        <p class="intro-copy" data-i18n="good_luck">Good luck!</p>
+        <button id="startQuizButton" class="quiz-btn quiz-btn--primary intro-start-btn" type="button" data-i18n="got_it">
           Got it
         </button>
       </div>
@@ -97,15 +97,15 @@
 
     <aside id="chatDrawer" class="chat-drawer hidden" role="complementary" aria-label="AI Chat">
       <div class="chat-drawer__header">
-        <h2 class="chat-drawer__title">AI Chat</h2>
+        <h2 class="chat-drawer__title" data-i18n="ai_chat_label">AI Chat</h2>
         <div class="chat-drawer__header-actions">
-          <button id="chatClearButton" class="chat-drawer__clear" type="button" aria-label="Clear chat history">Clear</button>
+          <button id="chatClearButton" class="chat-drawer__clear" type="button" aria-label="Clear chat history" data-i18n="clear_btn">Clear</button>
           <button id="chatCloseButton" class="chat-drawer__close" type="button" aria-label="Close chat">&times;</button>
         </div>
       </div>
       <div class="chat-drawer__context" id="chatContext">
-        <p class="chat-drawer__context-label">Words this round:</p>
-        <p class="chat-drawer__context-words" id="chatContextWords">None yet</p>
+        <p class="chat-drawer__context-label" data-i18n="words_this_round">Words this round:</p>
+        <p class="chat-drawer__context-words" id="chatContextWords" data-i18n="none_yet">None yet</p>
       </div>
       <div id="chatSetupPanel" class="chat-setup-panel hidden">
         <p class="chat-setup-panel__kicker">AI Setup Required</p>
@@ -114,7 +114,7 @@
 
         <div class="chat-setup-panel__grid">
           <label class="chat-setup-field">
-            <span>Provider</span>
+            <span data-i18n="provider">Provider</span>
             <select id="chatSetupProvider" class="chat-setup-control">
               <option value="openai">OpenAI</option>
               <option value="groq">Groq</option>
@@ -125,27 +125,27 @@
           </label>
 
           <label class="chat-setup-field">
-            <span>Model</span>
+            <span data-i18n="model_label">Model</span>
             <select id="chatSetupModel" class="chat-setup-control">
               <option value="">Select a model</option>
             </select>
           </label>
 
           <label class="chat-setup-field chat-setup-field--wide">
-            <span>API Key</span>
+            <span data-i18n="api_key">API Key</span>
             <input id="chatSetupApiKey" class="chat-setup-control" type="password" placeholder="Paste your API key" autocomplete="off" />
           </label>
         </div>
 
         <div class="chat-setup-panel__actions">
-          <button id="chatSetupSaveButton" class="quiz-btn quiz-btn--primary" type="button">Save AI Settings</button>
+          <button id="chatSetupSaveButton" class="quiz-btn quiz-btn--primary" type="button" data-i18n="save_ai_settings">Save AI Settings</button>
         </div>
       </div>
       <div class="chat-drawer__messages" id="chatMessages" aria-live="polite">
       </div>
       <form id="chatForm" class="chat-drawer__input-row" autocomplete="off">
-        <input id="chatInput" class="chat-drawer__input" type="text" placeholder="Ask about your wrong words..." aria-label="Chat message" />
-        <button class="chat-drawer__send quiz-btn quiz-btn--primary" type="submit">Send</button>
+        <input id="chatInput" class="chat-drawer__input" type="text" placeholder="Ask about your wrong words..." aria-label="Chat message" data-i18n-placeholder="chat_placeholder" />
+        <button class="chat-drawer__send quiz-btn quiz-btn--primary" type="submit" data-i18n="send">Send</button>
       </form>
       <p class="chat-drawer__status" id="chatStatus"></p>
     </aside>
@@ -153,6 +153,7 @@
 
     <script src="./vendor/anime.min.js"></script>
     <script src="./vendor/anime4.min.js"></script>
+    <script src="./i18n.js"></script>
     <script type="module" src="./quiz.js"></script>
   </body>
 </html>
