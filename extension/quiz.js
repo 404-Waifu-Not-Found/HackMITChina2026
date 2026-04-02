@@ -115,6 +115,111 @@ const AI_MODEL_FALLBACKS = {
 };
 const MAX_CHAT_HISTORY = 50;
 
+function flattenAiContentParts(value) {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => flattenAiContentParts(item))
+      .filter(Boolean)
+      .join('');
+  }
+
+  if (!value || typeof value !== 'object') {
+    return '';
+  }
+
+  if (typeof value.text === 'string') {
+    return value.text;
+  }
+
+  if (typeof value.content === 'string') {
+    return value.content;
+  }
+
+  if (Array.isArray(value.content)) {
+    return flattenAiContentParts(value.content);
+  }
+
+  if (typeof value.output_text === 'string') {
+    return value.output_text;
+  }
+
+  return '';
+}
+
+export function extractAiTextFromPayload(payload, options = {}) {
+  const shouldTrim = options.trim !== false;
+
+  if (!payload || typeof payload !== 'object') {
+    return '';
+  }
+
+  const choice = Array.isArray(payload.choices) ? payload.choices[0] : null;
+  const candidates = [
+    choice?.delta?.content,
+    choice?.message?.content,
+    choice?.delta?.text,
+    choice?.text,
+    payload.reply,
+    payload.response,
+    payload.output_text,
+    payload.text,
+    payload.content,
+    payload.answer
+  ];
+
+  for (const candidate of candidates) {
+    const rawText = flattenAiContentParts(candidate);
+    const text = shouldTrim ? rawText.trim() : rawText;
+    if (text) {
+      return text;
+    }
+  }
+
+  return '';
+}
+
+export function extractAiTextFromStreamChunk(chunkText) {
+  let collectedText = '';
+  let reachedDone = false;
+  const lines = String(chunkText ?? '').split(/\r?\n/);
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith(':')) {
+      continue;
+    }
+
+    const data = line.startsWith('data:') ? line.slice(5).trimStart() : line;
+    if (!data) {
+      continue;
+    }
+
+    if (data === '[DONE]') {
+      reachedDone = true;
+      break;
+    }
+
+    try {
+      const parsed = JSON.parse(data);
+      const token = extractAiTextFromPayload(parsed, { trim: false });
+      if (token) {
+        collectedText += token;
+      }
+    } catch {
+      // Some providers may emit non-JSON keepalive lines; ignore them.
+    }
+  }
+
+  return {
+    text: collectedText,
+    done: reachedDone
+  };
+}
+
 const chatState = {
   messages: [],
   isStreaming: false,
@@ -1874,6 +1979,7 @@ function handleChoiceClick(event) {
 }
 
 function showEmptyState(message) {
+  const t = window.LingoStreamI18n?.getTranslations() || {};
   elements.emptyState.classList.remove('hidden');
   elements.quizPanel.classList.add('hidden');
 
@@ -1882,7 +1988,7 @@ function showEmptyState(message) {
     paragraph.textContent = message;
   }
 
-  setAnimatedText(elements.selectionHeadline, 'Need more words', { duration: 240, stagger: 5, fromY: '0.2em' });
+  setAnimatedText(elements.selectionHeadline, t.need_more_words || 'Need more words', { duration: 240, stagger: 5, fromY: '0.2em' });
   setAnimatedText(elements.selectionStatus, message, { duration: 260, stagger: 3, fromY: '0.18em' });
 }
 
@@ -1892,10 +1998,12 @@ function showQuizPanel() {
 }
 
 function buildAndStartRound() {
+  const t = window.LingoStreamI18n?.getTranslations() || {};
   const candidates = buildQuizCandidateEntries(state.quizBuckets);
   const round = buildMatchingRound(candidates);
   if (!round) {
-    showEmptyState(`Need ${PAIRS_PER_ROUND}+ words in New or Retry.`);
+    const msg = (t.need_words_count || `Need {count}+ words in New or Retry.`).replace('{count}', PAIRS_PER_ROUND);
+    showEmptyState(msg);
     return false;
   }
 
@@ -1942,9 +2050,11 @@ async function refreshWordsAndStart() {
 }
 
 function startNewRound() {
+  const t = window.LingoStreamI18n?.getTranslations() || {};
   const candidates = buildQuizCandidateEntries(state.quizBuckets);
   if (!Array.isArray(candidates) || candidates.length < MIN_PAIRS_PER_ROUND) {
-    showEmptyState(`Need ${PAIRS_PER_ROUND}+ words in New or Retry.`);
+    const msg = (t.need_words_count || `Need {count}+ words in New or Retry.`).replace('{count}', PAIRS_PER_ROUND);
+    showEmptyState(msg);
     return;
   }
 
@@ -2062,16 +2172,18 @@ function syncAiSetupForm(aiSettings = {}) {
 }
 
 function renderChatSetupState() {
+  const t = window.LingoStreamI18n?.getTranslations() || {};
   const isConfigured = hasConfiguredAiSettings();
   elements.chatSetupPanel?.classList.toggle('hidden', isConfigured);
   elements.chatDrawer?.classList.toggle('chat-drawer--setup', !isConfigured);
 
   if (!isConfigured) {
-    setChatStatus('Add your AI provider, model, and API key to unlock chat.');
+    setChatStatus(t.chat_status_unlock || 'Add your AI provider, model, and API key to unlock chat.');
     return;
   }
 
-  if (elements.chatStatus?.textContent === 'Add your AI provider, model, and API key to unlock chat.') {
+  const statusUnlock = t.chat_status_unlock || 'Add your AI provider, model, and API key to unlock chat.';
+  if (elements.chatStatus?.textContent === statusUnlock) {
     setChatStatus('');
   }
 }
@@ -2091,18 +2203,19 @@ async function refreshAiModelChoices(preferredModel = '') {
 }
 
 async function saveAiSettingsFromQuiz() {
+  const t = window.LingoStreamI18n?.getTranslations() || {};
   const provider = elements.chatSetupProvider?.value ?? 'openai';
   const model = elements.chatSetupModel?.value ?? '';
   const apiKey = elements.chatSetupApiKey?.value.trim() ?? '';
 
   if (!apiKey) {
-    setChatStatus('Add an API key before saving.');
+    setChatStatus(t.chat_status_api_key || 'Add an API key before saving.');
     elements.chatSetupApiKey?.focus();
     return;
   }
 
   if (!model) {
-    setChatStatus('Select a model before saving.');
+    setChatStatus(t.chat_status_model || 'Select a model before saving.');
     elements.chatSetupModel?.focus();
     return;
   }
@@ -2111,16 +2224,17 @@ async function saveAiSettingsFromQuiz() {
   const saved = await setLocalStorage({ [AI_STORAGE_KEY]: aiSettings });
 
   if (!saved) {
-    setChatStatus('Failed to save AI settings. Try again.');
+    setChatStatus(t.chat_status_failed || 'Failed to save AI settings. Try again.');
     return;
   }
 
   chatState.aiSettings = aiSettings;
   renderChatSetupState();
-  setChatStatus('AI settings saved. You can start chatting now.');
+  setChatStatus(t.chat_status_saved || 'AI settings saved. You can start chatting now.');
 
   if (chatState.messages.length === 0) {
-    appendChatMessage('assistant', 'Hi! I can help you understand the words you got wrong. Ask me anything about them — meanings, usage, examples, or memory tips.', true);
+    const t = window.LingoStreamI18n?.getTranslations() || {};
+    appendChatMessage('assistant', t.chat_welcome || 'Hi! I can help you understand the words you got wrong. Ask me anything about them — meanings, usage, examples, or memory tips.', true);
   }
 
   elements.chatInput?.focus();
@@ -2133,7 +2247,8 @@ async function loadChatHistory() {
     chatState.messages = stored.slice(-MAX_CHAT_HISTORY);
     restoreChatMessagesUi();
   } else {
-    appendChatMessage('assistant', 'Hi! I can help you understand the words you got wrong. Ask me anything about them — meanings, usage, examples, or memory tips.', true);
+    const t = window.LingoStreamI18n?.getTranslations() || {};
+    appendChatMessage('assistant', t.chat_welcome || 'Hi! I can help you understand the words you got wrong. Ask me anything about them — meanings, usage, examples, or memory tips.', true);
   }
 }
 
@@ -2206,7 +2321,8 @@ function updateChatContext() {
   const correctWords = getCorrectWordsForChat();
 
   if (wrongWords.length === 0 && correctWords.length === 0) {
-    elements.chatContextWords.textContent = 'None yet — keep playing!';
+    const t = window.LingoStreamI18n?.getTranslations() || {};
+    elements.chatContextWords.textContent = t.chat_none_yet || 'None yet — keep playing!';
     return;
   }
 
@@ -2351,6 +2467,7 @@ function setChatStatus(text) {
 
 // Generates follow-up suggestion chips based on current conversation context and quiz results.
 function buildFollowUpSuggestions(assistantReply, userMessage) {
+  const t = window.LingoStreamI18n?.getTranslations() || {};
   const wrongWords = getWrongWordsForChat();
   const correctWords = getCorrectWordsForChat();
   const allWords = [...wrongWords, ...correctWords];
@@ -2362,25 +2479,74 @@ function buildFollowUpSuggestions(assistantReply, userMessage) {
 
   // Base suggestions always available regardless of context.
   const baseSuggestions = [
-    { label: '📖 Create a mini story', text: hasWords ? `Help me create a short mini story using these words so I can remember them: ${wordSample}` : 'Help me create a mini story with vocabulary words to practice' },
-    { label: '🧠 Memory tricks', text: hasWords ? `Give me memory tricks or mnemonics for these words: ${wordSample}` : 'Teach me some memory tricks for learning vocabulary' },
-    { label: '💬 Example sentences', text: hasWords ? `Show me natural example sentences using each of these words: ${wordSample}` : 'Give me example sentences with common vocabulary words' },
+    { 
+      label: t.suggestion_story || '📖 Create a mini story', 
+      text: hasWords 
+        ? (t.prompt_story || 'Help me create a short mini story using these words so I can remember them: {words}').replace('{words}', wordSample)
+        : (t.prompt_story_empty || 'Help me create a mini story with vocabulary words to practice')
+    },
+    { 
+      label: t.suggestion_mnemonic || '🧠 Memory tricks', 
+      text: hasWords 
+        ? (t.prompt_mnemonic || 'Give me memory tricks or mnemonics for these words: {words}').replace('{words}', wordSample)
+        : (t.prompt_mnemonic_empty || 'Teach me some memory tricks for learning vocabulary')
+    },
+    { 
+      label: t.suggestion_examples || '💬 Example sentences', 
+      text: hasWords 
+        ? (t.prompt_examples || 'Show me natural example sentences using each of these words: {words}').replace('{words}', wordSample)
+        : (t.prompt_examples_empty || 'Give me example sentences with common vocabulary words')
+    },
   ];
 
   // Wrong-word-specific suggestions, only shown when the user got something wrong.
   const wrongWordSuggestions = wrongOnly ? [
-    { label: '❌ Why did I get these wrong?', text: `Why might I have confused these words? Help me understand the tricky parts: ${wrongSample}` },
-    { label: '🔁 Quiz me again', text: `Quiz me on the words I got wrong — ask me to translate them one by one: ${wrongSample}` },
-    { label: '🎯 Common mistakes', text: `What are common mistakes learners make with these words: ${wrongSample}` },
+    { 
+      label: t.suggestion_why_wrong || '❌ Why did I get these wrong?', 
+      text: (t.prompt_why_wrong || 'Why might I have confused these words? Help me understand the tricky parts: {words}').replace('{words}', wrongSample)
+    },
+    { 
+      label: t.suggestion_quiz_again || '🔁 Quiz me again', 
+      text: (t.prompt_quiz_again || 'Quiz me on the words I got wrong — ask me to translate them one by one: {words}').replace('{words}', wrongSample)
+    },
+    { 
+      label: t.suggestion_common_mistakes || '🎯 Common mistakes', 
+      text: (t.prompt_common_mistakes || 'What are common mistakes learners make with these words: {words}').replace('{words}', wrongSample)
+    },
   ] : [];
 
   // Deeper learning suggestions for extending the current topic.
   const deeperSuggestions = [
-    { label: '🗣️ Dialogue practice', text: hasWords ? `Create a short dialogue between two people that naturally uses these words: ${wordSample}` : 'Create a practice dialogue for me using vocabulary words' },
-    { label: '📝 Fill in the blanks', text: hasWords ? `Give me fill-in-the-blank exercises using: ${wordSample}` : 'Give me fill-in-the-blank vocabulary exercises' },
-    { label: '🌍 Cultural context', text: hasWords ? `Explain any cultural context or nuances behind these words: ${wordSample}` : 'Tell me about cultural context in language learning' },
-    { label: '🔤 Word families', text: hasWords ? `Show me related words, synonyms, or word families for: ${wordSample}` : 'Teach me about word families and related vocabulary' },
-    { label: '🎵 Rhyme or song', text: hasWords ? `Make a short rhyme or catchy phrase to help me remember: ${wordSample}` : 'Create a catchy rhyme to help me remember vocabulary' },
+    { 
+      label: t.suggestion_dialogue || '🗣️ Dialogue practice', 
+      text: hasWords 
+        ? (t.prompt_dialogue || 'Create a short dialogue between two people that naturally uses these words: {words}').replace('{words}', wordSample)
+        : (t.prompt_dialogue_empty || 'Create a practice dialogue for me using vocabulary words')
+    },
+    { 
+      label: t.suggestion_fill_blanks || '📝 Fill in the blanks', 
+      text: hasWords 
+        ? (t.prompt_fill_blanks || 'Give me fill-in-the-blank exercises using: {words}').replace('{words}', wordSample)
+        : (t.prompt_fill_blanks_empty || 'Give me fill-in-the-blank vocabulary exercises')
+    },
+    { 
+      label: t.suggestion_cultural || '🌍 Cultural context', 
+      text: hasWords 
+        ? (t.prompt_cultural || 'Explain any cultural context or nuances behind these words: {words}').replace('{words}', wordSample)
+        : (t.prompt_cultural_empty || 'Tell me about cultural context in language learning')
+    },
+    { 
+      label: t.suggestion_word_families || '🔤 Word families', 
+      text: hasWords 
+        ? (t.prompt_word_families || 'Show me related words, synonyms, or word families for: {words}').replace('{words}', wordSample)
+        : (t.prompt_word_families_empty || 'Teach me about word families and related vocabulary')
+    },
+    { 
+      label: t.suggestion_rhyme || '🎵 Rhyme or song', 
+      text: hasWords 
+        ? (t.prompt_rhyme || 'Make a short rhyme or catchy phrase to help me remember: {words}').replace('{words}', wordSample)
+        : (t.prompt_rhyme_empty || 'Create a catchy rhyme to help me remember vocabulary')
+    },
   ];
 
   // Pick context-aware suggestions based on keywords in the latest AI reply and user message.
@@ -2389,29 +2555,51 @@ function buildFollowUpSuggestions(assistantReply, userMessage) {
   const contextSuggestions = [];
 
   if (replyLower.includes('story') || replyLower.includes('narrative') || userLower.includes('story')) {
-    contextSuggestions.push({ label: '📖 Continue the story', text: 'Continue the story and add more of my vocabulary words into the next part' });
-    contextSuggestions.push({ label: '🎭 Change the genre', text: 'Rewrite the story in a completely different genre — maybe sci-fi or mystery' });
+    contextSuggestions.push({ 
+      label: t.suggestion_story_continue || '📖 Continue the story', 
+      text: t.prompt_story_continue || 'Continue the story and add more of my vocabulary words into the next part' 
+    });
+    contextSuggestions.push({ 
+      label: t.suggestion_story_genre || '🎭 Change the genre', 
+      text: t.prompt_story_genre || 'Rewrite the story in a completely different genre — maybe sci-fi or mystery' 
+    });
   }
 
   if (replyLower.includes('mnemonic') || replyLower.includes('memory') || replyLower.includes('trick') || userLower.includes('mnemonic')) {
-    contextSuggestions.push({ label: '🧩 Visual mnemonics', text: 'Can you describe visual images or scenes I can picture to remember these words?' });
+    contextSuggestions.push({ 
+      label: t.suggestion_visual || '🧩 Visual mnemonics', 
+      text: t.prompt_visual || 'Can you describe visual images or scenes I can picture to remember these words?' 
+    });
   }
 
   if (replyLower.includes('example') || replyLower.includes('sentence') || userLower.includes('sentence')) {
-    contextSuggestions.push({ label: '🔄 More examples', text: 'Give me more examples but in casual everyday conversation style' });
-    contextSuggestions.push({ label: '📰 Formal examples', text: 'Now show me examples in a formal or academic writing style' });
+    contextSuggestions.push({ 
+      label: t.suggestion_examples_casual || '🔄 More examples', 
+      text: t.prompt_examples_casual || 'Give me more examples but in casual everyday conversation style' 
+    });
+    contextSuggestions.push({ 
+      label: t.suggestion_examples_formal || '📰 Formal examples', 
+      text: t.prompt_examples_formal || 'Now show me examples in a formal or academic writing style' 
+    });
   }
 
   if (replyLower.includes('quiz') || replyLower.includes('translate') || userLower.includes('quiz')) {
-    contextSuggestions.push({ label: '⬆️ Make it harder', text: 'Make the quiz harder — use the words in tricky sentences where I have to pick the right one' });
+    contextSuggestions.push({ 
+      label: t.suggestion_harder || '⬆️ Make it harder', 
+      text: t.prompt_harder || 'Make the quiz harder — use the words in tricky sentences where I have to pick the right one' 
+    });
   }
 
   if (replyLower.includes('dialogue') || replyLower.includes('conversation') || userLower.includes('dialogue')) {
-    contextSuggestions.push({ label: '🎤 Role play', text: 'Let\'s role play — you be one person and I\'ll respond as the other. Start the conversation!' });
+    contextSuggestions.push({ 
+      label: t.suggestion_roleplay || '🎤 Role play', 
+      text: t.prompt_roleplay || 'Let\'s role play — you be one person and I\'ll respond as the other. Start the conversation!' 
+    });
   }
 
   // Assemble the final list: context-relevant suggestions first, then the broader pools.
   const pool = [...contextSuggestions, ...wrongWordSuggestions, ...baseSuggestions, ...deeperSuggestions];
+
 
   // Deduplicate by label to avoid repeating the same chip.
   const seen = new Set();
@@ -2463,7 +2651,8 @@ async function sendChatMessage(userMessage) {
 
   const aiSettings = chatState.aiSettings;
   if (!aiSettings || !aiSettings.apiKey) {
-    appendChatMessage('error', 'No API key configured. Go to extension popup → Vocabulary tab to add one.');
+    const t = window.LingoStreamI18n?.getTranslations() || {};
+    appendChatMessage('error', t.chat_error_api || 'No API key configured. Go to extension popup → Vocabulary tab to add one.');
     return;
   }
 
@@ -2477,7 +2666,8 @@ async function sendChatMessage(userMessage) {
   }
 
   if (!model) {
-    appendChatMessage('error', 'No model selected. Go to extension popup → Vocabulary tab, save your API key, then pick a model.');
+    const t = window.LingoStreamI18n?.getTranslations() || {};
+    appendChatMessage('error', t.chat_error_model || 'No model selected. Go to extension popup → Vocabulary tab, save your API key, then pick a model.');
     return;
   }
 
@@ -2496,7 +2686,8 @@ async function sendChatMessage(userMessage) {
   ];
 
   chatState.isStreaming = true;
-  setChatStatus('Thinking...');
+  const tStatus = window.LingoStreamI18n?.getTranslations() || {};
+  setChatStatus(tStatus.chat_thinking || 'Thinking...');
 
   const assistantContent = appendChatMessage('assistant', '');
   let fullReply = '';
@@ -2524,11 +2715,29 @@ async function sendChatMessage(userMessage) {
 
     const reader = response.body?.getReader();
     if (!reader) {
-      throw new Error('Streaming not supported by this browser.');
+      const fallbackPayload = await response.json().catch(() => null);
+      fullReply = extractAiTextFromPayload(fallbackPayload);
+      if (!fullReply) {
+        throw new Error('Streaming not supported by this browser.');
+      }
+
+      if (assistantContent) {
+        assistantContent.innerHTML = renderMarkdown(fullReply);
+      }
+
+      chatState.messages.push({ role: 'assistant', content: fullReply });
+      saveChatHistory();
+      setChatStatus('');
+
+      const suggestions = buildFollowUpSuggestions(fullReply, _originalUserMessage);
+      renderSuggestionChips(suggestions);
+      return;
     }
 
     const decoder = new TextDecoder();
     let buffer = '';
+    let rawResponseText = '';
+    let reachedDoneMarker = false;
 
     while (true) {
       const { done, value } = await reader.read();
@@ -2536,39 +2745,51 @@ async function sendChatMessage(userMessage) {
         break;
       }
 
-      buffer += decoder.decode(value, { stream: true });
+      const decodedChunk = decoder.decode(value, { stream: true });
+      rawResponseText += decodedChunk;
+      buffer += decodedChunk;
 
       const lines = buffer.split('\n');
       // Keep the last incomplete chunk in the buffer to be processed with the next chunk.
       buffer = lines.pop() ?? '';
 
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed || !trimmed.startsWith('data: ')) {
-          continue;
-        }
-
-        const data = trimmed.slice(6);
-        if (data === '[DONE]') {
-          break;
-        }
-
-        try {
-          const parsed = JSON.parse(data);
-          const token = parsed.choices?.[0]?.delta?.content ?? '';
-          if (token) {
-            fullReply += token;
-            if (assistantContent) {
-              assistantContent.innerHTML = renderMarkdown(fullReply);
-              if (elements.chatMessages) {
-                elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
-              }
-            }
+      const parsedChunk = extractAiTextFromStreamChunk(lines.join('\n'));
+      if (parsedChunk.text) {
+        fullReply += parsedChunk.text;
+        if (assistantContent) {
+          assistantContent.innerHTML = renderMarkdown(fullReply);
+          if (elements.chatMessages) {
+            elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
           }
-        } catch {
-          // Ignore malformed SSE JSON lines.
         }
       }
+
+      if (parsedChunk.done) {
+        reachedDoneMarker = true;
+        break;
+      }
+    }
+
+    const finalChunkText = `${buffer}${decoder.decode()}`;
+    if (finalChunkText.trim()) {
+      rawResponseText += finalChunkText;
+      const parsedFinalChunk = extractAiTextFromStreamChunk(finalChunkText);
+      if (parsedFinalChunk.text) {
+        fullReply += parsedFinalChunk.text;
+      }
+      reachedDoneMarker = reachedDoneMarker || parsedFinalChunk.done;
+    }
+
+    if (!fullReply) {
+      const fallbackPayload = (() => {
+        try {
+          return JSON.parse(rawResponseText);
+        } catch {
+          return null;
+        }
+      })();
+
+      fullReply = extractAiTextFromPayload(fallbackPayload);
     }
 
     if (!fullReply) {
@@ -2576,6 +2797,8 @@ async function sendChatMessage(userMessage) {
       if (assistantContent) {
         assistantContent.innerHTML = renderMarkdown(fullReply);
       }
+    } else if (assistantContent && !reachedDoneMarker) {
+      assistantContent.innerHTML = renderMarkdown(fullReply);
     }
 
     chatState.messages.push({ role: 'assistant', content: fullReply });
@@ -2631,7 +2854,8 @@ function clearChatHistory() {
   if (elements.chatMessages) {
     elements.chatMessages.innerHTML = '';
   }
-  appendChatMessage('assistant', 'Chat cleared! I\'m ready to help with any words you get wrong.', true);
+  const t = window.LingoStreamI18n?.getTranslations() || {};
+  appendChatMessage('assistant', t.chat_cleared || 'Chat cleared! I\'m ready to help with any words you get wrong.', true);
 }
 
 function attachChatEventHandlers() {

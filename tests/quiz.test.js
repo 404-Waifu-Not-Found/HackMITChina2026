@@ -2,6 +2,8 @@ import {
   buildMatchingRound,
   buildQuizCandidateEntries,
   createVocabularyKey,
+  extractAiTextFromPayload,
+  extractAiTextFromStreamChunk,
   filterRecentEntries,
   normalizeQuizBuckets,
   PAIRS_PER_ROUND,
@@ -127,5 +129,55 @@ describe('quiz helpers', () => {
 
     expect(candidates.length).toBe(2);
     expect(keys.has(createVocabularyKey(correctEntry))).toBe(false);
+  });
+
+  it('extracts assistant text from non-streaming JSON payloads', () => {
+    const payload = {
+      choices: [
+        {
+          message: {
+            content: 'Memory trick: connect the new word to a vivid image.'
+          }
+        }
+      ]
+    };
+
+    expect(extractAiTextFromPayload(payload)).toBe('Memory trick: connect the new word to a vivid image.');
+  });
+
+  it('extracts streamed assistant text from SSE chunks', () => {
+    const chunk = [
+      'data: {"choices":[{"delta":{"content":"Hello"}}]}',
+      'data: {"choices":[{"delta":{"content":" there"}}]}',
+      'data: [DONE]'
+    ].join('\n');
+
+    expect(extractAiTextFromStreamChunk(chunk)).toEqual({
+      text: 'Hello there',
+      done: true
+    });
+  });
+
+  it('preserves spaces and newlines in streamed token fragments', () => {
+    const chunk = [
+      'data: {"choices":[{"delta":{"content":"Tips to boost"}}]}',
+      'data: {"choices":[{"delta":{"content":" your vocab retention"}}]}',
+      'data: {"choices":[{"delta":{"content":"\n- Use the words in context"}}]}',
+      'data: [DONE]'
+    ].join('\n');
+
+    expect(extractAiTextFromStreamChunk(chunk)).toEqual({
+      text: 'Tips to boost your vocab retention\n- Use the words in context',
+      done: true
+    });
+  });
+
+  it('extracts plain JSON lines from providers that ignore stream mode', () => {
+    const chunk = '{"reply":"Vocabulary tip: group words by theme."}';
+
+    expect(extractAiTextFromStreamChunk(chunk)).toEqual({
+      text: 'Vocabulary tip: group words by theme.',
+      done: false
+    });
   });
 });
