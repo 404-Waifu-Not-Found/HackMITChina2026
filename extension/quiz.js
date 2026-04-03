@@ -2938,6 +2938,7 @@ async function sendChatMessage(userMessage) {
     pendingThinking: true,
     collapseThinking: false
   });
+  await new Promise((resolve) => window.requestAnimationFrame(() => resolve()));
   let fullReply = '';
   let fullThinking = '';
 
