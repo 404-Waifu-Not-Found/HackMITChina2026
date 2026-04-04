@@ -562,7 +562,9 @@ function createCaptionMutationHandler({
       void window.log?.('Subtitle processing started');
       const settings = await getSettings();
       const enabled = settings?.enabled !== false;
-      const replacementPercentage = normalizeReplacementPercentage(Number(settings?.replacementPercentage));
+      const replacementPercentage = normalizeReplacementPercentage(
+        Number(settings?.effectiveReplacementPercentage ?? settings?.replacementPercentage)
+      );
       const renderConfigKey = typeof settings?.renderConfigKey === 'string' && settings.renderConfigKey
         ? settings.renderConfigKey
         : buildRenderConfigKey(replacementPercentage);

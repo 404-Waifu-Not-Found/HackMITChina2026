@@ -14,7 +14,7 @@ const CONTENT_SCRIPT_FILES = [
 const FIXTURE_PATH = new URL('./fixtures/youtube-caption-fixture.v1.json', import.meta.url);
 const FIXTURE = JSON.parse(fs.readFileSync(FIXTURE_PATH, 'utf8'));
 
-function createStorageArea(initialState = {}) {
+function createStorageArea(initialState = {}, areaName, emitChange) {
   const state = { ...initialState };
 
   return {
@@ -36,7 +36,18 @@ function createStorageArea(initialState = {}) {
       callback({ ...state });
     },
     set(items, callback) {
+      const changes = {};
+      for (const [key, value] of Object.entries(items ?? {})) {
+        changes[key] = {
+          oldValue: state[key],
+          newValue: value
+        };
+      }
+
       Object.assign(state, items);
+      if (typeof emitChange === 'function' && Object.keys(changes).length > 0) {
+        emitChange(changes, areaName);
+      }
       if (typeof callback === 'function') {
         callback();
       }
@@ -78,25 +89,32 @@ function createCaptionSegment(text) {
 function createE2EContext({ settings, translations, videoUrl }) {
   let mutationObserverCallback = null;
   let runtimeMessageListener = null;
+  const storageChangeListeners = [];
+  const emitStorageChange = (changes, areaName) => {
+    for (const listener of storageChangeListeners) {
+      listener(changes, areaName);
+    }
+  };
 
   const syncStorage = createStorageArea({
     enabled: settings.enabled,
     replacementPercentage: settings.replacementPercentage,
+    adaptiveDifficultyEnabled: settings.adaptiveDifficultyEnabled,
     translationProvider: settings.translationProvider,
     sourceLanguage: settings.sourceLanguage,
     targetLanguage: settings.targetLanguage,
     translationTimeoutMs: settings.translationTimeoutMs
-  });
+  }, 'sync', emitStorageChange);
   const localStorage = createStorageArea({
     debug: false,
     debugLogs: [],
     vocabularyEntries: [],
-    vocabularyQuizBuckets: {
+    vocabularyQuizBuckets: settings.quizBuckets ?? {
       notQuizzed: [],
       correct: [],
       incorrect: []
     }
-  });
+  }, 'local', emitStorageChange);
 
   const segments = [];
   const mockVideo = {
@@ -189,7 +207,9 @@ function createE2EContext({ settings, translations, videoUrl }) {
         sync: syncStorage,
         local: localStorage,
         onChanged: {
-          addListener: () => {}
+          addListener(listener) {
+            storageChangeListeners.push(listener);
+          }
         }
       }
     }
@@ -213,8 +233,15 @@ function createE2EContext({ settings, translations, videoUrl }) {
     context,
     addCaptionSegment,
     emitMutation,
-    getRuntimeMessageListener: () => runtimeMessageListener
+    getRuntimeMessageListener: () => runtimeMessageListener,
+    syncStorage,
+    localStorage
   };
+}
+
+function countInlineTranslations(text, translation) {
+  const pattern = new RegExp(`\\(${translation}\\)`, 'g');
+  return (String(text).match(pattern) ?? []).length;
 }
 
 async function waitForAsyncWork() {
@@ -274,5 +301,58 @@ describe('nightly content E2E smoke fixture', () => {
         expect(segment.textContent.toLowerCase()).toContain(String(expected).toLowerCase());
       }
     }
+  });
+
+  it('recomputes the swap rate from adaptive quiz difficulty changes', async () => {
+    const runtime = createE2EContext({
+      settings: {
+        enabled: true,
+        replacementPercentage: 10,
+        adaptiveDifficultyEnabled: true,
+        translationProvider: 'google',
+        sourceLanguage: 'en',
+        targetLanguage: 'es',
+        translationTimeoutMs: 1200,
+        quizBuckets: {
+          notQuizzed: [],
+          correct: new Array(9).fill(null).map((_, index) => ({ id: `c${index}` })),
+          incorrect: [{ id: 'i0' }]
+        }
+      },
+      translations: {
+        koa: 'sol'
+      },
+      videoUrl: FIXTURE.videoUrl
+    });
+
+    for (const scriptPath of CONTENT_SCRIPT_FILES) {
+      const source = fs.readFileSync(scriptPath, 'utf8');
+      expect(() => vm.runInContext(source, runtime.context, { filename: scriptPath })).not.toThrow();
+    }
+
+    const segment = createCaptionSegment(new Array(24).fill('koa').join(' '));
+    runtime.addCaptionSegment(segment);
+    runtime.emitMutation([
+      {
+        type: 'childList',
+        addedNodes: [segment]
+      }
+    ]);
+
+    await waitForAsyncWork();
+    const highDifficultyCount = countInlineTranslations(segment.textContent, 'sol');
+    expect(highDifficultyCount).toBeGreaterThan(0);
+
+    runtime.localStorage.set({
+      vocabularyQuizBuckets: {
+        notQuizzed: [],
+        correct: new Array(4).fill(null).map((_, index) => ({ id: `c${index}` })),
+        incorrect: new Array(6).fill(null).map((_, index) => ({ id: `i${index}` }))
+      }
+    });
+
+    await waitForAsyncWork();
+    const lowDifficultyCount = countInlineTranslations(segment.textContent, 'sol');
+    expect(lowDifficultyCount).toBeLessThan(highDifficultyCount);
   });
 });

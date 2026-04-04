@@ -2,12 +2,14 @@ const DEFAULT_REPLACEMENT_PERCENTAGE = 5;
 const DEFAULT_SETTINGS = {
   enabled: true,
   replacementPercentage: DEFAULT_REPLACEMENT_PERCENTAGE,
+  adaptiveDifficultyEnabled: false,
   translationProvider: 'auto',
   sourceLanguage: 'auto',
   targetLanguage: 'es',
   translationEndpoint: ''
 };
 const SETTINGS_CACHE_TTL_MS = 1500;
+const QUIZ_BUCKETS_STORAGE_KEY = 'vocabularyQuizBuckets';
 const SCRUB_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'j', 'l']);
 const CONTENT_CAPTION_SEGMENT_SELECTOR = '.ytp-caption-segment, .captions-text .caption-visual-line span';
 const PERSISTENT_REFRESH_INTERVAL_MS = 20; // Interval in ms for the persistent refresh loop that re-applies translations during playback.
@@ -37,7 +39,10 @@ function normalizeReplacementPercentage(value) {
 }
 
 function buildRenderConfigKey(settings) {
-  const safeReplacement = normalizeReplacementPercentage(settings?.replacementPercentage);
+  const safeReplacement = normalizeReplacementPercentage(
+    settings?.effectiveReplacementPercentage ?? settings?.replacementPercentage
+  );
+  const adaptiveDifficultyEnabled = settings?.adaptiveDifficultyEnabled === true ? 'on' : 'off';
   const translationProvider = typeof settings?.translationProvider === 'string'
     ? settings.translationProvider.trim().toLowerCase()
     : DEFAULT_SETTINGS.translationProvider;
@@ -53,6 +58,7 @@ function buildRenderConfigKey(settings) {
 
   return [
     `replacement:${safeReplacement}`,
+    `adaptive:${adaptiveDifficultyEnabled}`,
     `provider:${translationProvider}`,
     `source:${sourceLanguage}`,
     `target:${targetLanguage}`,
@@ -62,6 +68,8 @@ function buildRenderConfigKey(settings) {
 
 let cachedSettings = {
   ...DEFAULT_SETTINGS,
+  effectiveReplacementPercentage: DEFAULT_REPLACEMENT_PERCENTAGE,
+  adaptiveDifficulty: null,
   renderConfigKey: buildRenderConfigKey(DEFAULT_SETTINGS)
 };
 let lastSettingsReadAt = 0;
@@ -70,47 +78,125 @@ let inflightSettingsPromise = null;
 console.log('Lingo Stream loaded');
 void window.log?.('content.js loaded');
 
-function readSettingsFromStorage() {
+function getSyncStorageItems(keys) {
   return new Promise((resolve) => {
-    chrome.storage.sync.get(
-      [
-        'enabled',
-        'replacementPercentage',
-        'translationProvider',
-        'sourceLanguage',
-        'targetLanguage',
-        'translationEndpoint'
-      ],
-      (items) => {
+    chrome.storage.sync.get(keys, (items) => {
       if (chrome.runtime.lastError) {
-        console.error('Failed to read content settings from storage.', chrome.runtime.lastError);
-        resolve({
-          ...DEFAULT_SETTINGS,
-          renderConfigKey: buildRenderConfigKey(DEFAULT_SETTINGS)
-        });
+        resolve(null);
         return;
       }
 
-      const resolved = {
-        enabled: items.enabled ?? DEFAULT_SETTINGS.enabled,
-        replacementPercentage: normalizeReplacementPercentage(
-          items.replacementPercentage ?? DEFAULT_REPLACEMENT_PERCENTAGE
-        ),
-        translationProvider: items.translationProvider ?? DEFAULT_SETTINGS.translationProvider,
-        sourceLanguage: items.sourceLanguage ?? DEFAULT_SETTINGS.sourceLanguage,
-        targetLanguage: items.targetLanguage ?? DEFAULT_SETTINGS.targetLanguage,
-        translationEndpoint: typeof items.translationEndpoint === 'string'
-          ? items.translationEndpoint
-          : DEFAULT_SETTINGS.translationEndpoint
-      };
-      resolved.renderConfigKey = buildRenderConfigKey(resolved);
-
-      console.log('Content settings loaded.', resolved);
-      void window.log?.(`Content settings loaded: enabled=${resolved.enabled}, replacement=${resolved.replacementPercentage}`);
-      resolve(resolved);
-      }
-    );
+      resolve(items ?? {});
+    });
   });
+}
+
+function getLocalStorageItems(keys) {
+  return new Promise((resolve) => {
+    if (!chrome.storage?.local?.get) {
+      resolve({});
+      return;
+    }
+
+    chrome.storage.local.get(keys, (items) => {
+      if (chrome.runtime.lastError) {
+        resolve({});
+        return;
+      }
+
+      resolve(items ?? {});
+    });
+  });
+}
+
+function resolveAdaptiveDifficulty(baseReplacementPercentage, adaptiveDifficultyEnabled, quizBuckets) {
+  if (
+    adaptiveDifficultyEnabled !== true ||
+    typeof window.calculateAdaptiveReplacementPercentage !== 'function'
+  ) {
+    const normalizedBase = normalizeReplacementPercentage(baseReplacementPercentage);
+    return {
+      effectiveReplacementPercentage: normalizedBase,
+      baseReplacementPercentage: normalizedBase,
+      isAdaptiveActive: false,
+      reason: 'disabled',
+      band: 'baseline',
+      delta: 0,
+      correctCount: 0,
+      incorrectCount: 0,
+      answeredCount: 0,
+      accuracy: 100
+    };
+  }
+
+  return window.calculateAdaptiveReplacementPercentage(baseReplacementPercentage, quizBuckets);
+}
+
+async function readSettingsFromStorage() {
+  const items = await getSyncStorageItems([
+    'enabled',
+    'replacementPercentage',
+    'adaptiveDifficultyEnabled',
+    'translationProvider',
+    'sourceLanguage',
+    'targetLanguage',
+    'translationEndpoint'
+  ]);
+
+  if (items === null) {
+    console.error('Failed to read content settings from storage.', chrome.runtime.lastError);
+    return {
+      ...DEFAULT_SETTINGS,
+      effectiveReplacementPercentage: DEFAULT_REPLACEMENT_PERCENTAGE,
+      adaptiveDifficulty: null,
+      renderConfigKey: buildRenderConfigKey(DEFAULT_SETTINGS)
+    };
+  }
+
+  const replacementPercentage = normalizeReplacementPercentage(
+    items.replacementPercentage ?? DEFAULT_REPLACEMENT_PERCENTAGE
+  );
+  const adaptiveDifficultyEnabled = items.adaptiveDifficultyEnabled === true;
+  const localItems = adaptiveDifficultyEnabled
+    ? await getLocalStorageItems([QUIZ_BUCKETS_STORAGE_KEY])
+    : {};
+  const adaptiveDifficulty = resolveAdaptiveDifficulty(
+    replacementPercentage,
+    adaptiveDifficultyEnabled,
+    localItems?.[QUIZ_BUCKETS_STORAGE_KEY]
+  );
+
+  const resolved = {
+    enabled: items.enabled ?? DEFAULT_SETTINGS.enabled,
+    replacementPercentage,
+    effectiveReplacementPercentage: adaptiveDifficulty.effectiveReplacementPercentage,
+    adaptiveDifficultyEnabled,
+    adaptiveDifficulty,
+    translationProvider: items.translationProvider ?? DEFAULT_SETTINGS.translationProvider,
+    sourceLanguage: items.sourceLanguage ?? DEFAULT_SETTINGS.sourceLanguage,
+    targetLanguage: items.targetLanguage ?? DEFAULT_SETTINGS.targetLanguage,
+    translationEndpoint: typeof items.translationEndpoint === 'string'
+      ? items.translationEndpoint
+      : DEFAULT_SETTINGS.translationEndpoint
+  };
+  resolved.renderConfigKey = buildRenderConfigKey(resolved);
+
+  console.log('Content settings loaded.', resolved);
+  void window.log?.(
+    `Content settings loaded: enabled=${resolved.enabled}, base=${resolved.replacementPercentage}, effective=${resolved.effectiveReplacementPercentage}, adaptive=${resolved.adaptiveDifficultyEnabled}`
+  );
+  return resolved;
+}
+
+function invalidateSettingsCache() {
+  lastSettingsReadAt = 0;
+}
+
+async function refreshSettingsAndCaptions() {
+  cachedSettings = await readSettingsFromStorage();
+  lastSettingsReadAt = Date.now();
+  handler.primeFromCurrentCaptions();
+  handler.flushNow();
 }
 
 async function getSettings() {
@@ -471,52 +557,31 @@ function installRealtimeHooks() {
 installRealtimeHooks();
 
 chrome.storage.onChanged?.addListener((changes, areaName) => {
-  if (areaName !== 'sync') {
+  if (areaName === 'sync') {
+    const trackedKeys = [
+      'enabled',
+      'replacementPercentage',
+      'adaptiveDifficultyEnabled',
+      'translationProvider',
+      'sourceLanguage',
+      'targetLanguage',
+      'translationEndpoint'
+    ];
+
+    if (trackedKeys.some((key) => Object.prototype.hasOwnProperty.call(changes, key))) {
+      invalidateSettingsCache();
+      void refreshSettingsAndCaptions();
+    }
     return;
   }
 
-  const trackedKeys = [
-    'enabled',
-    'replacementPercentage',
-    'translationProvider',
-    'sourceLanguage',
-    'targetLanguage',
-    'translationEndpoint'
-  ];
-  let shouldRefresh = false;
-
-  for (const key of trackedKeys) {
-    if (!Object.prototype.hasOwnProperty.call(changes, key)) {
-      continue;
-    }
-
-    const nextValue = changes[key].newValue;
-    if (key === 'enabled') {
-      cachedSettings.enabled = nextValue ?? DEFAULT_SETTINGS.enabled;
-    } else if (key === 'replacementPercentage') {
-      cachedSettings.replacementPercentage = normalizeReplacementPercentage(
-        nextValue ?? DEFAULT_REPLACEMENT_PERCENTAGE
-      );
-    } else if (key === 'translationProvider') {
-      cachedSettings.translationProvider = nextValue ?? DEFAULT_SETTINGS.translationProvider;
-    } else if (key === 'sourceLanguage') {
-      cachedSettings.sourceLanguage = nextValue ?? DEFAULT_SETTINGS.sourceLanguage;
-    } else if (key === 'targetLanguage') {
-      cachedSettings.targetLanguage = nextValue ?? DEFAULT_SETTINGS.targetLanguage;
-    } else if (key === 'translationEndpoint') {
-      cachedSettings.translationEndpoint = typeof nextValue === 'string'
-        ? nextValue
-        : DEFAULT_SETTINGS.translationEndpoint;
-    }
-    shouldRefresh = true;
-  }
-
-  cachedSettings.renderConfigKey = buildRenderConfigKey(cachedSettings);
-  lastSettingsReadAt = Date.now();
-
-  if (shouldRefresh) {
-    handler.primeFromCurrentCaptions();
-    handler.flushNow();
+  if (
+    areaName === 'local' &&
+    Object.prototype.hasOwnProperty.call(changes, QUIZ_BUCKETS_STORAGE_KEY) &&
+    cachedSettings.adaptiveDifficultyEnabled === true
+  ) {
+    invalidateSettingsCache();
+    void refreshSettingsAndCaptions();
   }
 });
 

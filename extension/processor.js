@@ -5,6 +5,14 @@ const MIN_OVERFLOW_EXTRA_CHARS = 36;
 const MAX_OVERFLOW_EXTRA_CHARS = 84;
 const OVERFLOW_EXTRA_CHAR_RATIO = 1.2;
 const MAX_TOTAL_RENDERED_LENGTH = 120;
+const ADAPTIVE_MIN_ANSWERED_WORDS = 10;
+const ADAPTIVE_DIFFICULTY_BANDS = [
+  { minimumAccuracy: 90, delta: 3, label: 'expert' },
+  { minimumAccuracy: 80, delta: 1, label: 'advanced' },
+  { minimumAccuracy: 60, delta: 0, label: 'steady' },
+  { minimumAccuracy: 45, delta: -1, label: 'support' },
+  { minimumAccuracy: 0, delta: -3, label: 'gentle' }
+];
 const replacementCarryByPercentage = new Map();
 
 function normalizeReplacementPercentage(value) {
@@ -14,6 +22,68 @@ function normalizeReplacementPercentage(value) {
   }
 
   return Math.max(0, Math.min(100, Math.floor(numeric)));
+}
+
+function getQuizPerformanceSnapshot(quizBuckets) {
+  const correctEntries = Array.isArray(quizBuckets?.correct) ? quizBuckets.correct : [];
+  const incorrectEntries = Array.isArray(quizBuckets?.incorrect) ? quizBuckets.incorrect : [];
+  const correctCount = correctEntries.length;
+  const incorrectCount = incorrectEntries.length;
+  const answeredCount = correctCount + incorrectCount;
+  const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 100;
+
+  return {
+    correctCount,
+    incorrectCount,
+    answeredCount,
+    accuracy
+  };
+}
+
+function resolveAdaptiveDifficultyBand(accuracy) {
+  const normalizedAccuracy = Math.max(0, Math.min(100, Number(accuracy) || 0));
+  return ADAPTIVE_DIFFICULTY_BANDS.find((band) => normalizedAccuracy >= band.minimumAccuracy)
+    ?? ADAPTIVE_DIFFICULTY_BANDS[ADAPTIVE_DIFFICULTY_BANDS.length - 1];
+}
+
+function calculateAdaptiveReplacementPercentage(
+  baseReplacementPercentage,
+  quizBuckets,
+  options = {}
+) {
+  const base = normalizeReplacementPercentage(baseReplacementPercentage);
+  const minimumAnsweredWords = Math.max(
+    0,
+    Number.isFinite(options.minimumAnsweredWords)
+      ? Math.floor(options.minimumAnsweredWords)
+      : ADAPTIVE_MIN_ANSWERED_WORDS
+  );
+  const performance = getQuizPerformanceSnapshot(quizBuckets);
+
+  if (performance.answeredCount < minimumAnsweredWords) {
+    return {
+      effectiveReplacementPercentage: base,
+      baseReplacementPercentage: base,
+      isAdaptiveActive: false,
+      reason: 'insufficient_history',
+      band: 'baseline',
+      delta: 0,
+      ...performance
+    };
+  }
+
+  const band = resolveAdaptiveDifficultyBand(performance.accuracy);
+  const effectiveReplacementPercentage = normalizeReplacementPercentage(base + band.delta);
+
+  return {
+    effectiveReplacementPercentage,
+    baseReplacementPercentage: base,
+    isAdaptiveActive: band.delta !== 0,
+    reason: 'band_adjusted',
+    band: band.label,
+    delta: band.delta,
+    ...performance
+  };
 }
 
 function calculateReplacementCount(totalCandidates, replacementPercentage = 5) {
@@ -472,6 +542,8 @@ async function buildImmersiveSubtitlesBatch(
 }
 
 window.calculateReplacementCount = calculateReplacementCount;
+window.calculateAdaptiveReplacementPercentage = calculateAdaptiveReplacementPercentage;
+window.getQuizPerformanceSnapshot = getQuizPerformanceSnapshot;
 window.resetReplacementCarry = resetReplacementCarry;
 window.pickUniqueWordInfos = pickUniqueWordInfos;
 window.buildImmersiveSubtitle = buildImmersiveSubtitle;

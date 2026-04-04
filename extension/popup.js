@@ -3,6 +3,7 @@ const DEFAULT_SETTINGS = {
   sourceLanguage: 'auto',
   targetLanguage: 'es',
   replacementPercentage: 5,
+  adaptiveDifficultyEnabled: false,
   enabled: true,
   saveVocabulary: true,
   interfaceLanguage: 'en'
@@ -32,6 +33,7 @@ const sourceLanguageSelect = document.getElementById('sourceLanguage');
 const targetLanguageSelect = document.getElementById('targetLanguage');
 const replacementPercentageInput = document.getElementById('replacementPercentage');
 const replacementPercentageValue = document.getElementById('replacementPercentageValue');
+const adaptiveDifficultyInput = document.getElementById('adaptiveDifficultyEnabled');
 const enabledInput = document.getElementById('enabled');
 const saveVocabularyInput = document.getElementById('saveVocabulary');
 const saveButton = document.getElementById('saveButton');
@@ -627,6 +629,7 @@ function readFormSettings() {
     replacementPercentage: Number.isFinite(replacementPercentage)
       ? Math.max(0, Math.min(100, replacementPercentage))
       : DEFAULT_SETTINGS.replacementPercentage,
+    adaptiveDifficultyEnabled: adaptiveDifficultyInput?.checked === true,
     enabled: enabledInput.checked,
     saveVocabulary: saveVocabularyInput.checked,
     interfaceLanguage: interfaceLanguageSelect
@@ -646,6 +649,9 @@ function applySettingsToForm(settings) {
   }
   targetLanguageSelect.value = settings.targetLanguage;
   replacementPercentageInput.value = String(settings.replacementPercentage);
+  if (adaptiveDifficultyInput) {
+    adaptiveDifficultyInput.checked = settings.adaptiveDifficultyEnabled === true;
+  }
   enabledInput.checked = settings.enabled;
   saveVocabularyInput.checked = settings.saveVocabulary === true;
   updateReplacementLabel(settings.replacementPercentage);

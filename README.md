@@ -271,11 +271,12 @@ The popup and quiz UI can be displayed in your preferred language. Go to **Setti
 ## Usage
 
 1. Open a YouTube video with captions enabled.
-2. Open popup and configure provider, target language, and replacement percentage.
-3. Save settings and refresh captions if needed.
-4. Recheck health in popup.
-5. Export vocabulary CSV and practice in Quiz mode.
-6. To change the UI language: open **Settings → Interface Language**, select a language, and click **Save Settings**.
+2. Open popup and configure provider, target language, and your base replacement percentage.
+3. Optionally enable adaptive difficulty to make the swap rate gentler for beginners and harder for strong quiz performers.
+4. Save settings and refresh captions if needed.
+5. Recheck health in popup.
+6. Export vocabulary CSV and practice in Quiz mode.
+7. To change the UI language: open **Settings → Interface Language**, select a language, and click **Save Settings**.
 
 ## Development
 

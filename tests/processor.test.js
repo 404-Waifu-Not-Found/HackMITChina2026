@@ -10,6 +10,56 @@ describe('percentage replacement logic', () => {
     vi.restoreAllMocks();
   });
 
+  it('summarizes quiz performance from correct and incorrect buckets', () => {
+    expect(window.getQuizPerformanceSnapshot({
+      correct: [{ id: 'c1' }, { id: 'c2' }, { id: 'c3' }],
+      incorrect: [{ id: 'i1' }]
+    })).toEqual({
+      correctCount: 3,
+      incorrectCount: 1,
+      answeredCount: 4,
+      accuracy: 75
+    });
+  });
+
+  it('keeps the base rate until enough quiz history exists', () => {
+    expect(window.calculateAdaptiveReplacementPercentage(12, {
+      correct: [{ id: 'c1' }, { id: 'c2' }],
+      incorrect: [{ id: 'i1' }]
+    })).toMatchObject({
+      effectiveReplacementPercentage: 12,
+      isAdaptiveActive: false,
+      reason: 'insufficient_history',
+      band: 'baseline'
+    });
+  });
+
+  it('raises the replacement rate for strong quiz accuracy', () => {
+    expect(window.calculateAdaptiveReplacementPercentage(12, {
+      correct: new Array(9).fill(null).map((_, index) => ({ id: `c${index}` })),
+      incorrect: [{ id: 'i1' }]
+    })).toMatchObject({
+      effectiveReplacementPercentage: 15,
+      isAdaptiveActive: true,
+      band: 'expert',
+      delta: 3,
+      accuracy: 90
+    });
+  });
+
+  it('lowers the replacement rate for struggling learners', () => {
+    expect(window.calculateAdaptiveReplacementPercentage(12, {
+      correct: new Array(5).fill(null).map((_, index) => ({ id: `c${index}` })),
+      incorrect: new Array(5).fill(null).map((_, index) => ({ id: `i${index}` }))
+    })).toMatchObject({
+      effectiveReplacementPercentage: 11,
+      isAdaptiveActive: true,
+      band: 'support',
+      delta: -1,
+      accuracy: 50
+    });
+  });
+
   it('calculates replacement count safely', () => {
     expect(window.calculateReplacementCount(0, 5)).toBe(0);
 

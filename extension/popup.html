@@ -271,6 +271,16 @@
               <span data-i18n="caption_mix_ratio">Caption mix ratio:</span> <span id="replacementPercentageValue">5%</span>
             </label>
             <input id="replacementPercentage" name="replacementPercentage" type="range" min="1" max="100" step="1" />
+            <p class="ls-note" data-i18n="caption_mix_ratio_note">Use this as your base swap rate. Adaptive mode can raise or lower it after quiz results.</p>
+          </div>
+
+          <div class="ls-field ls-switch-field">
+            <label for="adaptiveDifficultyEnabled" data-i18n="adaptive_difficulty_enabled">Adaptive difficulty rate</label>
+            <label class="ls-toggle">
+              <input id="adaptiveDifficultyEnabled" name="adaptiveDifficultyEnabled" type="checkbox" />
+              <span class="ls-toggle__slider"></span>
+            </label>
+            <p class="ls-note" data-i18n="adaptive_difficulty_note">Adjust word-swap intensity automatically from quiz performance: gentler for beginners, harder for experts.</p>
           </div>
 
           <div class="ls-field ls-switch-field">
