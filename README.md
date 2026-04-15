@@ -33,7 +33,7 @@
 </p>
 
 <p align="center">
-   <img alt="HackMIT China 2026" src="https://img.shields.io/badge/HackMIT%20China-2026-1f6feb?style=flat" />
+   <img alt="HackMIT China Best Overall Hack" src="https://img.shields.io/badge/HackMIT%20China-Best%20Overall%20Hack-1f6feb?style=flat" />
    <img alt="Stage" src="https://img.shields.io/badge/Stage-Implemented-1a7f37?style=flat" />
    <img alt="Project" src="https://img.shields.io/badge/Project-Chrome%20Extension-16a34a?style=flat" />
    <img alt="Manifest" src="https://img.shields.io/badge/Manifest-MV3-0f766e?style=flat" />
