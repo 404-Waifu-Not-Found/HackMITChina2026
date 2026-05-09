@@ -379,8 +379,14 @@ function installRealtimeHooks() {
     }
   };
 
-  // Tracks the video src for which a full-track prefetch has already been completed.
-  let fullTrackPrefetchedVideoSrc = null;
+  // Tracks the video srcs for which a full-track prefetch is finished (success or
+  // exhausted retries). The retries map keeps per-src attempt counts; the inflight
+  // map dedupes concurrent calls so warm-up + loadeddata don't double-run.
+  const fullTrackPrefetchedVideoSrcs = new Set();
+  const fullTrackPrefetchAttempts = new Map();
+  const fullTrackPrefetchInflight = new Map();
+  const FULL_TRACK_PREFETCH_MAX_ATTEMPTS = 3;
+  const FULL_TRACK_PREFETCH_FAILURE_THRESHOLD = 0.3;
 
   function collectAllTrackWords(video) {
     if (!video || !video.textTracks) {
@@ -435,30 +441,63 @@ function installRealtimeHooks() {
     }
 
     const videoSrc = video.currentSrc || video.src || '';
-    if (fullTrackPrefetchedVideoSrc === videoSrc) {
+    if (fullTrackPrefetchedVideoSrcs.has(videoSrc)) {
       return;
     }
 
-    const allWords = collectAllTrackWords(video);
-    if (allWords.length === 0) {
-      return;
+    const existing = fullTrackPrefetchInflight.get(videoSrc);
+    if (existing) {
+      return existing;
     }
 
-    fullTrackPrefetchedVideoSrc = videoSrc;
-    void window.log?.(`Full-track prefetch starting: ${allWords.length} words`);
-
-    // Process in batches to stay within the extension message word limit per request.
-    const BATCH_SIZE = 30;
-    for (let i = 0; i < allWords.length; i += BATCH_SIZE) {
-      const batch = allWords.slice(i, i + BATCH_SIZE);
-      try {
-        await window.prefetchTranslationWords(batch);
-      } catch (error) {
-        console.warn('Full-track prefetch batch failed.', error);
+    const inflight = (async () => {
+      const allWords = collectAllTrackWords(video);
+      if (allWords.length === 0) {
+        return;
       }
-    }
 
-    void window.log?.(`Full-track prefetch complete: ${allWords.length} words cached`);
+      const attemptCount = (fullTrackPrefetchAttempts.get(videoSrc) ?? 0) + 1;
+      fullTrackPrefetchAttempts.set(videoSrc, attemptCount);
+      void window.log?.(
+        `Full-track prefetch starting (attempt ${attemptCount}): ${allWords.length} words`
+      );
+
+      const BATCH_SIZE = 30;
+      let totalBatches = 0;
+      let failedBatches = 0;
+      for (let i = 0; i < allWords.length; i += BATCH_SIZE) {
+        const batch = allWords.slice(i, i + BATCH_SIZE);
+        totalBatches += 1;
+        try {
+          const result = await window.prefetchTranslationWords(batch);
+          // An empty result means every word in this batch missed; treat as failure.
+          if (!result || Object.keys(result).length === 0) {
+            failedBatches += 1;
+          }
+        } catch (error) {
+          console.warn('Full-track prefetch batch failed.', error);
+          failedBatches += 1;
+        }
+      }
+
+      const failureRate = totalBatches === 0 ? 0 : failedBatches / totalBatches;
+      const exhausted = attemptCount >= FULL_TRACK_PREFETCH_MAX_ATTEMPTS;
+      if (failureRate < FULL_TRACK_PREFETCH_FAILURE_THRESHOLD || exhausted) {
+        fullTrackPrefetchedVideoSrcs.add(videoSrc);
+        void window.log?.(
+          `Full-track prefetch complete (attempt ${attemptCount}, ${totalBatches - failedBatches}/${totalBatches} batches): ${allWords.length} words`
+        );
+      } else {
+        void window.log?.(
+          `Full-track prefetch retained for retry (attempt ${attemptCount}, ${failedBatches}/${totalBatches} batches failed)`
+        );
+      }
+    })().finally(() => {
+      fullTrackPrefetchInflight.delete(videoSrc);
+    });
+
+    fullTrackPrefetchInflight.set(videoSrc, inflight);
+    return inflight;
   }
 
   const persistentRefresh = () => {
@@ -491,7 +530,8 @@ function installRealtimeHooks() {
 
     // Invalidate the prefetch cache and re-run when a text track is added or changed.
     video.textTracks?.addEventListener?.('addtrack', () => {
-      fullTrackPrefetchedVideoSrc = null;
+      fullTrackPrefetchedVideoSrcs.clear();
+      fullTrackPrefetchAttempts.clear();
       void runFullTrackPrefetch();
     });
     video.textTracks?.addEventListener?.('change', () => {

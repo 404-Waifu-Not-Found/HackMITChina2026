@@ -753,3 +753,15 @@ window.translateWordsCached = translateWordsCached;
 window.prefetchTranslationWords = prefetchTranslationWords;
 window.flushPersistentTranslationCache = flushPersistentCache;
 window.loadPersistentTranslationCache = loadPersistentCache;
+
+// Warm the persistent cache on module init so the first translateWords call doesn't
+// pay storage IO. Best-effort: any error here is swallowed and translateWords will
+// lazy-load on demand.
+void (async () => {
+  try {
+    const settings = await getTranslationSettings();
+    await loadPersistentCache(settings.sourceLanguage, settings.targetLanguage);
+  } catch (_) {
+    // Storage may not be available yet (e.g. at test import time); that's fine.
+  }
+})();
