@@ -154,6 +154,7 @@ describe('quiz helpers', () => {
 
     expect(extractAiTextFromStreamChunk(chunk)).toEqual({
       text: 'Hello there',
+      thinking: '',
       done: true
     });
   });
@@ -162,12 +163,13 @@ describe('quiz helpers', () => {
     const chunk = [
       'data: {"choices":[{"delta":{"content":"Tips to boost"}}]}',
       'data: {"choices":[{"delta":{"content":" your vocab retention"}}]}',
-      'data: {"choices":[{"delta":{"content":"\n- Use the words in context"}}]}',
+      'data: {"choices":[{"delta":{"content":"\\n- Use the words in context"}}]}',
       'data: [DONE]'
     ].join('\n');
 
     expect(extractAiTextFromStreamChunk(chunk)).toEqual({
       text: 'Tips to boost your vocab retention\n- Use the words in context',
+      thinking: '',
       done: true
     });
   });
@@ -177,6 +179,7 @@ describe('quiz helpers', () => {
 
     expect(extractAiTextFromStreamChunk(chunk)).toEqual({
       text: 'Vocabulary tip: group words by theme.',
+      thinking: '',
       done: false
     });
   });

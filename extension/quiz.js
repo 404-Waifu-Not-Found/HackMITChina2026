@@ -223,6 +223,9 @@ function extractAiResponsePartsFromPayload(payload, options = {}) {
     payload.content,
     payload.answer
   ];
+  // Plain string content is response text, not thinking; only structured part-arrays
+  // (e.g. Anthropic-style [{type:'thinking',...},{type:'text',...}]) should feed thinking.
+  const arrayOnly = (value) => Array.isArray(value) ? value : null;
   const thinkingCandidates = [
     choice?.delta?.reasoning_content,
     choice?.message?.reasoning_content,
@@ -236,9 +239,9 @@ function extractAiResponsePartsFromPayload(payload, options = {}) {
     payload.reasoning,
     payload.thinking,
     payload.thought,
-    choice?.delta?.content,
-    choice?.message?.content,
-    payload.content
+    arrayOnly(choice?.delta?.content),
+    arrayOnly(choice?.message?.content),
+    arrayOnly(payload.content)
   ];
 
   let text = '';
