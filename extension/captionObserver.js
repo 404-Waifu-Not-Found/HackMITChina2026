@@ -378,6 +378,21 @@ function createCaptionMutationHandler({
     unproductiveTransformAttempts.delete(transformKey);
   }
 
+  // A cached transform is "productive" only if it carries at least one inline
+  // translation marker (e.g. "word (translation)"). Defends against legacy poisoned
+  // entries and rendering edge cases that produce non-original-but-still-untranslated text.
+  function isProductiveTransformedText(transformedText, originalText) {
+    if (typeof transformedText !== 'string' || !transformedText) {
+      return false;
+    }
+
+    if (typeof originalText === 'string' && transformedText === originalText) {
+      return false;
+    }
+
+    return /\S+\s*\([^)]+\)/.test(transformedText);
+  }
+
   function getRecentTransform(cacheKey, now = Date.now()) {
     const entry = recentTransformsByKey.get(cacheKey);
     if (!entry) {
@@ -510,6 +525,10 @@ function createCaptionMutationHandler({
       return false;
     }
 
+    if (!isProductiveTransformedText(state.transformedText, state.originalText)) {
+      return false;
+    }
+
     const currentText = readSegmentText(segment);
     if (!currentText || currentText === state.transformedText) {
       return false;
@@ -547,6 +566,12 @@ function createCaptionMutationHandler({
     const cachedTransformedText = getRecentTransform(transformKey);
 
     if (cachedTransformedText === null || readSegmentText(segment) === cachedTransformedText) {
+      return false;
+    }
+
+    if (!isProductiveTransformedText(cachedTransformedText, originalText)) {
+      // Stale fallback in cache; drop it so the next pass tries a real translation.
+      recentTransformsByKey.delete(transformKey);
       return false;
     }
 
@@ -668,20 +693,25 @@ function createCaptionMutationHandler({
 
         const cachedTransformedText = getRecentTransform(transformKey);
         if (cachedTransformedText !== null) {
-          if (readSegmentText(segment) !== cachedTransformedText) {
-            applyTransformedText(segment, cachedTransformedText);
-          }
+          if (!isProductiveTransformedText(cachedTransformedText, originalText)) {
+            // Stale fallback in cache; drop it so we re-attempt below.
+            recentTransformsByKey.delete(transformKey);
+          } else {
+            if (readSegmentText(segment) !== cachedTransformedText) {
+              applyTransformedText(segment, cachedTransformedText);
+            }
 
-          const cachedPinnedTranslations = extractPinnedTranslations(originalText, cachedTransformedText);
-          rememberRenderedState(
-            segment,
-            originalText,
-            cachedTransformedText,
-            cachedPinnedTranslations,
-            renderConfigKey
-          );
-          markSegmentProcessed(segment, originalHash, renderConfigKey);
-          continue;
+            const cachedPinnedTranslations = extractPinnedTranslations(originalText, cachedTransformedText);
+            rememberRenderedState(
+              segment,
+              originalText,
+              cachedTransformedText,
+              cachedPinnedTranslations,
+              renderConfigKey
+            );
+            markSegmentProcessed(segment, originalHash, renderConfigKey);
+            continue;
+          }
         }
 
         // Skip work if we just tried this exact caption and it produced no translation;

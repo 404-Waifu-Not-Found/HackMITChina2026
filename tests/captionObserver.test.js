@@ -680,4 +680,43 @@ describe('caption observer hardening', () => {
 
     vi.useRealTimers();
   });
+
+  it('retries translation when an earlier attempt produced no inline translations', async () => {
+    vi.useFakeTimers();
+
+    let attemptCount = 0;
+    const transformSubtitle = vi.fn(async (text) => {
+      attemptCount += 1;
+      // First attempt simulates a transient bridge failure: nothing translated.
+      // Second attempt succeeds and adds an inline translation marker.
+      return attemptCount === 1 ? text : `${text.replace('cat', 'cat (gato)')}`;
+    });
+
+    const handler = window.createCaptionMutationHandler({
+      getSettings: async () => ({ enabled: true, replacementPercentage: 50 }),
+      transformSubtitle,
+      debounceMs: 1
+    });
+
+    const firstNode = createCaptionNode('a black cat');
+    handler.handleMutations(mutationForNode(firstNode));
+    await vi.advanceTimersByTimeAsync(2);
+
+    // First pass produced no productive translation; segment must keep the original.
+    expect(firstNode.textContent).toBe('a black cat');
+    expect(transformSubtitle).toHaveBeenCalledTimes(1);
+
+    // Re-mutate the same caption text after the unproductive cooldown elapses.
+    await vi.advanceTimersByTimeAsync(800);
+    const secondNode = createCaptionNode('a black cat');
+    handler.handleMutations(mutationForNode(secondNode));
+    await vi.advanceTimersByTimeAsync(2);
+
+    // The cache must NOT have served the prior unproductive output. A fresh attempt runs
+    // and the productive translation gets applied.
+    expect(transformSubtitle).toHaveBeenCalledTimes(2);
+    expect(secondNode.textContent).toBe('a black cat (gato)');
+
+    vi.useRealTimers();
+  });
 });
