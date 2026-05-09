@@ -253,6 +253,49 @@ describe('translation bridge layer', () => {
     expect(globalThis.chrome.runtime.sendMessage).toHaveBeenCalledTimes(1);
   });
 
+  it('uses a short soft-miss backoff when the bridge succeeds but omits a word', async () => {
+    globalThis.chrome = createChromeMock({
+      response: {
+        ok: true,
+        translations: { world: 'mundo' },
+        meta: {
+          providerByWord: { world: 'libre' },
+          failedProvidersByWord: {}
+        }
+      }
+    });
+
+    await window.translateWords(['hello', 'world']);
+
+    const missAt = window.translationMissCache.hello;
+    expect(missAt).toBeTypeOf('number');
+    // Soft misses must expire well before the 30s hard-miss window so the next
+    // caption cycle gets to retry; allow a generous margin to keep the test stable.
+    const remainingTtl = (missAt + 30 * 1000) - Date.now();
+    expect(remainingTtl).toBeLessThanOrEqual(3 * 1000);
+    expect(remainingTtl).toBeGreaterThan(0);
+  });
+
+  it('uses the full miss-cache window when every provider explicitly failed', async () => {
+    globalThis.chrome = createChromeMock({
+      response: {
+        ok: true,
+        translations: {},
+        meta: {
+          providerByWord: {},
+          failedProvidersByWord: { hello: ['libre', 'mymemory'] }
+        }
+      }
+    });
+
+    await window.translateWords(['hello']);
+
+    const missAt = window.translationMissCache.hello;
+    expect(missAt).toBeTypeOf('number');
+    const remainingTtl = (missAt + 30 * 1000) - Date.now();
+    expect(remainingTtl).toBeGreaterThan(20 * 1000);
+  });
+
   it('uses defaults when translation settings are absent in storage', async () => {
     globalThis.chrome = createChromeMock({
       storageItems: {},

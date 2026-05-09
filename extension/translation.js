@@ -3,7 +3,11 @@ const missCache = {};
 
 const DEFAULT_TIMEOUT_MS = 1200;
 const MISS_CACHE_TTL_MS = 30 * 1000;
-const BRIDGE_FAILURE_BACKOFF_MS = 1500;
+// Soft backoff for words that weren't returned by an otherwise-OK bridge response.
+// These are usually transient (partial batch, mid-flight provider hiccup) and should
+// retry within a caption cycle or two rather than waiting out the full 30s window.
+const SOFT_MISS_BACKOFF_MS = 3 * 1000;
+const BRIDGE_FAILURE_BACKOFF_MS = 750;
 const LAST_TRANSLATION_SUCCESS_AT_KEY = 'lastTranslationSuccessAt';
 const LAST_TRANSLATION_SUCCESS_PROVIDER_KEY = 'lastTranslationSuccessProvider';
 const LAST_TRANSLATION_SUCCESS_COUNT_KEY = 'lastTranslationSuccessCount';
@@ -688,9 +692,12 @@ async function translateWords(words) {
   for (const word of misses) {
     const normalized = word.toLowerCase();
     if (!translations[normalized]) {
-      markMissCached(normalized, now);
       const failedProviders = fetched.meta?.failedProvidersByWord?.[normalized];
-      if (Array.isArray(failedProviders) && failedProviders.length > 0) {
+      const isHardMiss = Array.isArray(failedProviders) && failedProviders.length > 0;
+      // Hard miss: backend tried and every provider failed for this word — wait the
+      // full window. Soft miss: bridge response just didn't include it; retry sooner.
+      markMissCached(normalized, now, isHardMiss ? MISS_CACHE_TTL_MS : SOFT_MISS_BACKOFF_MS);
+      if (isHardMiss) {
         void window.log?.(`Translation unavailable (${failedProviders.join('>')}): ${word}`);
       } else {
         void window.log?.(`Translation unavailable: ${word}`);
