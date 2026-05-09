@@ -3,6 +3,7 @@ const CAPTION_SEGMENT_SELECTOR = '.ytp-caption-segment, .captions-text .caption-
 const WORD_CAPTURE_PATTERN = /[\p{sc=Han}][\p{M}]*|[\p{sc=Hiragana}][\p{M}]*|[\p{sc=Katakana}]+[\p{M}]*|[\p{sc=Thai}][\p{M}]*|\p{L}[\p{L}\p{M}'-]*/gu;
 const RECENT_TRANSFORM_TTL_MS = 300_000;
 const MAX_RECENT_TRANSFORMS = 200;
+const UNPRODUCTIVE_TRANSFORM_BACKOFF_MS = 750;
 const TRANSLATED_WORD_COLOR = '#86efac';
 const HIGHLIGHT_NAME = 'lingo-stream-translation';
 const TRANSLATION_INLINE_PATTERN = /\S+\s*\([^)]+\)/g;
@@ -298,6 +299,7 @@ function createCaptionMutationHandler({
   const nodeRenderState = new WeakMap();
   const trackedSegments = new Set();
   const recentTransformsByKey = new Map();
+  const unproductiveTransformAttempts = new Map();
 
   let activeRequestId = 0;
   let timer = null;
@@ -346,6 +348,34 @@ function createCaptionMutationHandler({
       }
       recentTransformsByKey.delete(oldestKey);
     }
+
+    for (const [transformKey, attemptedAt] of Array.from(unproductiveTransformAttempts.entries())) {
+      if (now - attemptedAt > UNPRODUCTIVE_TRANSFORM_BACKOFF_MS) {
+        unproductiveTransformAttempts.delete(transformKey);
+      }
+    }
+  }
+
+  function isUnproductiveAttemptActive(transformKey, now = Date.now()) {
+    const attemptedAt = unproductiveTransformAttempts.get(transformKey);
+    if (typeof attemptedAt !== 'number') {
+      return false;
+    }
+
+    if (now - attemptedAt > UNPRODUCTIVE_TRANSFORM_BACKOFF_MS) {
+      unproductiveTransformAttempts.delete(transformKey);
+      return false;
+    }
+
+    return true;
+  }
+
+  function recordUnproductiveTransformAttempt(transformKey, now = Date.now()) {
+    unproductiveTransformAttempts.set(transformKey, now);
+  }
+
+  function clearUnproductiveTransformAttempt(transformKey) {
+    unproductiveTransformAttempts.delete(transformKey);
   }
 
   function getRecentTransform(cacheKey, now = Date.now()) {
@@ -547,7 +577,12 @@ function createCaptionMutationHandler({
 
     const transformed = await transformSubtitle(originalText, replacementPercentage, pinnedTranslations);
     const finalText = typeof transformed === 'string' && transformed.length > 0 ? transformed : originalText;
-    setRecentTransform(cacheKey, finalText, now);
+    if (finalText !== originalText) {
+      setRecentTransform(cacheKey, finalText, now);
+      clearUnproductiveTransformAttempt(cacheKey);
+    } else {
+      recordUnproductiveTransformAttempt(cacheKey, now);
+    }
     return finalText;
   }
 
@@ -649,6 +684,12 @@ function createCaptionMutationHandler({
           continue;
         }
 
+        // Skip work if we just tried this exact caption and it produced no translation;
+        // a later prime cycle will retry once the cooldown expires.
+        if (isUnproductiveAttemptActive(transformKey)) {
+          continue;
+        }
+
         jobs.push({
           segment,
           originalText,
@@ -734,7 +775,12 @@ function createCaptionMutationHandler({
               const finalText = typeof transformed === 'string' && transformed.length > 0
                 ? transformed
                 : job.originalText;
-              setRecentTransform(job.transformKey, finalText);
+              if (finalText !== job.originalText) {
+                setRecentTransform(job.transformKey, finalText);
+                clearUnproductiveTransformAttempt(job.transformKey);
+              } else {
+                recordUnproductiveTransformAttempt(job.transformKey);
+              }
               return finalText;
             });
           }
@@ -798,6 +844,12 @@ function createCaptionMutationHandler({
         const transformedText = typeof transformedResults[index] === 'string' && transformedResults[index].length > 0
           ? transformedResults[index]
           : job.originalText;
+
+        // If the transform produced nothing translatable, leave the segment unmarked so a
+        // subsequent prime cycle can retry once the unproductive-attempt cooldown elapses.
+        if (transformedText === latestOriginalText) {
+          continue;
+        }
 
         if (readSegmentText(segment) !== transformedText) {
           applyTransformedText(segment, transformedText);
