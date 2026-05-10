@@ -807,7 +807,7 @@ function saveAiSettings() {
 
       try {
         setAiChatCollapsed(Boolean(settings.apiKey));
-      } catch (e) {
+      } catch {
         // Silently ignore errors from collapsing the chat panel on settings load.
       }
 

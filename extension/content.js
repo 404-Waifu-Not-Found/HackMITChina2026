@@ -75,7 +75,6 @@ let cachedSettings = {
 let lastSettingsReadAt = 0;
 let inflightSettingsPromise = null;
 
-console.log('Lingo Stream loaded');
 void window.log?.('content.js loaded');
 
 function getSyncStorageItems(keys) {
@@ -181,7 +180,6 @@ async function readSettingsFromStorage() {
   };
   resolved.renderConfigKey = buildRenderConfigKey(resolved);
 
-  console.log('Content settings loaded.', resolved);
   void window.log?.(
     `Content settings loaded: enabled=${resolved.enabled}, base=${resolved.replacementPercentage}, effective=${resolved.effectiveReplacementPercentage}, adaptive=${resolved.adaptiveDifficultyEnabled}`
   );
@@ -252,7 +250,7 @@ if (document.body) {
     characterData: true,
     subtree: true
   });
-  console.log('Lingo Stream observer attached to document.body');
+  void window.log?.('Lingo Stream observer attached to document.body');
   handler.primeFromCurrentCaptions();
 } else {
   document.addEventListener(
@@ -263,8 +261,7 @@ if (document.body) {
         characterData: true,
         subtree: true
       });
-      console.log('Lingo Stream observer attached after DOMContentLoaded');
-      void window.log?.('MutationObserver attached after DOMContentLoaded');
+      void window.log?.('Lingo Stream observer attached after DOMContentLoaded');
       handler.primeFromCurrentCaptions();
     },
     { once: true }

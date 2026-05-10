@@ -761,7 +761,7 @@ void (async () => {
   try {
     const settings = await getTranslationSettings();
     await loadPersistentCache(settings.sourceLanguage, settings.targetLanguage);
-  } catch (_) {
+  } catch {
     // Storage may not be available yet (e.g. at test import time); that's fine.
   }
 })();
