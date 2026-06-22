@@ -40,6 +40,21 @@
    <img alt="Release" src="https://img.shields.io/badge/Release-v1.0.0-2563eb?style=flat" />
 </p>
 
+<table align="center">
+   <tr>
+      <td align="center">
+         <img alt="team group photo" src="./media/group_photo_owo.jpeg" height="160" />
+         <br />
+         <sub>Group Photo of 404-Waifu-Not-Found🗿</sub>
+      </td>
+      <td align="center">
+         <img alt="slab of glass" src="./media/slab_of_glass.jpeg" height="160" />
+         <br />
+         <sub>Slab of glass for best overall hack</sub>
+      </td>
+   </tr>
+</table>
+
 > [!TIP]
 > Quick pitch for judges: Lingo Stream turns passive subtitle watching into low-friction vocabulary training without forcing users to leave YouTube.
 
